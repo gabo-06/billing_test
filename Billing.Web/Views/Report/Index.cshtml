@@ -1,0 +1,232 @@
+﻿@model IEnumerable<Billing.Web.Models.Specialty>
+
+@{
+    ViewBag.Title = "REPORTS";
+}
+
+<div >
+       <div class="row">
+           <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12" id="divEspecialidad">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title header_formulario">
+                            <h5>REPORTS</h5>
+                            
+                        </div>
+
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-6 b-r">
+                                
+                               <table class="table table-hover no-margins" id ="tablaReporte">  
+                                            <tbody>
+                                            <tr>
+                                             <!--<td class="DataEntry">Data Entry Reports</td>-->
+                                             <td class="DataEntry">Data Entry Reports</td>
+                                             <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr >
+                                              <!--<td class="Adjuster">Adjuster Reports</td>-->
+                                              <td class="Adjuster">Adjuster Reports</td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="ReferralDate">Open Cases by Referral Date </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="Physical">Physical Therapy Reports </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="Translation">Translation Reports </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="Transportation">Transportation Reports </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="DataEntryPerUser">Data Entry Per User Reports</td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="Closing">Closing Report </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="OpenCasesBySupervisor">Open Cases by Supervisor </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                              <td class="PresumptionCases">List of Presumption Cases </td>
+                                              <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                                <!--<td class="OpenCasesByInsurer" >Open Cases by Insurer </td>-->
+                                                <td class="OpenCasesByInsurer" >Open Cases by Insurer </td>
+                                                <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                                <!--<td  class="CasesByInsurer">Cases by Insurer</> </td>-->
+                                                <td  class="CasesByInsurer">Cases by Insurer</> </td>
+                                                <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="ReferralSupervisor">New Referral by Supervisor</td>
+                                                <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="MonthlyBillingInsurer">Monthly Billing by Insurer </td>
+                                                <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="MenuCaseActivity">Cases with no Activity </td>
+                                                <td class="text-navy"> <i class="fa fa-chevron-right"></i> </td>
+                                            </tr>
+                                                
+                                            </tbody>
+                                        </table>
+                            </div>
+                            <div class="col-sm-6"><h4>&nbsp;</h4>
+                                <p>&nbsp;</p>
+                                <p>&nbsp;</p>
+                                <p>&nbsp;</p>
+                                <p class="text-center">
+                                    <!--<a href="#"><i class="fa fa-list big-icon"></i></a>-->
+                                    <a href="#" ><i><img src="@Url.Content("~/images/report.jpg")" style="width: 280px;"></i></a>
+                                    
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+              
+
+
+
+
+                    </div>
+                </div>
+            
+         
+            </div>    
+          
+</div>
+
+@Html.Partial("footer")
+
+
+
+
+<script>    
+    $(Inicio);
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function Hola(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+    function Inicio()
+    {
+        ProcesoActual = "Reports";
+        Hola(CodigoUsuarioGlobal);
+
+        //$("#tablaReporte >tbody > tr").on("click", leeFila);
+        $("#tablaReporte > tbody").on("click", "tr", cargaPagina);
+        //$("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso);
+
+        //$("#tblModalPaciente tbody").on('click', 'tr', function ()  //selecciona fila de tabla  
+
+        ocultarReporteCasesWithNoActivityParaUsuarioNoAdministrador() // Función que se encarga de ocultar el reporte "Cases with no Activity" para usuarios no administradores.
+    }
+
+    // Función que se encarga de ocultar el reporte "Cases with no Activity" para usuarios no administradores.
+    function ocultarReporteCasesWithNoActivityParaUsuarioNoAdministrador()
+    {
+        if (RolUsuarioGlobal != 'Administrator')
+        {
+            //$('.MenuCaseActivity')["0"].parentElement.style.display = 'none'
+            $('.MonthlyBillingInsurer')["0"].parentElement.style.display = 'none'
+        }
+    }
+
+    function cargaPagina (e) 
+    {
+        console.log("--LeeFila--");       
+        console.log($(this).children("td").is(".DataEntry"));
+        //console.log($(this).find("td:eq(0)").html());
+        if ($(this).children("td").is(".DataEntry") == true)
+            url = '@Url.Action("DataEntry", "Report")';
+
+        if ($(this).children("td").is(".Adjuster") == true)
+            url = '@Url.Action("Adjuster", "Report")';
+
+        if ($(this).children("td").is(".ReferralDate") == true)
+            url = '@Url.Action("ReferralDate", "Report")';
+
+        if ($(this).children("td").is(".Physical") == true)
+            url = '@Url.Action("Physical", "Report")';
+
+        if ($(this).children("td").is(".Translation") == true)
+            url = '@Url.Action("Translation", "Report")';
+
+        if ($(this).children("td").is(".Transportation") == true)
+            url = '@Url.Action("Transportation", "Report")';
+
+        if ($(this).children("td").is(".DataEntryPerUser") == true)
+            url = '@Url.Action("DataEntryPerUser", "Report")';
+
+        if ($(this).children("td").is(".Closing") == true)
+            url = '@Url.Action("Closing", "Report")';
+
+        if ($(this).children("td").is(".OpenCasesBySupervisor") == true)
+            url = '@Url.Action("OpenCasesBySupervisor", "Report")';
+
+        if ($(this).children("td").is(".PresumptionCases") == true)
+            url = '@Url.Action("PresumptionCases", "Report")';
+
+        if ($(this).children("td").is(".OpenCasesByInsurer") == true)
+            url = '@Url.Action("OpenCasesByInsurer", "Report")';
+
+        if ($(this).children("td").is(".CasesByInsurer") == true)
+            url = '@Url.Action("CasesByInsurer", "Report")';
+
+        if ($(this).children("td").is(".ReferralSupervisor") == true)
+            url = '@Url.Action("ReferralBySupervisor", "Report")';
+        
+        if ($(this).children("td").is(".MonthlyBillingInsurer") == true)
+            url = '@Url.Action("MonthlyBillingInsurer", "Report")';
+
+        if ($(this).children("td").is(".MenuCaseActivity") == true)
+            url = '@Url.Action("CaseActivity", "Report")';
+        
+        
+        
+
+        $("#dvLoading").css("display", "block");        
+        $.ajax({
+            type: "POST",
+            //async: false,
+            url: url,
+            //contentType: "application/json",
+            contentType: "application/html;charset=utf-8",
+            dataType: 'html',
+            success: function (Data) {
+                $("#dvLoading").fadeOut(2000);
+                $("#MaestroProceso").html(Data);
+            }
+        });
+    }
+
+
+
+</script>

@@ -1,0 +1,1739 @@
+﻿<style>
+    /*
+    #PagoAjustadoSegunDistribucion
+    {
+        overflow: hidden;    
+        text-align: right;
+    }
+    #PagoAjustadoSegunDistribucion > span
+    {
+        font-size: 2em;
+    }
+    #PagoAjustadoSegunDistribucion > div
+    {
+        border: 3px outset #e1d7d8;
+        padding: 0.2em 1.2em;
+        font-size: 1.5em;
+        width: 120px;
+        float: right;
+    }
+    */
+    #cmbFilterModal
+    {
+        cursor: pointer;
+    }
+
+</style>
+<script src="@Url.Content("~/scripts/js/plugins/dataTables/buttons.html5.min.js")"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5> RECEIVE PAYMENT</h5>
+                </div> 
+                <div class="ibox-content">
+
+                  <form method="get" class="form-horizontal">
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Received From	</label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                    <select class="form-control" id="cmbFilter">
+                                    
+                                    </select>
+                                    <input type="hidden" id="hdCodigoAseguradora" />
+                                </div>                                   
+                           </div>
+                            <label class="col-sm-1 control-label">Balance</label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                 <input type="text" class="form-control " id="txtclaim" readonly >
+                                 <input type="hidden" id="txtBalanceCopia" >
+                                </div>                                   
+                           </div>
+                    </div>
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Amount <!--<span style="color: #b9858e; font-size: 0.9em;">(You can mipulate this amount)</span>--> </label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                 <input type="text" class="form-control " id="txtAmount" readonly >
+                                </div>                                   
+                           </div>
+
+<label class="col-sm-1 control-label">Date </label>
+<div class="input-group date col-sm-3" style="padding-left: 29px;">
+    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+    <input class="form-control dtpFecha" type="text" id="txtDate" autocomplete="off" style="background: #ffffff; width: 205px" maxlength="10" data-mask="99/99/9999" value=@DateTime.Now.ToString("MM/dd/yyyy") tabindex="03">
+</div>
+
+
+
+
+
+
+                    </div>
+                    <div class="form-group text-center">                            
+                           <label class="col-sm-3 control-label">Method of payment <!--<span style="color: #b9858e; font-size: 0.9em;">(You can select other method)</span>--></label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-9">
+                                 <select class="form-control" id="cmbPayment">
+                                    @*<option selected value="0">Selected</option>*@
+                                </select>
+                                </div>                                   
+                                 <div class="col-lg-3">
+                                     <button tabindex="19" title="Method of Payment" data-placement="top" type="button" data-target="#myModalMetodoPago" data-toggle="modal" class="btn btn-primary control_tabs" id="btnRegistrarAdjuster">
+                                       Add
+                                     </button>
+                                   @*  <button type="button" class="btn btn-primary" id="btnModalMetodoPago" data-toggle="modal" data-target="#myModalMetodoPago" style="display:none;"></button>*@
+                           </div>
+                                                                
+                           </div>
+                           <label class="col-sm-1 control-label">Check # </label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                 <input type="text" class="form-control " id="txtCheck" >
+                                </div>                                   
+                           </div>
+                    </div>
+
+                    <div class="form-group text-center">
+                          <button id="btnGenerate" class="btn btn-primary" type="button" disabled >Save</button>
+                          <!--<button id="btnUndo" class="btn btn-primary" type="submit">Search</button>-->
+                        <button id="btnHelp" type="button"  title="Delete" data-placement="top" data-target="#myModalElimina" data-toggle="modal" class="btn btn-primary control_tabs" >Delete Payment</button>
+                        <button id="btnReset" type="button"  class="btn btn-primary control_tabs" >Refresh</button>
+                        @*<button id="btnPrueba" type="button"  class="btn btn-primary control_tabs" >prueba</button>*@
+                        <div>
+                            <input type="checkbox" id="chbMultiPago" /><label>&nbsp;Multi Check Payment</label>
+                        </div>
+
+                            @*<button type="button" id="btnPrueba">Prueba</button>*@
+                    </div>
+                  </form>
+                    <div class="ibox float-e-margins">
+
+
+
+                             
+
+
+
+
+                  <!--////////////////////////////////////////////////FORMUALRIO BUSQUEDAD////////////////////////////////////////////////////-->
+                 <div class="ibox-content hidden" id="formulario_busquedad" style="background: #f1f1f1;">
+                     <div class="ibox-title" style="background: none;border: none;padding-top:1px;text-align: left;">
+                         <h5 style="text-align: left;">FILTER RESULTS BY:</h5>
+                         <hr style="border-top: 1px solid #171212;margin-top: 15px;margin-bottom: 15px;">
+                     </div>
+                     
+                        <div class="form-horizontal">
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Closing Date From</label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12 input-group date">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <!--<input type="text" class="form-control dtpFecha" id="txtDateInicio" maxlength="10" value="@ViewBag.fechaInicio" data-mask="99/99/9999" value=@DateTime.Now.ToString("MM/dd/yyyy")>-->
+                                    <input type="text" class="form-control dtpFecha" id="txtDateInicio" maxlength="10" value="" data-mask="99/99/9999" >
+                                </div>  
+                           </div>
+                            <label class="col-sm-2 control-label">Closing Date to</label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12 input-group date">
+                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                     <!--<input type="text" class="form-control dtpFecha"id="txtDateFinal" maxlength="10"  value="@ViewBag.fechaFin" data-mask="99/99/9999" value=@DateTime.Now.ToString("MM/dd/yyyy")>-->
+                                    <input type="text" class="form-control dtpFecha"id="txtDateFinal" maxlength="10"  value="" data-mask="99/99/9999" >
+                                </div>                                   
+                           </div>
+                    </div>
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Bill Number </label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                 <input type="text" class="form-control" id="txtBill" maxlength="10" value="" style="width: 250px;" >
+                                </div>                                   
+                           </div>
+
+                           <label class="col-sm-2 control-label">Claim </label>
+                           <div class="col-sm-3" style="padding-left: 29px;">                                
+                                <input type="text" class="form-control" id="txtClaim" maxlength="10" value="" style="width: 250px;" >
+                           </div>
+                    </div>
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Patient </label>
+                                    <input type="hidden" id="hdCodigoPaciente" value ="0"/>
+                                    <input type="hidden" id="apellidoPaciente" value =""/>
+                                    <div class="col-sm-3">                                
+                                      <div class="col-lg-12">
+                                        @*<input type="text" class="form-control" id="txtPaciente" />*@                                                                                
+                                        <select class="form-control control_tabs" id="cmbPaciente" tabindex ="1">
+                                            <option selected value="0"></option>
+                                        </select>
+                                    </div></div>
+
+                            <!--<div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                 <input type="text" class="form-control" id="txtPatient" maxlength="10" value="" style="width: 250px;" >
+                                </div>                                   
+                           </div>-->
+                         
+                        <div class="col-sm-3" style="text-align: left;">                                
+                        <button id="btnFiltro" class="btn btn-primary" type="button">Search</button>
+                        </div>
+                    </div>
+                    
+                  </div>
+               </div>  
+                <!--////////////////////////////////////////////////////////////////////////////////////////////////////-->
+                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         
+                        <div class="ibox-content" id="EnvolturatblFacturas" style="padding:15px 0px 20px 0px"> 
+
+                        </div>
+                    </div>
+                </div>
+
+@*                <div class="ibox-content" id="frmBusquedaCliente">
+                    <div class="form-group" >
+                        
+                    </div>
+                </div>*@
+            </div>
+        </div>
+        <div class="col-lg-12">
+                                   
+        </div>
+    </div>
+</div>
+
+
+<!--////////////////////////// MODAL METODO DE PAGO//////////////////-->
+
+  <div class="modal inmodal" id="myModalMetodoPago" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog" style="width: 550px;">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                          <p><strong style="float:left;">Type pay: </strong> <input type="text" class="form-control " id="type_pay_modal" style="width: 60%;float:left;margin-left:15px;margin-right:15px;"> 
+                                               <button id="btnRegisterPayModal" type="button" class="btn btn-primary">Register</button></p>
+                                            <br>
+
+                            <table class="table table-bordered dataTables-example" id="tblMetodoPago">
+                                <thead >
+                                <tr>
+                                    <th class="hidden">Codigo</th>
+                                    <th class="th_tabla">Tipe Pay</th>                                                                        
+                                    <th class="th_tabla">Remove</th>           
+                                </tr>
+                                </thead>
+                                <tbody>
+                                      
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <!--<button  id="btnRegistrarModalAdjusterHom" type="button" class="btn btn-primary" >Continue</button>-->
+                                            <button id="btnCancelarModalAdjusterHom"  type="button" class="btn btn-danger" data-dismiss="modal" >Cancel</button>
+                                            
+                                            <input  id="accionAdjusterHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoAdjusterHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionAdjusterHom" type="hidden" value="0" />          
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+    
+<!--////////////////////////// MODAL ELIMINACION//////////////////-->
+
+  <div class="modal inmodal" id="myModalElimina" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog" >
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header header_formulario" style="padding: 8px 15px;">
+
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            
+                                            <h3 class="modal-title"><i class="fa fa-warning"></i> Delete Payment</h3>
+
+
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                           @* <p><strong>Insurer were found with similiar names and surnames!.</strong> If the Insurer attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Insurer record, click to continue.</p>*@
+                        <input type="hidden" id="hdCodigoAseguradoraModal" />
+                        <div class="form-group text-center">
+                            <label class="col-sm-4 control-label">Received From	</label>
+                            <div class="col-sm-6">                                
+                                <div class="col-lg-6">
+                                <select class="form-control" id="cmbFilterModal" style="width: 300px">
+                                    
+                                </select>
+                                </div>
+                           </div>
+                            <br /><br />
+                            <label class="col-sm-4 control-label">Check Number</label>
+                            <div class="col-sm-6">                                
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control " id="txtBuscaFacturasEliminarPorNumeroCheque" width="100px" />
+                                </div>                                   
+                           </div>
+                            <br /><br />
+                            <button id="btnBuscarPagosParaEliminar" type="button" class="btn btn-danger">Buscar</button>
+                        </div>
+
+<div style="text-align: center; display: none;" id="cargando_modal_general"><img src="/images/loading.gif" class="img" alt="image"></div>
+                    <br />
+                    <!--/////////////////////FORMULARIO ////////////////////-->                          
+                    <div id="FormularioPagosParaEliminar" style="margin-top:20px;display:none;">
+                        <form method="get" class="form-horizontal">
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Paid Date	</label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                  <input type="text" class="form-control " id="paidDateModal" readonly="">                                 
+                                </div>                                   
+                           </div>
+                            <label class="col-sm-2 control-label">Amount</label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12"><input type="text" class="form-control" id="amountModal" readonly="">                                 
+                                </div>                                   
+                           </div>
+                    </div>
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Check # </label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12"><input type="text" class="form-control " id="checkModal" readonly=""></div>                                   
+                           </div>
+                           <!--<label class="col-sm-2 control-label">Bill Number</label>
+                           <div class="col-sm-3" >                               
+                               <div class="col-lg-12"><input type="text" class="form-control " id="billNumberModal" readonly=""></div>
+                           </div>-->
+                    </div>
+
+                  </form>
+                  </div>
+                 <!--/////////////////////FIN FORMULARIO ////////////////////-->                                                    
+
+                    <div id="EnvolturaPagosParaEliminar">
+
+                    </div>
+                            @*
+                            <table class="table table-bordered" id="tblModalElimina">
+                                <thead>
+                                <tr>
+                                    <th class="hidden">Codigo</th>
+                                    <th class="th_tabla">Date Pay</th>                                                                        
+                                    <th class="th_tabla">Amount</th>      
+                                    <th class="th_tabla">Tipe Pay</th>                                                                        
+                                    <th class="th_tabla">Delete</th>           
+                                </tr>
+                                </thead>
+                                <tbody>
+                                      
+                                </tbody>
+                            </table>
+                                            *@
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            @*<button  id="btnModalElimina" type="button" class="btn btn-primary" >Continue</button>*@
+                                            <button id="btnCancelarModalElimina"  type="button" class="btn btn-danger" data-dismiss="modal" >Close</button>
+                                        </div>
+                                    </div>
+                            </div>
+    
+
+</div>
+
+@Html.Partial("footer")
+
+@*<script src="@Url.Content("~/scripts/js/plugins/dataTables/datatables.min.js")" async="async"></script>*@
+<script src="@Url.Content("~/scripts/js/plugins/iCheck/icheck.min.js")" async="async"></script>
+
+
+<script>
+    var CodigoAseguradoraSeleccionada = 0; // Código de la aseguradora de quien se va a realizar el pago.
+    var AseguradorasParaPago; // Arreglo donde se obtienen las aseguradoras.
+    var AseguradorasParaEliminacion; // Arreglo donde se obtienen las aseguradoras.
+    var CodigosAseguradorasParaPago; // Arreglo donde se mapean los códigos de las aseguradoras para pago.
+    var CodigosAseguradorasParaEliminacion; // Arreglo donde se mapean los códigos de las aseguradoras.
+    var TiposPago;
+    var CantidadFacturasPorPagar = 0;
+    var ArregloFacturas = new Array(); /* Arreglo donde se irán almamcenando los datos de las facturas cuando se pagine la vista parcial de facturas, los datos a almacenar serán: .
+                                          - ArregloFacturas[index]["CodigoNuevoFactura"]
+                                          - ArregloFacturas[index]["Balance"]
+                                          - ArregloFacturas[index]["Pago"]
+                                       */
+    var FacturasPorPagar = new Array(); // Arreglo que almacenará objetos de tipo "FacturaPorPagar" y que será el que se enviará al controlador para serializar como XML.
+    var SumaTotalPago = 0.00; // Variable que almacena la suma de lo que se pagará por cada factura (los pagos serán extraídos de las cajas de texto que están en la columna "Pay Now").
+    var MontoAntesDePagar;
+    var ExitoPago = false; // Variable que indica si el registro del pago se realizó con éxito.
+    var banderaNumeroChequeRepetido = false // Bandera que se activa cuando se intenta registrar un pago con un número de cheque repetido.
+
+    $(Inicio);    
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function Hola(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+
+    // función que carga la información obtenida del filtro
+    var cargaBusquedaFiltro = function () {
+        CodigoAseguradora = $("#hdCodigoAseguradora").val();
+        bill_number = $("#txtBill").val().trim();
+        claim = $("#txtClaim").val().trim();
+        paciente = $("#apellidoPaciente").val().trim();
+        fechasValidacion = false;
+
+        if ($("#hdCodigoPaciente").val() == 0)
+            paciente = "";
+
+        console.log("cargaBusquedaFiltro");
+        console.log(dato);
+
+        fechaIn  = $("#txtDateInicio").val();
+        fechaFin = $("#txtDateFinal").val();
+
+        if (fechaFin.trim() != "" || fechaIn.trim() != "") {
+            if (fechaIn.trim() != "" && fechaFin.trim() != "") {
+                if (fechaIn.trim() != "" && fechaIn.trim() == "")
+                    $("#txtDateFinal").focus();
+                if (fechaFin.trim() != "" && fechaIn.trim() == "")
+                    $("#txtDateInicio").focus();
+
+                console.log("correcto fechas");
+                fechasValidacion = true;
+            }
+            else {
+                fechasValidacion = false;
+                error = "Error";
+                mensaje = "Put closing date to";
+                MensajeError(mensaje, error);
+                return false;
+            }
+        }
+        console.log("antes de ajax");
+        if (bill_number != "" || claim || "" || paciente != "" || (fechaFin.trim() != "" && fechaIn.trim() != ""))
+            {
+        if ((fechaFin.trim() != "" && fechaIn.trim() != ""))
+        {
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora, "fechaIn": fechaIn, "fechaFin": fechaFin }),
+                url: '@Url.Action("BuscarPorRangoDeFecha", "Payment")',
+                contentType: "application/json",
+                success: function (VistaParcialFacturas) {
+                    $("#EnvolturatblFacturas_tabla").html(VistaParcialFacturas);
+                    console.log("CON FECHAS");
+                }
+            });
+
+        }
+
+        }
+        else 
+            {
+            error = "Error";
+            mensaje = "Enter information to search";
+            MensajeError(mensaje, error);
+        }
+
+
+        console.log("DESPUES DE FECHAS");
+        //$('#tblFacturasPorPagar').dataTable().fnFilter(dato);
+
+
+        $('#Bill').val(bill_number);
+        $('#Bill').trigger("change");
+
+        $('#Claim').val(claim);
+        $('#Claim').trigger("change");
+
+
+        $('#Patient').val(paciente);
+        $('#Patient').trigger("change");
+
+        // $("#EnvolturatblFacturas > .table-responsive > #EnvolturatblFacturas_tabla > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>0.00</div></div><br />");
+        MostrarMontoTotalpago('0.00')
+        //$("#tblFacturasPorPagar > tbody").css({ "display": "table-row-group" });
+        //$("#tblBillingSearch_paginate").css({ "display": "block" });
+    }
+
+    function MostrarMontoTotalpago(MontoTotalpago)
+    {
+        $('#tblFacturasPorPagar > tbody').append('<tr>' +
+                                                    '<td class="hidden"></td>' +
+                                                    '<td></td>' +
+                                                    '<td class="hidden"></td>' +
+                                                    '<td></td>' +
+                                                    '<td></td>' +
+                                                    '<td></td>' +
+                                                    '<td></td>' +
+                                                    '<td></td>' +
+                                                    '<td></td>' +
+                                                    '<td style="text-align: center; font-size: 20px;">TOTAL:</td>' +
+                                                    '<td style="text-align: left; font-size: 20px;" id="PagoAjustadoSegunDistribucion">' + parseFloat(MontoTotalpago).toFixed(2) + '</td>' +
+                                                    '<td class="hidden"></td>' +
+                                                    '<td></td>' +
+                                                    '<td class="hidden"></td>' +
+                                                    '<td class="hidden"></td>' +
+                                                 '</tr>')
+
+        $('#tblFacturasPorPagar > tbody > tr:last-child > td').css({ 'border-left-width': '0' })
+        $('#tblFacturasPorPagar > tbody > tr:last-child > td').css({ 'border-bottom-width': '0' })
+        $('#tblFacturasPorPagar > tbody > tr:last-child > td').css({ 'border-right-width': '0' })
+    }
+
+    function Inicio()
+    {
+        //console.clear();        
+        ProcesoActual = "ReceivePayment";
+        Hola(CodigoUsuarioGlobal);
+
+        var fechaActual;
+        $("#cmbPaciente").select2();
+        $("#btnRegistrarAdjuster").on("click", function () { $("#type_pay_modal").val("") });
+
+        $("#btnRegisterPayModal").on("click", RegistraTipoPagoModal);        
+
+        $("#cmbFilter").select2(); // Convierte la lista desplegable de aseguradoras en lista desplegable autocompletable.
+        $("#cmbPayment").select2(); // Convierte la lista desplegable de tipos de pago en lista desplegable autocompletable.
+        $("#cmbFilterModal").select2(); // Convierte la lista desplegable de aseguradoras para eliminar pagos en lista desplegable autocompletable.
+
+        //////fechaActual = $.datepicker.formatDate("mm/dd/yy", new Date());
+
+
+
+
+
+        /////$("#txtDate").datepicker("setDate", fechaActual);
+        //fechaActual = $.datepicker.formatDate("mm/dd/yy", new Date());
+        // $('.dataTables-example').DataTable();
+        // 
+        // $('.i-checks').iCheck({
+        //     checkboxClass: 'icheckbox_square-green',
+        //     radioClass: 'iradio_square-green',
+        // });
+        // $("#txtDate").datepicker("setDate", new Date());
+
+
+        // Métodos
+        ObtenerAseguradorasParaPago();
+        ObtenerAseguradorasParaEliminacion();
+        CargarAseguradorasParaPago();
+        CargarAseguradorasParaEliminacion();
+        ObtenerTiposDePago();
+        CargarTiposPagoEnCombo();
+        CargarTiposPagoEnModal();
+
+        // Eventos
+        $("#cmbFilter").on("change", CargarInformacionDeFacturas);
+        $("#btnFiltro").on("click", function(){        
+            buscaFiltro(cargaBusquedaFiltro)
+        });
+
+//        $("#tblMetodoPago").find(".btn-danger").on("click", EliminarTipoPago);
+
+        $(".dtpFecha").parent(".input-group").find(".input-group-addon").on("click", function () {
+            // console.log($(this).parent(".input-group").find(".dtpFecha"));
+            $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+            $(this).parent(".input-group").find(".dtpFecha").focus();
+        });
+
+
+        $('.dtpFecha').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+        /*$("#txtDate").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+        });*/
+
+        $("#btnGenerate").on("click", btnGenerate_click);
+        $("#txtAmount").on("keypress", validaNumeros);
+        // $("#txtAmount").on('focusin', function (e)
+        // {+
+        //     // $(this).val(e.target.value.replace(',','.'));
+        //     console.log(e.target.value);
+        // });
+        $("#txtCheck--").on("keypress", validaNumeros);
+        $("#cmbFilterModal").on("change", ListaPagosParaEliminar);
+        $('#btnUndo').on("click", function (e)
+        {   e.preventDefault(); });
+        $('#btnHelp').on('click', InicializarControlesEnPagosParaEliminar);
+        $('#btnReset').on('click', function ()
+        {
+            var codigoAseguradoraSeleccionada = parseInt($('#cmbFilter').val());
+            var nombreAseguradoraSeleccionada = $('#cmbFilter > option:selected').html().trim();
+
+            if (nombreAseguradoraSeleccionada != '---------------')
+                $("#cmbFilter").val(codigoAseguradoraSeleccionada).trigger("change");
+
+            limpiaFormularioBusquedad();
+        });
+
+        // Inicialización
+        // $("#cmbFilter").val("1").trigger("change");
+        $("#cmbPayment").val("1").trigger("change");
+
+        $('#chbMultiPago').on('click', chbMultiPago_Clik);
+
+        $('#btnPrueba').on('click', function ()
+        {
+            MensajeConfirmacionMenu('Do You want exit?'
+                                  , 'Confirmation'
+                                  , RespuestaConfirmacionPago
+                                  , [{ 'otrParametro': 1 }]);
+        });
+
+        cargaTabla_TipoPago();        
+        ObtenerPacientesAutocompletar();
+
+        $('#btnBuscarPagosParaEliminar').on('click', btnBuscarPagosParaEliminar_click)
+
+        //$('#btnHelp').trigger('click')
+    }
+
+
+    function btnBuscarPagosParaEliminar_click()
+    {
+        $("#cargando_modal_general").css("display", "block");
+        BuscarPagosParaEliminar();
+    }
+
+    function BuscarPagosParaEliminar()
+    {
+        // DECLARACION DE VARIABLES
+
+        var codigoAseguradoraSeleccionada
+        var nombreAseguradoraSeleccionada
+        var numeroCheque
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // TOMA DE VALORES
+
+        // Primero obtiene el nombre de la aseguradora seleccionada para saber si fue una aseguradora válida o la de puntos suspensivos.
+        nombreAseguradoraSeleccionada = $('#cmbFilterModal > option:selected').text().trim()
+
+        // (Al tomar el código y nombre de la aseguradora seleccionada primero verifica que no sea la aseguradora de puntos suspensivos
+        // ya que si es así tomará como código el número 0 y como nombre la cadena vacía).
+        codigoAseguradoraSeleccionada = (nombreAseguradoraSeleccionada.indexOf('---------') != -1) ? 0 : $('#cmbFilterModal')["0"].value
+        nombreAseguradoraSeleccionada = (nombreAseguradoraSeleccionada.indexOf('---------') != -1) ? '' : nombreAseguradoraSeleccionada
+        numeroCheque = $('#txtBuscaFacturasEliminarPorNumeroCheque').val().trim()
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // console.clear()
+        // console.log(codigoAseguradoraSeleccionada)
+        // console.log(nombreAseguradoraSeleccionada)
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // VALIDACION
+
+
+
+
+        // Si se ha seleccionado una aseguradora inválida 
+        // y se ha ingresado un número de cheque vacío,
+        // fuerza a que se ingresen uno de los dos valores.
+        if ((nombreAseguradoraSeleccionada == '')
+            && numeroCheque == '')
+        {
+            // console.log('Elegir uno de los dos filtros')
+            MensajeError('Select one of the two filters!', 'Advice')
+            return false
+        }
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // LLAMADA AL SERVIDOR
+
+        $.ajax({
+              type: 'POST'
+            , async: false
+            , data: JSON.stringify({
+                      'CodigoAseguradora': codigoAseguradoraSeleccionada
+                    , 'NumeroCheque': numeroCheque
+            })
+            , url: '@Url.Action("ListarPagosParaEliminar", "Payment")'
+            , contentType: 'application/json'
+            // , dataType: 'html'
+            , success: function (VistaParcialPagos)
+            {
+                $("#EnvolturaPagosParaEliminar").html(VistaParcialPagos);
+                $("#EnvolturaPagosParaEliminar").css("display", "block");
+                $("#FormularioPagosParaEliminar").css("display", "none");
+                $("#cargando_modal_general").css("display", "none");
+            }
+        })
+    }
+
+    $("#txtDateInicio").on("keyup", function () { 
+        console.log("txtDateInicio - keyup");
+        console.log($(this));
+        console.log($(this).val());
+        if($(this).val()=="__/__/____" ||  $(this).val()=="" )
+            console.log($("#txtDateInicio").datepicker());
+
+    });
+
+
+    function btnGenerate_click(e)
+    {
+        if (validaFormulario(e) == true)
+            ProcesaPago();
+    }
+
+    function validaFormulario(e)
+    {
+        var Error = "Error!";
+        var Mensaje = "";
+
+        // console.log(parseFloat(SumaTotalPago).toFixed(2));
+        // console.log(parseFloat($("#txtAmount").val()).toFixed(2));
+
+        // ***************************************************************************************
+        // 1. HACE LA VALIDACION DEL FORMULARIO.
+
+        // La función "ValidacionParaGuardar" valida que se hayan ingresado los campos necesarios
+        // del formulario y si recibe un mensaje quiere decir que faltan campos por llenar.
+        Mensaje = ValidacionParaGuardar();
+
+        // Si la función "ValidacionParaGuardar" retorna un mensaje de 
+        // error, quiere decir que el registro del pago no se realizará
+        // por que se encontraron errores en la validación del formulario.
+        // y se mostrará un mensaje de error.
+        if (Mensaje != "") {
+            MensajeError(Mensaje, Error);
+            ExitoPago = false;
+
+            return false;
+        }
+        // ***************************************************************************************
+
+        // ***************************************************************************************
+        // 2. VALIDA QUE LA SUMA LOS PAGOS QUE SE HARAN DE CADA FACTURA COINCIDA CON EL MONTO TOTAL 
+        //    RECIBIDO DE LA ASEGURADORA.
+        if ((parseFloat(SumaTotalPago).toFixed(2) != parseFloat($("#txtAmount").val()).toFixed(2))
+            && (!($('#chbMultiPago')["0"].checked)))
+        {
+            MensajeError("The total amount does not match with the amount received", "Error");
+            ExitoPago = false;
+
+            // console.log("valida3");
+            return false;
+        }
+        // ***************************************************************************************
+
+        // MensajeConfirmacion("Are you sure to save these payments?", "Message from webpage");
+        return true;
+    }
+
+    // function ProcesarConfirmacionPago(isConfirm)
+    function ProcesaPago()
+    {
+        RegistraPago()
+    }
+
+    function RegistraPago()
+    {
+        // Variables que almacenan los valores del pago.
+        var Monto = null;
+        var FechaPago = null;
+        var FormaPago = null;
+        var NumeroTransaccion = null;
+        var CodigoUsuario = null;
+        var respuesta;
+
+        Monto = parseFloat($("#txtAmount").val().trim());
+        FechaPago = $("#txtDate").val().trim();
+        FormaPago = parseInt($("#cmbPayment").val());
+        NumeroTransaccion = $("#txtCheck").val().trim();
+        CodigoUsuario = CodigoUsuarioGlobal;
+
+        // --------------------------------------------------------------------------------------------------------
+        // INICIO DE VALIDACIONES
+        // Valida que se haya ingresado un pago en alguna factura, es decir que por lo menos exista alguna factura que se le haya ingresado un pago.
+        if (!(SumaTotalPago != 0))
+        {
+            MensajeError('Enter the pay of any invoice!', 'Advice');
+            ExitoPago = false;
+            return false;
+        }
+        else
+        {
+            $.each(ArregloFacturas, function (Indice, Valor)
+            {
+                if (Valor.FacturaSeleccionada)
+                {
+                    var objFacturaPorPagar = new FacturaPorPagar();
+
+                    objFacturaPorPagar.CodigoNuevoFactura = Valor.CodigoNuevoFactura;
+                    objFacturaPorPagar.Pago = parseFloat(Valor.Pago);
+                    objFacturaPorPagar.NumeroCheque = Valor.numeroCheke;
+
+                    FacturasPorPagar.push(objFacturaPorPagar);
+                }
+            });
+        }
+
+        /*
+        // Si no está activado el pago multi cheke.
+        if (!($('#chbMultiPago')["0"].checked))
+        {
+            // Valida que se haya ingresado un pago en alguna factura, es decir que por lo menos exista alguna factura que se le haya ingresado un pago.
+            if (SumaTotalPago != 0)
+            {
+                $.each(ArregloFacturas, function (Indice, Valor)
+                {
+                    var objFacturaPorPagar = new FacturaPorPagar();
+
+                    objFacturaPorPagar.CodigoNuevoFactura = Valor.CodigoNuevoFactura;
+                    objFacturaPorPagar.Pago = parseFloat(Valor.Pago);
+
+                    FacturasPorPagar.push(objFacturaPorPagar);
+                });
+            }
+            else
+            {
+                MensajeError('Enter the pay of any invoice!', 'Advice');
+                ExitoPago = false;
+                return false;
+            }
+        }
+        */
+
+        /*
+        // Si está activado el pago multi cheke.
+        if ($('#chbMultiPago')["0"].checked)
+        {
+            $.each(ArregloFacturas, function (Indice, Valor)
+            {                
+                console.clear();
+                console.log(Valor);
+                // if (Valor.numeroCheke != "")
+                // {
+                    var objFacturaPorPagar = new FacturaPorPagar();
+
+                    objFacturaPorPagar.CodigoNuevoFactura = Valor.CodigoNuevoFactura;
+                    objFacturaPorPagar.Pago = parseFloat(Valor.Pago);
+                    objFacturaPorPagar.NumeroCheque = Valor.numeroCheke;
+
+                    FacturasPorPagar.push(objFacturaPorPagar);
+                // }
+            });
+        }
+        */
+        // FIN DE VALIDACIONES
+        // --------------------------------------------------------------------------------------------------------
+
+        var Parametros;
+
+        if (!($('#chbMultiPago')["0"].checked)) {
+            Parametros =
+            {
+                "TipoPago": 'N' // Si la variable "TipoPago" está en 'N', quiere decir que no es pago multi cheque y que es un pago normal.
+                , "Monto": Monto
+                , "FechaPago": FechaPago
+                , "FormaPago": FormaPago
+                , "NumeroTransaccion": NumeroTransaccion
+                , "CodigoUsuario": CodigoUsuario
+                , "FacturasPorPagar": FacturasPorPagar
+            }
+        }
+        else {
+            Parametros =
+            {
+                "TipoPago": 'M' // Si la variable "TipoPago" está en M, quiere decir que es pago multi cheque y que no es pago normal.
+                , "Monto": Monto
+                , "FechaPago": FechaPago
+                , "FormaPago": FormaPago
+                , "NumeroTransaccion": NumeroTransaccion
+                , "CodigoUsuario": CodigoUsuario
+                , "FacturasPorPagar": FacturasPorPagar
+            }
+        }
+
+        // respuesta = MensajeConfirmacionPago("Are you sure to save these payments?", "Message from webpage", Parametros);
+        swal({
+            title: "Message from webpage",
+            text: "Are you sure to save these payments?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            { 
+                // ProcesarConfirmacionPago(isConfirm);Brenher
+                ProcesarConfirmacionPago(Parametros);
+            }
+        })
+    }
+
+    function ProcesarConfirmacionPago(Parametros)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Parametros),
+            url: '@Url.Action("ArmaXML", "Payment")',
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function (Data) {
+                        // Si éste es el código devuelto es por que se está intentando 
+                        // registrar el pago con un número de transacción repetido.
+                        if (Data.CodigoErrorPago == 2601) {
+                            console.log("aaaa");
+                            MensajeError('The transaction number is repeated!', 'Advice');
+                            banderaNumeroChequeRepetido = true;
+                            ExitoPago = false;
+                        }
+                        else {
+                            console.log("a-MostrarMontoTotalpago");
+                            //MensajeError('The Payment has been saved Successfully!!!', ' ');                            
+                            //alert("bbbbbbbb");
+                            // $("#PagoAjustadoSegunDistribucion > div").html('0.00')
+                            MostrarMontoTotalpago('0.00')
+
+                            ExitoPago = true;
+                        }
+                    }
+                        })
+
+        // Intenta seleccionar el número de cheque repetido para corrregirlo (cuando el multicheque está seleccioado).
+                if (!ExitoPago && banderaNumeroChequeRepetido && ($('#chbMultiPago')["0"].checked)) {
+                    banderaNumeroChequeRepetido = false;
+                    // $('#txtCheck').focus()
+                    // $('#txtCheck').select()
+                    return false
+                }
+
+        // Intenta seleccionar el número de cheque repetido para corrregirlo (cuando el multicheque no está seleccioado).
+                if (!ExitoPago && banderaNumeroChequeRepetido && (!($('#chbMultiPago')["0"].checked))) {
+                    banderaNumeroChequeRepetido = false;
+                    $('#txtCheck').focus()
+                    $('#txtCheck').select()
+                    return false
+                }
+
+                LimpiarArreglos();
+                ObtenerAseguradorasParaPago();
+        // ObtenerAseguradorasParaEliminacion();                
+                CargarAseguradorasParaPago();
+
+                var codigoASeguradoraSeleccionada = $("#hdCodigoAseguradora").val();
+        // $("#cmbFilter").val(codigoASeguradoraSeleccionada).trigger("change");
+
+        // Si se han pagado todas las facturas de una aseguradora el código de la 
+        // aseguradora ya no estará disponible es por eso que se verificará si el 
+        // código de la aseguradora aún sigue disponible después de haber realizado 
+        // el pago. La forma en que se hará esto será buscar en el arreglo de códigos
+        // de aseguradoras el código de la aseguradora anteriormente seleccionada.
+                var IndiceCodigoAseguradora = CodigosAseguradorasParaPago.indexOf(parseInt(codigoASeguradoraSeleccionada));
+
+        // Si el código de la aseguradora fue encontrado, fuerza a que se vuelva a 
+        // seleccionar provocando que se vuelvan a cargar las facturas corresponientes,
+        // pero si no fue encontrado no cargará nada y se limpiarán los controles.
+                if (IndiceCodigoAseguradora != -1) {
+                    $("#cmbFilter").val(codigoASeguradoraSeleccionada).trigger("change");
+                }
+                    // Si el código de la aseguradora ya no fue encontrado, 
+                    // simplemente se limpian los controles.
+                else {
+                    // Hace que se seleccione la opción guiones del combo de aseguradoras "cmbFilter".
+                    InicializarControlesEnPagosParaPago();
+                }
+
+        // si el pago se realizón con éxito 
+        // if (ExitoPago) {
+        //     // Si el check de multi cheque está seleccionado
+        //     if ($('#chbMultiPago')["0"].checked) {
+        //         $('#chbMultiPago').trigger('click');
+        //     }
+        // }
+    }
+
+    $("#cmbPaciente").on("change", function (e) {
+        var CodigoPacienteSeleccionado;
+        var Paciente;
+
+        CodigoPacienteSeleccionado = $(this).val();
+        console.log(CodigoPacienteSeleccionado);
+        console.log($("#select2-cmbPaciente-container").attr("title"));
+
+        $("#hdCodigoPaciente").val(CodigoPacienteSeleccionado);
+        $("#apellidoPaciente").val($("#select2-cmbPaciente-container").attr("title"));
+
+    });
+
+    function CargarPacientesEnCombo(Pacientes)
+    {
+        var CodigoPaciente;
+        var NombrePaciente;
+        $("#cmbPaciente").empty();
+
+        $("#cmbPaciente").append("<option value='0'>---------------------</option>");
+
+        $.map(Pacientes, function (val, i) {
+            CodigoPaciente = val.Codigo;
+            NombrePaciente = val.NombreCompleto;
+
+            $("#cmbPaciente").append("<option value='" + CodigoPaciente + "'>" + NombrePaciente + "</option>");
+        });
+    }
+
+    function ObtenerPacientesAutocompletar() 
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaAutocompletar", "Patient")',
+                        contentType: "application/json",
+                        dataType: 'json',
+                        success: function (Data) {
+                            //console.log(Data);                            
+                            Pacientes = Data; // obtiene datos de los Pacientes para autocompletado
+                            CargarPacientesEnCombo(Pacientes); // Carga los pacientes en el combo autocompletable de pacientes.
+                        }
+        });
+    }
+
+    function cargaTabla_TipoPago()
+    {
+        
+        var otable = $("#tblMetodoPago").dataTable().fnDestroy();
+
+        otable = $("#tblMetodoPago").DataTable({
+              "pageLength": 10            
+            , "bLengthChange": false
+            , "bInfo": false
+            , "ordering": false
+            , "bFilter": false            
+        })
+    }
+
+    function chbMultiPago_Clik(e)
+    {
+        // Descheckea el check de la cabecera si es que este está checkeado.
+        if ($('#CheckBoxCabecera')["0"].checked)
+            $('#CheckBoxCabecera').trigger('click')
+
+        if (e.currentTarget.checked)
+        {
+            PaginarTabla();
+                        
+            // $("#EnvolturatblFacturas > .table-responsive > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>" + $("#txtclaim").val() + "</div></div><br />");
+            MostrarMontoTotalpago('0')
+        }
+
+        if (!(e.currentTarget.checked)) {
+            var Bandera = false;
+
+            // Activo la caja de texto "xtCheck"
+            $('#txtCheck').attr('disabled', false)
+            $('#txtCheck').focus()
+
+            $(ArregloFacturas).each(function (i, val) {
+                if (val.numeroCheke != "") {
+                    Bandera = true;
+                }
+            });
+
+            if (Bandera == true) {
+                MensajeConfirmacionMenu('Do You want exit?'
+                                       , 'Confirmation'
+                                       , RespuestaConfirmacionPago
+                                       , [{ 'myE': e }]);
+            }
+            else {
+                PaginarTabla();
+                                
+                // $("#EnvolturatblFacturas > .table-responsive > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>" + $("#txtclaim").val() + "</div></div><br />");
+                MostrarMontoTotalpago('0')
+            }
+        }
+        else {
+            // Limpio y desactivo la caja de texto "xtCheck"
+            $('#txtCheck').val('')
+            $('#txtCheck').attr('disabled', true)
+        }
+    }
+
+    function MensajeConfirmacionMenu(mensaje, titulo, miFuncion, objetoArgumentos)
+    {
+        swal({
+            title: titulo,
+            text: mensaje,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function (isConfirm)
+        {
+            miFuncion(isConfirm, objetoArgumentos);
+        })
+    }
+
+    var RespuestaConfirmacionPago = function (Respuesta, objetoArgumentos)
+    {
+        // Si confirma la salida.
+        if (Respuesta)
+        {            
+            PaginarTabla();            
+            
+            // $("#EnvolturatblFacturas > .table-responsive > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>" + $("#txtclaim").val() + "</div></div><br />");
+            MostrarMontoTotalpago($("#txtclaim").val())
+        }
+        else
+        {
+            objetoArgumentos["0"].myE.currentTarget.checked = true;
+            return false;
+        }        
+    }
+
+    function ActivaPagoMultiCheke(e) {
+        var EstadoMultiPago; // Obtiene un valor booleano que indicará si el pago con varios checkes se activa o no.
+
+        EstadoMultiPago = e.currentTarget.checked;
+
+        //console.clear();
+
+        if (EstadoMultiPago) {
+            // Hace invisible la columna de la cabecera
+            $('#tblFacturasPorPagar > thead > tr > th:eq(12)').css({ 'display': 'none' });
+
+            $('#tblFacturasPorPagar > tbody > tr').each(function () {
+                console.log($(this)["0"].children[12]);
+
+                var columnaCheke = $(this)["0"].children[12];
+                $(columnaCheke).css({ 'display': 'none' });
+            })
+        }
+        else
+        {
+
+        }
+    } 
+
+    function InicializarControlesEnPagosParaPago() {
+        // selecciona la opción '---------' del combo de aseguradoras.
+        $('#cmbFilter > option').each(function (index, value) {
+            var $opcion = $(value);
+            var $codigoAseguradora = $opcion["0"].value;
+            var $nombreAseguradora = $(value)["0"].innerHTML.trim();
+
+            if ($nombreAseguradora.indexOf('---------') != -1)
+                $("#cmbFilter").val($codigoAseguradora).trigger("change");
+        });
+
+        // Limpia la tabla de pagos a eliminar.
+        // $("#EnvolturaPagosParaEliminar").html('');
+    }
+
+    function InicializarControlesEnPagosParaEliminar() {
+
+
+        // Obtiene nuevamente las aseguradoras para eliminación de pagos.
+        ObtenerAseguradorasParaEliminacion();
+
+        // Carga en el combo "cmbFilterModal" las aseguradoras obtenidas en el paso anterior.
+        CargarAseguradorasParaEliminacion();
+
+        // selecciona la opción '---------' del combo de aseguradoras.
+        $('#cmbFilterModal > option').each(function (index, value) {
+            var $opcion = $(value);
+            var $codigoAseguradora = $opcion["0"].value;
+            var $nombreAseguradora = $(value)["0"].innerHTML.trim();
+
+            if ($nombreAseguradora.indexOf('---------') != -1)
+                $("#cmbFilterModal").val($codigoAseguradora).trigger("change");
+
+            $("#cmbFilterModal > .select2-search__field").css("display", "none");
+        });
+
+        $("#txtBuscaFacturasEliminarPorNumeroCheque")
+        // Limpia la tabla de pagos a eliminar.
+        $("#EnvolturaPagosParaEliminar").html('');
+        $("#FormularioPagosParaEliminar").css("display", "none");
+    }
+
+    function RegistraTipoPagoModal() {
+        tipo_pago = $("#type_pay_modal").val();
+        if (tipo_pago == "")
+        {
+            error = "Error";
+            mensaje = "Put type pay";
+            MensajeError(mensaje, error);
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "tipo_pago": tipo_pago }),
+            url: '@Url.Action("Registra_Tipo_Pago_Modal", "Payment")',
+            contentType: "application/json",
+            dataType: 'Html',
+            success: function (Data) {
+                //CantidadFacturasPorPagar = Data;
+                console.log("RegistraTipoPagoModal"); 
+                console.log(Data);
+                if (Data != 'Existe') {
+                    $('#tblMetodoPago').DataTable().clear();
+                    MensajeError("Type of payment successfully registered", "Success!");
+                    var otable = $("#tblMetodoPago").dataTable().fnDestroy();
+                    ObtenerTiposDePago()
+                    CargarTiposPagoEnModal();
+                    $("#type_pay_modal").val("");
+                    //$('#tblMetodoPago').DataTable().clear();
+                    //var rowindex = $('#tblMetodoPago').dataTable().fnAddData([0, tipo_pago, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="btn btn-danger  btn-bitbucket EliminarTipoPago" href="#">Delete</a>']);
+                    //var otable = $("#tblMetodoPago").dataTable().fnDestroy();"
+
+                    /*otable = $("#tblMetodoPago").DataTable({
+                    pageLength: 5,
+                    columnDefs: [{ className: "hidden", "targets": [0, 2, 4] }]
+                    });*/
+                    //$("#btnCancelarModalAdjusterHom").trigger("click");
+                }
+                else
+                {
+                    MensajeError( "Payment type already exists!", "Error");
+                }
+            }
+           });
+    }
+
+    function ListaPagosParaEliminar()
+    {
+            //  Este return detiene el comportamiento de esta función, ya que ahora
+            // la lista de pagos para eliminar se hará con el botón "btnBuscarPagosParaEliminar"
+            // que incluirá los filtros de "Aseguradora" y "Número de cheque".
+            return
+
+            var CodigoAseguradora = parseInt($(this).val());
+
+        // Si la aseguradora que se elige es la de puntos.
+        if (CodigoAseguradora == 7)
+          {
+            $('#EnvolturaPagosParaEliminar').html('');
+            return false
+          }
+        // Si se elige una aseguradora válida, se obtiene el código de la aseguradora seleccionada.
+        else
+        {
+            $('#hdCodigoAseguradoraModal').val(CodigoAseguradora)
+        }
+
+
+        return false
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora }),
+            url: '@Url.Action("ListarPagosParaEliminar", "Payment")',
+            contentType: "application/json",
+            success: function (VistaParcialPagos) {
+                $("#EnvolturaPagosParaEliminar").html(VistaParcialPagos);
+                $("#EnvolturaPagosParaEliminar").css("display", "block");
+                $("#FormularioPagosParaEliminar").css("display", "none");
+            }
+        });
+    }
+
+    function CargarTiposPagoEnModal() {
+        $.each(TiposPago, function (Indice, Valor) {
+            $("#tblMetodoPago > tbody").append("<tr>" +
+                                                    "<td style='display: none;'>" + Valor.Pty_code + "</td>" +
+                                                    "<td>" + Valor.Pty_description.toUpperCase() + "</td>" +
+                                                    "<td><a href=\"#\" onclick =\"MensajeConfirmacionEliminaTipoPago(" + Valor.Pty_code + ")\" class=\"btn btn-danger  btn-bitbucket  \">Remove</a></td>" +
+                                                    "</tr>");
+
+            // Controla el evento click del botón eliminar de los registros de la tabla de tipos de pago.
+            $("#tblMetodoPago > tbody").on("click", "tr:eq(" + Indice + ") > td:eq(2)", function (e) {
+                e.preventDefault();                
+            });
+        });        
+    }
+    
+        
+    function ObtenerTiposDePago()
+        {
+        $.ajax({
+            type: "POST",
+            async: false,
+            // data: JSON.stringify(Paciente),
+            url: '@Url.Action("ListarTiposDePago", "Payment")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                TiposPago = Data;
+            }
+        });
+    }
+    
+    function CargarInformacionDeFacturas(e)
+    {
+        
+        CodigoAseguradoraSeleccionada = parseInt(e.currentTarget.value);        
+
+        
+
+        if (isNaN(CodigoAseguradoraSeleccionada))
+            return false
+        
+
+        if (CodigoAseguradoraSeleccionada != 0 && CodigoAseguradoraSeleccionada != 8) // 8 es => ---------------------
+        {
+            CargarFacturas(CodigoAseguradoraSeleccionada);
+            ObtenerDeudaDePago(CodigoAseguradoraSeleccionada);
+
+            // CantidadFacturasPorPagar = ObtenerCantidadFacturasPorPagar(CodigoAseguradoraSeleccionada);
+            $("#hdCodigoAseguradora").val(CodigoAseguradoraSeleccionada);            
+            // $("#txtAmount").val($("#txtclaim").val());
+            $("#txtAmount").val("0.00");
+            $("#txtBalanceCopia").val($("#txtclaim").val());
+            $("#txtAmount").focus();
+            $("#cmbPayment").val("1").trigger("change");
+            $("#btnGenerate").prop("disabled", false);
+            $("#txtCheck").val("");
+            $("#formulario_busquedad").css("display", "block");
+        }
+        else 
+        {
+            $("#hdCodigoAseguradora").val("");
+            $("#EnvolturatblFacturas").html("");
+            $("#txtclaim").val("");
+            $("#txtAmount").val("");
+            $("#cmbPayment").val("0").trigger("change");
+            $("#btnGenerate").prop("disabled", true);
+            $("#txtCheck").val("");
+            $("#formulario_busquedad").css("display", "none");
+        }
+                
+        var MontoPorPagar = $("#txtAmount").val()
+
+        // $("#EnvolturatblFacturas > .table-responsive > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>" + MontoPorPagar + "</div></div><br />");        
+        MostrarMontoTotalpago(MontoPorPagar)
+        $("#formulario_busquedad").removeClass("hidden");
+
+        limpiaFormularioBusquedad();
+    }
+
+    function limpiaFormularioBusquedad()
+    {
+        console.log("SSDDDDDD");
+        $("#txtDateInicio").val("");
+        $("#txtDateFinal").val("");
+        $("#txtBill").val("");
+        $("#txtClaim").val("");
+        $("#cmbPaciente").val(0).trigger("change");
+    }
+
+    function ObtenerCantidadFacturasPorPagar(CodigoAseguradora) {
+        var CantidadFacturasPorPagar;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora }),
+            url: '@Url.Action("ObtenerCantidadFacturasPorPagar", "Payment")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                CantidadFacturasPorPagar = Data;
+            }
+        });
+
+        return CantidadFacturasPorPagar;
+    }
+
+    function CargarFacturas(CodigoAseguradora) {
+        
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora }),
+            url: '@Url.Action("ListarFacturasPorPagar", "Payment")',
+            contentType: "application/json",
+            dataType: 'html',
+            success: function (VistaParcialFacturas) {
+                $("#EnvolturatblFacturas").html(VistaParcialFacturas);
+                $(".select2-container").css("width", "100%");
+            }
+        });
+    }
+
+    function ObtenerDeudaDePago(CodigoAseguradora)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora }),
+            url: '@Url.Action("ObtenerDeudaDePago", "Payment")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                $("#txtclaim").val(Data); }
+        });
+    }
+    
+    // Obtiene las aseguradora para las que se van a realizar pagos.
+    function ObtenerAseguradorasParaPago() {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaPago", "Insurer")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                AseguradorasParaPago = Data;
+            }
+        });
+    }
+
+    // Obtiene las aseguradoras para las que se van a eliminar pagos.
+    // Se llenan en el combo de la ventana modal.
+    function ObtenerAseguradorasParaEliminacion() {
+        $.ajax({
+            type: "POST",
+            async: false,
+            @* url: '@Url.Action("ListarParaEliminarPago", "Insurer")', *@
+            url: '@Url.Action("ListarParaEliminarPago", "Insurer")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                AseguradorasParaEliminacion = Data;                
+            }
+        });
+    }
+
+    function CargarAseguradorasParaPago()
+    {
+        var CodigoAseguradora;
+        var NombreAseguradora;
+         
+        // Limpiar el combo de aseguradoras.
+        $("#cmbFilter").empty();
+
+        // Agrega la primera opción del combo con código "0".
+        // $("#cmbFilter").append("<option value = '0'>&nbsp</option>")
+
+        // Mapea en "CodigosAseguradorasParaPago" los códigos de las aseguradoras.
+        CodigosAseguradorasParaPago = $.map(AseguradorasParaPago, function (Valor, Indice) {
+            return Valor.Ins_code;
+        });
+
+        $.each(AseguradorasParaPago, function (Indice, Valor) {
+                
+
+            CodigoAseguradora = Valor.Ins_code;
+            NombreAseguradora = Valor.Ins_name;
+                
+            if (NombreAseguradora.indexOf("---------") != -1)
+                $("#cmbFilter").append('<option selected value="' + CodigoAseguradora + '">' + NombreAseguradora.toUpperCase() + '</option>')
+            else
+                $("#cmbFilter").append('<option value="' + CodigoAseguradora + '">' + NombreAseguradora.toUpperCase() + '</option>')
+                
+        });            
+    }
+
+    function CargarAseguradorasParaEliminacion()
+    {
+            var CodigoAseguradora;
+            var NombreAseguradora;
+
+            // Limpiar el combo de aseguradoras.
+            $("#cmbFilterModal").empty();
+
+            // Agrega la primera opción del combo con código "0".
+            // $("#cmbFilterModal").append("<option value = '0'>&nbsp</option>")
+
+            // Mapea en "CodigosAseguradorasParaEliminacion" los códigos de las aseguradoras.
+            CodigosAseguradorasParaEliminacion =
+        $.map(AseguradorasParaEliminacion, function (Valor, Indice) {
+                return Valor.Ins_code;
+        });
+  
+        //$("#cmbFilterModal").append("<option selected value='" + CodigoAseguradora + "'>" + NombreAseguradora.toUpperCase() + "</option>"); $("#cmbFilterModal").append("<option selected value='" + CodigoAseguradora + "'>" + NombreAseguradora.toUpperCase() + "</option>");  
+        // $("#cmbFilterModal").append("<option selected value='7'>-----------</option>");
+
+        $.each(AseguradorasParaEliminacion, function (Indice, Valor) {
+                CodigoAseguradora = Valor.Ins_code;
+                NombreAseguradora = Valor.Ins_name;
+
+                if (NombreAseguradora.indexOf("---------") != -1)
+                {
+                    // console.log("Código: " + CodigoAseguradora);
+                    
+                    $("#cmbFilterModal").append("<option selected value='" + CodigoAseguradora + "'>" + NombreAseguradora.toUpperCase() + "</option>");
+                }
+                else
+                    // console.log("no encontro");
+                    $("#cmbFilterModal").append("<option value='" + CodigoAseguradora + "'>" + NombreAseguradora.toUpperCase() + "</option>");
+
+            });
+        }
+
+    function CargarTiposPagoEnCombo() {
+            var CodigoTipoPago;
+            var NombreTipoPago;
+         
+            $("#cmbPayment").empty();
+            $("#cmbPayment").append("<option selected value='0'>&nbsp</option>")
+        $.each(TiposPago, function (Indice, Valor) {
+                CodigoTipoPago = Valor.Pty_code;
+                NombreTipoPago = Valor.Pty_description;
+            
+                $("#cmbPayment").append("<option value='" + CodigoTipoPago + "'>" + NombreTipoPago.toUpperCase().trim() + "</option>");
+            });
+        }
+
+    function MensajeError(mensaje, error) {
+            swal({
+                title: error,
+                text: mensaje,    
+                html: true
+            });
+    }
+
+    function MensajeConfirmacionEliminaTipoPago(id) 
+    {
+        swal({
+            title: "Advice",
+            text: "Do you want to delete payment type?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function (isConfirm) {
+            EliminarTipoPago(id);
+        });
+    }
+
+
+    function EliminarTipoPago(id) {
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "id": id }),
+            url: '@Url.Action("EliminarTipoDePago", "Payment")',
+            contentType: "application/json",
+            dataType: 'Html',
+            success: function (Data)     
+               {
+                $('#tblMetodoPago').DataTable().clear();
+                var otable = $("#tblMetodoPago").dataTable().fnDestroy();
+                ObtenerTiposDePago()
+                CargarTiposPagoEnModal();
+                setTimeout(function () {
+                    MensajeError("Payment type was deleted", "Success!");
+                }, 150)
+            }
+        });
+    }
+
+    function FacturaPorPagar()
+    {
+        var CodigoNuevoFactura;        
+        var FechaPago;
+        var Pago;
+        var NumeroCheque;
+        var CodigoUsuario;
+    }
+
+    function ValidacionParaGuardar()
+    {
+            var Mensaje = "";
+
+            // console.log("Método de pago: " + $("#cmbPayment").val());
+
+        if ($("#txtAmount").val().trim() == "") {
+                $("#txtAmount").focus();
+                $("#txtAmount").addClass("has-error");
+            
+                Mensaje = "Payment amount is required!";
+                ExitoPago = false;
+
+                return Mensaje;
+            }
+        else if ($("#cmbPayment").val() == 0) {
+                $("#cmbPayment").focus();
+                $("#cmbPayment").addClass("has-error");
+
+                Mensaje = "Method of payment is required!";
+                ExitoPago = false;
+
+                return Mensaje;
+            }
+        else if ($("#txtCheck").val().trim() == "" && (!($('#chbMultiPago')["0"].checked)))
+            {
+            
+                $("#txtCheck").focus();
+                $("#txtCheck").addClass("has-error");
+
+                Mensaje = "Check number is required!";
+                ExitoPago = false;
+
+                return Mensaje;
+            }
+
+            return "";
+        }
+
+    function buscaRango()
+    {
+        CodigoAseguradora = $("#hdCodigoAseguradora").val();
+
+        fechaIn = $("#txtDateInicio").val();
+        fechaFin = $("#txtDateFinal").val();
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora, "fechaIn": fechaIn, "fechaFin": fechaFin }),
+            url: '@Url.Action("BuscarPorRangoDeFecha", "Payment")',
+            contentType: "application/json",
+            success: function (VistaParcialFacturas)
+            {
+                $("#EnvolturatblFacturas").html(VistaParcialFacturas);
+            }
+        });
+
+        // $("#EnvolturatblFacturas > .table-responsive > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>" + $("#txtclaim").val() + "</div></div><br />");
+        MostrarMontoTotalpago($("#txtclaim").val())
+    }
+
+    function buscaFiltroXX()
+    {
+        CodigoAseguradora = $("#hdCodigoAseguradora").val();
+
+        fechaIn = $("#txtDateInicio").val();
+        fechaFin = $("#txtDateFinal").val();
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoAseguradora": CodigoAseguradora, "fechaIn": fechaIn, "fechaFin": fechaFin }),
+            url: '@Url.Action("BuscarPorRangoDeFecha", "Payment")',
+            contentType: "application/json",
+            success: function (VistaParcialFacturas) {
+                $("#EnvolturatblFacturas").html(VistaParcialFacturas);
+            }
+        });
+                
+        // $("#EnvolturatblFacturas > .table-responsive > #tblFacturasPorPagar_wrapper > #tblFacturasPorPagar").after("<div id='PagoAjustadoSegunDistribucion'><span style='font-size: 2em;'>TOTAL PAY:&nbsp;</span><div>" + $("#txtclaim").val() + "</div></div><br />");
+        MostrarMontoTotalpago($("#txtclaim").val())
+    }
+
+    function buscaFiltro(miFunction)
+    {        
+        if (SumaTotalPago == 0) // Si no se ha seleccionado aún ninguna factura para pagar.
+        {
+            miFunction()
+        }
+        else // Si se ha seleccionado alguna factura para pagar.
+        { 
+            swal({
+                title: "Advice",
+                text: "Do you want exit?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function (isConfirm)
+            {
+                if (isConfirm)
+                {
+                    miFunction()
+                }
+                else
+                {
+                    return false
+                }
+            })
+        }        
+    }
+
+    function validaNumeros(e) {
+            if (!((e.which >= 48 && e.which <= 57) || (e.which == 40 || e.which == 41) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 46)))//46punto
+            {
+                e.preventDefault();
+                return false;
+            }
+        }
+        function LimpiarArreglos()
+        {
+
+            ArregloFacturas = [];
+            FacturasPorPagar = [];
+
+            ArregloFacturas = new Array();
+            FacturasPorPagar = new Array();
+        }
+
+    function MensajeError(mensaje, titulo) {
+            swal({
+                title: titulo,
+            text: mensaje
+
+            });
+        }
+
+
+
+
+</script>
+
+
+

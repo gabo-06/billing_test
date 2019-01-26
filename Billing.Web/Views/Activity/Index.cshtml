@@ -1,0 +1,696 @@
+﻿@model IEnumerable<Billing.Web.Models.PActivity>
+
+@{
+    ViewBag.Title = "Patient";
+}
+<div >     
+       <div class="row">
+           <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12" id="divPatient">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title  header_formulario">
+                            <h5>REGISTER ACTIVITIES</h5>
+                        </div>
+                        
+                        <div class="ibox-content" id="frmRegistroActividad" style="display: none;">
+                            <form method="get" class="form-horizontal">
+                                <input type="hidden" id="hdCodigo" />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Description<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre" id="description" autofocus tabindex ="1" />
+                                    </div>
+                                </div>
+                                @*<div class="hr-line-dashed"></div>*@
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Type<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <select id="cmbTipoActividad" tabindex ="2">
+                                                <option value="">-- Selected --</option>
+                                        </select>
+                                    </div>
+                                </div>                           
+
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-8 col-sm-offset-2 text-center">
+                                        <button id="btnRegistrar" class="btn btn-primary" type="submit" tabindex ="3">Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" disabled tabindex ="3">Update</button>
+                                        <button id="btnCancelar" class="btn btn-danger" type="button" tabindex ="3">Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Activity")">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+           <!--///////////////////LISTA///////////////////////-->
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger"   id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">   
+                        @Html.Partial("Activity_List")
+                    </div>
+                </div>
+            </div>
+            </div>    
+          
+</div>
+
+@Html.Partial("footer")
+
+
+
+
+
+<script>
+    
+    var websocket = io.connect(ServidorPuertoNode);
+
+    websocket.on('funcionActividadDesdeNode', function (data) {
+        funcionActividadDesdeNode_llamada(data);
+    });
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function LiberaCasoDeUsuarioActual(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+
+    LiberaCasoDeUsuarioActual(CodigoUsuarioGlobal);
+
+    $('input:text').on('keypress', function (e) {
+
+        if (e.which == 13 || e.which == 9) {
+            currentTabIndex = parseInt($(this).attr("tabindex"));
+
+            currentTabIndex = currentTabIndex + 1;
+            $("input[tabindex=" + currentTabIndex + "]").select();
+            e.preventDefault();
+        }
+
+    });
+    $('input.letter').on('keypress', function (e) {
+
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    function LimpiarControlesRegistro()
+    {
+        $("#description").val("");
+    }
+
+    function VerificarContraccionFormularioRegistro() {
+        if ($("#frmRegistroActividad").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    function LlenarActividad(Codigo,
+                            Descripcion,
+                            TipoActividad)
+    {
+        var ActividadJson =
+            {
+                "Act_code": Codigo
+                ,"Act_description": Descripcion
+                ,"Aty_code": TipoActividad
+                ,"Act_operatorUser": CodigoUsuarioGlobal
+        }
+        return ActividadJson;
+    }
+
+    // Esta función se ejecuta para actualizar el mantenedor de auditoría a través de node.
+    function actualizaTrazabilidad(codigoActividad, nombreActividad)
+    {
+        var parametros
+
+        parametros = {
+            'codigoActividadActualizada': codigoActividad
+           , 'nombreActividadActualizada': nombreActividad
+        }
+
+        websocket.emit('actualizaTrazabilidadActividad', parametros)
+    }
+
+    function RegistrarActividad(e)
+    {
+        if ($("#description").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#description").focus();
+            $("#description").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required Description!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#cmbTipoActividad").val() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#cmbTipoActividad").focus();
+            $("#cmbTipoActividad").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Activity Type!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else
+        {
+            e.preventDefault();
+
+
+            var Actividad = LlenarActividad(null
+                                          , $("#description").val().trim().toUpperCase()
+                                          , $("#cmbTipoActividad").val())
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Actividad),
+                url: '@Url.Action("Create", "Activity")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    
+                    if (Data[0].ErrorMessage == "")
+                    {
+                        seleccionado = $("#cmbTipoActividad option:selected").html();
+                        //AgregaFila(Actividad, Data[0].ActivityErrorCode, seleccionado);
+                        AgregaFila(Actividad);
+                        mensaje = "Success!";
+                        error = "Data saved Successfully!!!";
+                        MensajeError(mensaje, error);
+                        $("#frmRegistroActividad").css("display", "none");
+                        
+                        // En "RegistrarActividad".
+                        actualizaTrazabilidad(Actividad.Act_code, Actividad.Act_description)
+                    }
+                    else {
+                        if (Data[0].PatientErrorCode == 2601) {
+                            // $("#NumeroSeguroSocialD").focus();
+                            // mensaje = "The social security number already exists";
+                        }
+                        else
+                            mensaje = "Error in register!!";
+
+                        error = Data[0].ErrorMessage;
+                        codigo = Data[0].PatientErrorCode;
+                        MensajeError(mensaje, Data[0].ErrorMessage);
+                    }
+                }
+            });
+        }
+    }
+
+    function EditarActividad(e)
+    {
+        e.preventDefault();
+
+        var otable = $("#tblActividad").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        $("#frmRegistroActividad").css("display", "block");
+
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+
+        /* 
+        La siguiente línea obtiene el código del proveedor seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del proveedor seleccionado. 
+        */
+        var CodigoActividad = $(this).parent().parent().find("td:eq(0)").html();
+
+        var Actividad;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoActividad) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Actividad = (Data);
+            }
+        });
+
+        var position = $("#divPatient").position();
+        scroll(0, position.top);
+  
+        // myDate = convierteFecha(Proveedor.Pat_birthday);
+        // Proveedor.Pat_birthday = myDate;
+
+        CargarDatosFormulario(Actividad); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+        $("#divPatient").find("#Nombre").focus();
+        $("#apos").val(aPos);
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+    function MensajeError(mensaje,error)
+    {
+            swal({
+                title: mensaje,
+                text: error
+            });
+    }
+
+    function EliminaActividadModal(e)
+    {
+        e.preventDefault();
+
+        var codPac = $(this).parent().parent().find("td:eq(0)").html();
+        var nomPac = $(this).parent().parent().find("td:eq(1)").html();
+        var apePac = $(this).parent().parent().find("td:eq(2)").html();
+        dato = nomPac.trim() + " " + apePac.trim();
+        var otable = $("#tblActividad").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        $("#frmRegistroActividad").css("display", "none");
+        
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover the information from " + dato +"!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                swal("Deleted!", "Your file information has been deleted.", "success");
+                EliminarActividad(codPac, aPos, otable);                
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated :)", "error");
+                return 0;
+            }
+        });
+    }
+
+
+    function CancelarRegistro()
+    {
+        
+        $("#frmRegistroActividad").css("display", "none");
+
+        LimpiarControlesRegistro();
+        $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+        $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Actividad)
+    {        
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            //ExpandirFormularioRegistro($("#frmRegistroActividad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+            $("#frmRegistroActividad").css("display", "block");
+
+        console.log(Actividad);
+
+        $("#hdCodigo").val(Actividad.Act_code);
+        $("#description").val(Actividad.Act_description);
+        $("#cmbTipoActividad").val(Actividad.Aty_code);
+    }
+
+    function ActualizarDatos(e)
+    {
+        if ($("#description").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#description").focus();
+            $("#description").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required Description!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#cmbTipoActividad").val() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#cmbTipoActividad").focus();
+            $("#cmbTipoActividad").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Activity Type!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else {
+            e.preventDefault();
+
+            var NombreCiudad;
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            aPos = $("#apos").val();
+
+            var Actividad = LlenarActividad($("#hdCodigo").val()
+                                          , $("#description").val().trim().toUpperCase()
+                                          , $("#cmbTipoActividad").val())
+   
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Actividad),
+                url: '@Url.Action("ActualizarDatos", "Activity")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    ActividadX = Actividad;
+                    Actividad = (Data);                    
+
+                    if (Data[0].ErrorMessage == "")
+                    {
+                         
+                        //var otable = $("#tblActividad").dataTable();
+                        seleccionado = $("#cmbTipoActividad option:selected").html();
+                        EditaFila(ActividadX);
+                        //EditaFila(ActividadX, aPos, otable, seleccionado);
+
+                        mensaje = "Successful!";
+                        error = "Data saved correctly...";
+                        LimpiarControlesRegistro();
+                        //ExpandirFormularioRegistro($("#frmRegistroActividad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+                        $("#frmRegistroActividad").css("display", "none");
+
+                        // En "ActualizarDatos".
+                        actualizaTrazabilidad(ActividadX.Act_code, ActividadX.Act_description)
+                    }
+                    else
+                    {
+                        
+                         mensaje = "Error!";
+                         error = Data[0].ErrorMessage + "...";
+                         $("#cmbTipoActividad").focus();//el error solo se muestra en SSD
+                    }
+
+
+                    MensajeError(mensaje, error);
+                    
+                }
+            });
+        }
+    }
+
+
+
+
+                    
+    function EliminarActividad(CodigoActividad, pos, otable)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoActividad) }),
+            url: '@Url.Action("Delete", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+
+                if (Data == 50000) { /// 50000 es el nro de error general 
+                    // mensaje = "You can not delete patient he has an active case!!!";
+                    // MensajeError("Error!", mensaje);
+                }
+                else
+                {
+                    Actividad = (Data);
+                    //otable.fnDeleteRow(pos);
+                    dato = "";
+                    recargaInformacionTabla(dato);
+                    controlaTab();
+
+                    websocket.emit('funcionActualizacionTablaActividadNode', 'Mantenedor_Actividad');
+                    websocket.on('funcionActividadDesdeNode', function (data) {
+                        funcionActividadDesdeNode_llamada(data);
+                    });
+                }
+            }
+        });
+    }
+
+
+
+    function AgregaFila(Actividad)
+    {
+             
+        //$('#tblActividad').dataTable().fnAddData([           
+        //CodActNew, Actividad.Act_description, seleccionado, '<a class="btn EditarActividad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a>']);
+
+        dato = Actividad.Act_description;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+        ///otable =  $("#tblPacientes").dataTable({ "columnDefs": [{className:"hidden","targets": [0,6,8]}]  });
+
+        websocket.emit('funcionActualizacionTablaActividadNode', 'Mantenedor_Actividad');
+        websocket.on('funcionActividadDesdeNode', function (data) {
+            funcionActividadDesdeNode_llamada(data);
+        });
+    }
+
+
+    //function EditaFila(Actividad, pos, otable,seleccion)
+    function EditaFila(Actividad)
+    {
+         //otable.fnUpdate([
+         //Actividad.Act_code, Actividad.Act_description, seleccion, '<a class="btn EditarActividad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> '], pos, undefined, true);
+
+
+         dato = Actividad.Act_description;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+         recargaInformacionTabla(dato);
+
+         websocket.emit('funcionActualizacionTablaActividadNode', 'Mantenedor_Actividad');
+         websocket.on('funcionActividadDesdeNode', function (data) {
+             funcionActividadDesdeNode_llamada(data);
+         });
+
+         
+
+
+    }
+
+    function recargaInformacionTabla(dato_busca) {
+        console.log("recargaInformacionTabla");
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarActividadTabla", "Activity")',
+            contentType: false,
+            contentType: false,
+            success: function (Data) {
+                console.log("correcto");
+                $('#tblActividad').DataTable().ajax.reload();
+                if (dato_busca != "")
+                    setTimeout(function () { otable = $('#tblActividad').dataTable().fnFilter(dato_busca) }, "1000");
+                else 
+                    setTimeout(function () { otable = $('#tblActividad').dataTable().fnFilter("") }, "1000");
+
+            }
+        });
+    }
+
+
+    function CargarTiposActividad()
+    {
+        var CodigoTipoActividad;
+        var NombreTipoActividad;
+        var TiposActividad;
+        console.log("aqui");
+        $("#cmbTipoActividad").addClass("form-control m-b");
+
+        $.ajax({
+            async: false,
+            url: '@Url.Action("ListaTiposActividades", "ActivityType")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                TiposActividad = Data;
+            }
+        });
+        
+        console.log(TiposActividad);
+        $.map(TiposActividad, function (val, i) {
+            CodigoTipoActividad = val.Aty_code;
+            NombreTipoActividad = val.Aty_description;
+
+            $("#cmbTipoActividad").append("<option value='" + CodigoTipoActividad + "'>" + NombreTipoActividad + "</option>");
+        });
+    }
+
+    var websocket = io.connect(ServidorPuertoNode);
+
+    $(document).ready(function () 
+    {
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "";
+        // console.log(ProcesoActual);        
+        
+        //var otable = $("#tblActividad").dataTable().fnDestroy();
+        //otable = $('.dataTables-example').DataTable({
+        //    order: [[1, "asc"]],
+        //    dom: '<"html5buttons"B>lTfgitp',
+        //    buttons: [
+        //        { extend: 'copy' },
+        //        { extend: 'csv' },
+        //        { extend: 'excel', title: 'ExampleFile' },
+        //        { extend: 'pdf', title: 'ExampleFile' },
+
+        //        {
+        //            extend: 'print',
+        //            customize: function (win) {
+        //                $(win.document.body).addClass('white-bg');
+        //                $(win.document.body).css('font-size', '10px');
+
+        //                $(win.document.body).find('table')
+        //                        .addClass('compact')
+        //                        .css('font-size', 'inherit');
+        //            }
+        //        }
+        //    ]
+        //});
+
+        CargarTiposActividad();
+
+        // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+        $("#EnlaceCrearNuevo").on("click", function (e) {            
+            e.preventDefault();
+
+            LimpiarControlesRegistro();
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+
+            if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+                $("#frmRegistroActividad").css("display", "block");
+
+
+            var position = $("#divPatient").position();
+            scroll(0, position.top);
+            $("#description").focus();
+
+        });
+
+        $("#btnRegistrar").on("click", RegistrarActividad); // Dispara la función que registra un Proveedor, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblActividad > tbody").on("click", "tr > td > .EditarActividad", EditarActividad); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblActividad > tbody").on("click", "tr > td > .EliminarActividad", EliminaActividadModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+        controlaTab();
+    });
+
+    function controlaTab() {
+
+        $('.form-control').on('keydown', function (e) {
+            //
+            console.log("control_keydown");
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var tabindex = $(this).attr('tabindex');
+                console.log(tabindex);
+                tabindex++;
+                console.log(tabindex);
+                $("[tabindex='" + tabindex + "']").focus();
+            }
+
+        });
+    }
+
+
+
+    function funcionActividadDesdeNode_llamada(data) {
+        // debugger;
+        console.log("funcion_n_Actividad");
+        console.log(data);
+        dato_busca = ""; // este campo se usa para filtro en tabla
+        //var otable = $("#tblActividad").dataTable();
+        recargaInformacionTabla(dato_busca);
+    }
+   
+    $('input.letterNombre').on('keypress', function (e) {
+
+        console.log(e.which);
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 45) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+  </script>          

@@ -1,0 +1,239 @@
+﻿<div class="panel-body">
+<fieldset class="form-horizontal">
+<div class="form-group">
+                        <label class="col-lg-3 control-label">Doctors Name</label> 
+                        <input type="hidden" id="hdCodigoDoctorParaAsignar" value="0">
+                        <div class="col-lg-9">
+                        @*<input type="text" class="form-control ui-autocomplete-input" id="txtDoctor" autocomplete="off" disabled="disabled">*@     
+                    <select class="form-control" id="cmbDoctor">
+                                            
+                    </select>
+                        </div>                                           
+                        </div>
+<div class="form-group text-center" style="margin-left: 130px;">
+                                             
+                            <button style="display:none;" data-target="#myModalDoctorHom" data-toggle="modal" id="btnModalDoctorHom" class="btn btn-primary" type="button"></button>                                             
+                            <button id="btnAsignaDoctor" class="btn btn-primary" type="submit" data-placement="top" title="Add doctor to table">Add Doctor</button>
+                            <button id="btnNuevoDoctor" class="btn btn-primary" data-toggle="modal" data-target="#myModal4" type="button"  data-placement="top" title="Register a new doctor">Add New Doctor</button>
+                            <!-- <button type="button" class="btn btn-primary"  id="btnModalxx" data-toggle="modal" data-target="#myModal4" style="display:block;"></button> -->
+
+
+                            <a role="menuitem" href="#finish" id="muestraDetalleDoctor"  style="color:#b73333;display:none;float: right;padding-right: 20px;" onclick="muestraDetalleDoctor()"  > >> Show Doctor Info</a>
+</div>
+<div class="table-responsive" id="div_detalle_doctor" style="display:none;">
+        <table class="table table-striped table-bordered table-hover dataTables-example" id="tabla_detalle_doctor" >
+        <thead class="th_tabla">
+            <tr style="background-color:#f26666;">             
+                <th >
+                    Name
+                </th>
+                <th >         
+                    Street      
+                </th>
+                <th >
+                    City
+                </th>
+                <th>
+                    State
+                </th>
+                <th>
+                    Zip
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    Phone
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    All phone
+                </th>
+                <th>
+                    Fax
+                </th>
+                <th>
+                    Speciality
+                </th>
+                <th>
+                    Office
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+ <div class="table-responsive" id="TablaParaBusquedaDoctor">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblDoctor" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden"></th>
+                <th >
+                    Name
+                </th>
+                <th >         
+                    Street      
+                </th>
+                <th >
+                    City
+                </th>
+                <th>
+                    State
+                </th>
+                <th>
+                    Zip
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    Phone
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    All phone
+                </th>
+                <th>
+                    Fax
+                </th>
+                <th>
+                    Speciality
+                </th>
+                <th>
+                    Office
+                </th>
+                <th>
+                    Delete
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+       
+        </tbody>
+        <tfoot>
+           <tr>
+                <th class="hidden"></th>
+                <th>
+                    Name
+                </th>
+                <th >         
+                    Street      
+                </th>
+                <th >
+                    City
+                </th>
+                <th>
+                    State
+                </th>
+                <th>
+                    Zip
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    Phone
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    All phone
+                </th>
+                <th>
+                    Fax
+                </th>
+                <th>
+                    Speciality
+                </th>
+                <th>
+                    Office
+                </th>
+                <th>
+                    Delete
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+</fieldset>
+</div>
+
+
+
+<script>
+    function muestraDetalleDoctor()
+    {
+        valorHd= $("#hdCodigoDoctorParaAsignar").val();
+
+        if (valorHd != 0 && valorHd != "" && valorHd != null && valorHd != 630) {
+            console.log($("#div_detalle_doctor").is(":visible"));
+
+            visible = $("#div_detalle_doctor").is(":visible");
+            console.log(visible);
+
+            if (visible == true) {
+                $("#muestraDetalleDoctor").html(" >> Show Doctor Info");
+                $("#div_detalle_doctor").css("display", "none");
+            }
+            else {
+                llenaTablaDetalle(valorHd);
+            }
+        }
+        else
+        {
+            error = "Error";
+            mensaje = "Select a Doctors name";
+            MensajeError(mensaje,error);
+        }
+             
+
+    }
+
+
+    function llenaTablaDetalle(valorHd)
+    {
+
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoDoctor": parseInt(valorHd) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Medical")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    console.log(Data);
+                    console.log(Data.Specialty);
+    
+                    $("#tabla_detalle_doctor").DataTable().clear();                         
+                    nombreDoctor = Data.Med_firstName + " " + Data.Med_lastName;
+                    if (Data.Med_office != "" && Data.Med_office !=null)
+                        oficina = Data.Med_office.toUpperCase();
+                    else 
+                        oficina ="";
+                             $('#tabla_detalle_doctor').dataTable().fnAddData([
+                              nombreDoctor.toUpperCase(), Data.Med_address.toUpperCase(), Data.Med_city.toUpperCase(), Data.Med_state.toUpperCase(), Data.Med_zipCode, Data.Med_zipCodeExt, Data.Med_phone, Data.Med_phoneExt, Data.Med_alternatePhone, Data.Med_fax, Data.Specialty.Spe_name, oficina]);
+                           
+
+                         var otable = $("#tabla_detalle_doctor").dataTable().fnDestroy();
+                         otable = $('#tabla_detalle_doctor').DataTable({ "searching": false, "paging": false, "ordering": false });
+
+                         $("#muestraDetalleDoctor").html(" >> Hide Doctor Info");
+                         $("#div_detalle_doctor").css("display", "block");
+                         $("#tabla_detalle_doctor_info").css("display", "none");
+    
+                }
+        });
+
+
+
+    }
+
+</script>

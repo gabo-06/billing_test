@@ -1,0 +1,1379 @@
+﻿@model IEnumerable<Billing.Web.Models.Insurer>
+
+
+@{
+    ViewBag.Title = "Insurers";
+}
+
+
+
+<div >
+    
+<div class="row">
+           <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12" id="divInsurer">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title  header_formulario">
+                            <h5>REGISTER INSURERS</h5>
+                            
+                            </div>
+                        
+                        <div class="ibox-content" id="frmRegistroInsurer" style="display: none;">
+                            <form method="get" class="form-horizontal"> 
+                                <input type="hidden" id="hdCodigo" value="0"/>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Name <span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre" id="Nombre" autofocus tabindex="1"  />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Phone</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="Telefono"  data-mask ="999-999-9999" placeholder="" tabindex="2"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Ext</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="ExtensionTelefono" maxlength ="5" placeholder="" tabindex="3"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Fax</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="Fax" data-mask ="999-999-9999"  tabindex="4"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Street
+                                    </label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letter" id="Direccion"  tabindex="5"/> 
+
+                                    </div>
+                                </div>    
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">State<span style="color:red; font-size:15px;"> (*)</span></label>
+                                   <div class="col-sm-6">
+                                        <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <span style="color:red; font-size: 0.8em; font-style: italic;">(if you do not belong to any state, select the "NONE" option from the list)</span>
+                                        <input type="hidden" id="hdAbreviaturaEstadoPais" value="">
+                                        <input type="text" id="EstadoPais" class="form-control ui-autocomplete-input" autocomplete="off" tabindex="6">                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">City<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <input type="hidden" id="hdCiudad" value="">
+                                        <input type="text" id="Ciudad" class="form-control ui-autocomplete-input" autocomplete="off" tabindex="7">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Zip Code</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" maxlength ="5" class="form-control"  id="CodigoPostal"  tabindex="8" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Ext</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" maxlength ="4" class="form-control" id="ExtensionCodigoPostal" tabindex="9" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">SC/TPA</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="SCTpa" data-mask ="999-999-9999" tabindex="10" /> 
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Fein Sc</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="FeinSC" data-mask ="99-9999999" tabindex="11" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Carrier</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="Carrier" data-mask ="999-999-9999" tabindex="12" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Fein CC</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="FeinCC" data-mask ="99-9999999" tabindex="13" />
+                                    </div>
+                                </div>
+
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-8 col-sm-offset-2 text-center">
+                                        <button id="btnRegistrar" class="btn btn-primary" type="submit" tabindex="14" >Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" disabled tabindex="14">Update</button>
+                                        <button id="btnCancelar" class="btn btn-danger" type="button" tabindex="15">Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Patient")">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+<!--///////////////////LISTA///////////////////////-->
+<div class="col-lg-12">
+  <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        @*<h5>Basic Data Tables example with responsive plugin</h5>*@
+                        <button class="btn btn-danger"   id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+                        <button type="button" class="btn btn-primary"  id="btnModal" data-toggle="modal" data-target="#myModal4" style="display:none;"></button>
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        @Html.Partial("Insurer_List")
+
+                    </div>
+                </div>
+            </div>
+</div>    
+          
+</div>
+
+<!-----PIE----->
+@Html.Partial("footer")
+<!---------->
+
+   <!--/////////////////////MODAL//////////////////-->
+
+  <div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Insurer were found with similiar names and surnames!.</strong> If the Insurer attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Insurer record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalInsurer">
+                                <thead >
+                                <tr>
+                                    <th >Codigo</th>
+                                    <th class="th_tabla">Name</th>
+                                    <th class="th_tabla">City</th>
+                                    <th class="th_tabla">State</th>
+                                    <th class="th_tabla">zip</th>
+                                    <th class="th_tabla">Status</th> 
+                                    <th class="th_tabla">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button id="btnCancelarModal"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>
+                                            <button  id="btnRegistrarModal" type="button" class="btn btn-primary" >Continue</button>
+                                            <input  id="accion" type="hidden" value="registra" />
+                                            <input  id="seleccionado" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccion" type="hidden" value="0" />          
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+
+<!----------------------------------------------->
+
+
+<script>
+    $(Inicio);
+
+    var websocket = io.connect(ServidorPuertoNode);
+    websocket.on('funcionInsurerDesdeNode', function (data) {
+        funcionInsurerDesdeNode_llamada(data);
+    });
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function LiberaCasoDeUsuarioActual(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+    function Inicio()
+    {
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "";
+        // console.log(ProcesoActual);
+        LiberaCasoDeUsuarioActual(CodigoUsuarioGlobal);
+
+        $("#CodigoPostal").on("keypress", validaNumerosSinPunto);
+        controlaTab();
+
+    }
+    function controlaTab()
+    {
+
+        $('.form-control').on('keydown', function (e) {
+            //
+            console.log("control_keydown");
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var tabindex = $(this).attr('tabindex');
+                console.log(tabindex);
+                tabindex++;
+                console.log(tabindex);
+                $("[tabindex='" + tabindex + "']").focus();
+            }
+
+        });
+    }
+    function validaNumerosSinPunto(e)
+    {
+        if (!((e.which >= 48 && e.which <= 57) || (e.which == 40 || e.which == 41) || (e.which == 32 || e.which == 8 || e.which == 0)))//
+        {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+
+    $('input:text').on('keypress', function (e) {
+        
+        if (e.which == 13 || e.which == 9) {
+            currentTabIndex = parseInt($(this).attr("tabindex"));
+
+            currentTabIndex = currentTabIndex + 1;
+            $("input[tabindex=" + currentTabIndex + "]").select();
+            e.preventDefault();
+        }
+
+    });
+
+    function LimpiarControlesRegistro()
+    {
+        ValorOriginalEstadoPais = "";
+        ValorOriginalCiudad = "";
+
+        $("#Nombre").val("");
+        $("#Telefono").val("");
+        $("#ExtensionTelefono").val("");
+        $("#Fax").val("");
+        $("#Direccion").val("");
+        $("#hdAbreviaturaEstadoPais").val("");
+        $("#EstadoPais").val("");
+        $("#hdCiudad").val("");
+        $("#Ciudad").val("");
+        $("#CodigoPostal").val("");
+        $("#ExtensionCodigoPostal").val("");
+        $("#SCTpa").val("");
+        $("#FeinSC").val("");
+        $("#Carrier").val("");
+        $("#FeinCC").val("");
+    }
+
+    function VerificarContraccionFormularioRegistro()
+    {
+        if ($("#frmRegistroInsurer").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    function LlenarInsurer(Codigo, Nombre, Telefono, ExtensionTelefono, Fax, Direccion, NombreCiudad, AbreviaturaEstadoPais, CodigoPostal, ExtensionCodigoPostal, SCTpa, FeinSC, Carrier, FeinCC)
+    {
+        var InsurerJson =
+            {
+                "Ins_code"        : Codigo
+                ,"Ins_name"        : Nombre.toUpperCase() 
+                ,"Ins_phone"       : Telefono
+                ,"Ins_phoneExt"    : ExtensionTelefono
+                ,"Ins_fax"         : Fax
+                ,"Ins_address"     : Direccion.toUpperCase()
+                ,"Ins_city"        : NombreCiudad
+                ,"Ins_state"       : AbreviaturaEstadoPais
+                ,"Ins_zipCode"     : CodigoPostal
+                ,"Ins_zipExt"      : ExtensionCodigoPostal
+                ,"Ins_scTpaCode"   : SCTpa
+                ,"Ins_feinSc"      : FeinSC
+                ,"Ins_carrierCode" : Carrier
+                ,"Ins_feinCc"      : FeinCC
+                ,"Ins_operatorUser": CodigoUsuarioGlobal
+            }
+
+        return InsurerJson;
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+
+    function MensajeError(mensaje,error)
+    {     
+            swal({
+                title: mensaje,
+                text: error
+            });
+    }
+
+    function EliminaInsurerModal(e)
+    {
+        e.preventDefault();
+
+        var codIns = $(this).parent().parent().find("td:eq(0)").html();
+        var nomIns = $(this).parent().parent().find("td:eq(1)").html();
+
+        dato = nomIns.trim();
+
+        //var otable = $("#tblInsurer").dataTable();
+        //var target_row = $(this).closest("tr").get(0);
+        //var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        $("#frmRegistroInsurer").css("display", "none");
+
+        swal({
+            title: "Do you want to delete this insurer?",
+            text: "You will not be able to recover the information from " + dato +"!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                swal("Deleted!", "Your file information has been deleted.", "success");                
+                EliminarInsurer(codIns);
+
+                // En "EliminaInsurerModal".
+                actualizaTrazabilidad(codIns, nomIns)
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated", "error");
+                return 0;
+            }
+        });
+    }
+
+    function CancelarRegistro()
+    {
+        
+        $("#frmRegistroInsurer").css("display", "none");
+
+
+
+          LimpiarControlesRegistro();
+          $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+          $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Insurer)
+    {        
+        ValorOriginalEstadoPais = Insurer.Ins_state;
+        ValorOriginalCiudad = Insurer.Ins_city;
+
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroInsurer").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+        
+        $("#hdCodigo").val(Insurer.Ins_code);
+        $("#Nombre").val(Insurer.Ins_name);
+        $("#Telefono").val(Insurer.Ins_phone);
+        $("#ExtensionTelefono").val(Insurer.Ins_phoneExt);
+        $("#Fax").val(Insurer.Ins_fax);
+        $("#Direccion").val(Insurer.Ins_address);
+
+        // Cargar el estado del país
+        if (Insurer.Ins_state == "" || Insurer.Ins_state == null) {
+            $("#hdAbreviaturaEstadoPais").val("");
+            $("#EstadoPais").val("");
+        }
+        else {
+            $("#hdAbreviaturaEstadoPais").val(Insurer.Sta_abbreviation);
+            $("#EstadoPais").val(Insurer.Ins_state);
+        }
+
+        // Carga la ciudad
+        if (Insurer.Ins_city == "" || Insurer.Ins_city == null) {
+            $("#hdCiudad").val("");
+            $("#Ciudad").val("");
+        }
+        else {
+            $("#hdCiudad").val(Insurer.Ins_city);
+            $("#Ciudad").val(Insurer.Ins_city);
+        }
+
+        $("#CodigoPostal").val(Insurer.Ins_zipCode);
+        $("#ExtensionCodigoPostal").val(Insurer.Ins_zipExt);
+        $("#SCTpa").val(Insurer.Ins_scTpaCode);
+        $("#FeinSC").val(Insurer.Ins_feinSc);
+        $("#Carrier").val(Insurer.Ins_carrierCode);
+        $("#FeinCC").val(Insurer.Ins_feinCc);
+
+    }
+
+
+
+    function ActualizarDatos(e)
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#hdAbreviaturaEstadoPais").val() == "") // Valida la obligatoriedad del estado
+        {
+            e.stopPropagation();
+
+            mensaje = "Error!";
+            error = "Select a State from the list!!...";
+            MensajeError(mensaje, error);
+
+            $("#EstadoPais").focus();
+            return false;
+        }
+        else if ($("#hdCiudad").val() == "" && $("#Ciudad").val() == "") // Valida la obligatoriedad de la ciudad (valida que se seleccione una ciudad del autocompletado o que se escriba una ciudad en la caja de texto)
+        {
+            e.stopPropagation();
+            mensaje = "Error!";
+            error = "Select or type a City from the list!!...";
+            MensajeError(mensaje, error);
+            $("#Ciudad").focus();
+            return false;
+        }
+        else
+        {
+            var NombreCiudad;
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            aPos = $("#apos").val();
+
+            var Insurer = LlenarInsurer($("#hdCodigo").val()
+                                          , $("#Nombre").val().trim()
+                                          , $("#Telefono").val().trim()
+                                          , $("#ExtensionTelefono").val().trim()
+                                          , $("#Fax").val().trim()
+                                          , $("#Direccion").val().trim()
+                                          , NombreCiudad
+                                          , $("#hdAbreviaturaEstadoPais").val().trim()
+                                          , $("#CodigoPostal").val().trim()
+                                          , $("#ExtensionCodigoPostal").val().trim()
+                                          , $("#SCTpa").val().trim()
+                                          , $("#FeinSC").val().trim()
+                                          , $("#Carrier").val().trim()
+                                          , $("#FeinCC").val().trim())
+
+            // Primero verifica que no exista un paciente homónimox.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Insurer),
+                url: '@Url.Action("BuscarHomonimos", "Insurer")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    //console.clear();
+
+                    if (!Data.Resultado) // Si no se encontraron homónimos.
+                    {
+                        // Llamará al código que registrará al paciente.
+                        metodoActualizaInsurer(e,"activo");
+                }
+                    else // Si se encontraron homónimos.
+                    {
+                        // console.log(Data); // Muestra las coincidencias de hómónimos.
+                        llenaModal(Data, 'actualiza');
+                    }
+                }
+            });
+        
+           
+        }
+    }
+
+    // Esta funcción se ejecuta para actualizar el mantenedor de auditoría a través de node.
+    function actualizaTrazabilidad(codigoAseguradora, nombreAseguradora)
+    {
+        var parametros
+
+        parametros = {
+            'codigoAseguradoraActualizada': codigoAseguradora
+           , 'nombreAseguradoraActualizada': nombreAseguradora
+        }
+
+        websocket.emit('actualizaTrazabilidadAseguradora', parametros)
+    }
+
+    
+    function RegistrarInsurer(e)//////registrando Edher
+    {
+
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#hdAbreviaturaEstadoPais").val() == "") // Valida la obligatoriedad del estado
+        {
+            e.stopPropagation();
+
+            mensaje = "Error!";
+            error = "Select a State from the list!!...";
+            MensajeError(mensaje, error);
+
+            $("#EstadoPais").focus();
+            return false;
+        }
+
+
+        else if ($("#hdCiudad").val() == "" && $("#Ciudad").val() == "") // Valida la obligatoriedad de la ciudad (valida que se seleccione una ciudad del autocompletado o que se escriba una ciudad en la caja de texto)
+        {
+            e.stopPropagation();
+            mensaje = "Error!";
+            error = "Select or type a City from the list!!...";
+            MensajeError(mensaje, error);
+            $("#Ciudad").focus();
+            return false;
+        }
+        else
+        {
+            e.preventDefault();
+
+            var NombreCiudad;
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            var Insurer = LlenarInsurer(null
+                                          , $("#Nombre").val().trim()      
+                                          , $("#Telefono").val().trim()          
+                                          , $("#ExtensionTelefono").val().trim() 
+                                          , $("#Fax").val().trim()
+                                          , $("#Direccion").val().trim() 
+                                          , NombreCiudad
+                                          , $("#hdAbreviaturaEstadoPais").val().trim()   
+                                          , $("#CodigoPostal").val().trim()             
+                                          , $("#ExtensionCodigoPostal").val().trim()    
+                                          , $("#SCTpa").val().trim()        
+                                          , $("#FeinSC").val().trim()       
+                                          , $("#Carrier").val().trim()      
+                                          , $("#FeinCC").val().trim())
+
+            // Primero verifica que no exista un paciente homónimo.x
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Insurer),
+                url: '@Url.Action("BuscarHomonimos", "Insurer")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    //console.clear();
+                    console.log(Data);
+                    if (!Data.Resultado) // Si no se encontraron homónimos.
+                    {
+                        // Llamará al código que registrará al paciente.
+                        metodoRegistraInsurer(e, Insurer);
+                    }
+                    else // Si se encontraron homónimos.
+                    {
+                        // console.log(Data); // Muestra las coincidencias de hómónimos.
+                        llenaModal(Data, 'registra');
+                    }
+                }
+            });
+
+
+
+        }
+    }
+
+    function EditarInsurer(e)
+    {
+        e.preventDefault();
+
+
+
+        var otable = $("#tblInsurer").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+  
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+        /* 
+        La siguiente línea obtiene el código del Insurer seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del Insurer seleccionado. 
+        */
+
+        var CodigoInsurer = $(this).parent().parent().find("td:eq(0)").html();
+
+        var Insurer;
+
+        //console.clear();
+        console.log(parseInt(CodigoInsurer));
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoInsurer) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Insurer")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    Insurer = (Data);
+                    console.log(Data);
+                    $("#frmRegistroInsurer").css("display", "block");
+                }
+            });
+
+        var position = $("#divInsurer").position();
+        scroll(0, position.top);
+
+        if (Insurer.Pat_birthday != null)
+        {
+            myDate = convierteFecha(Insurer.Pat_birthday);
+            Insurer.Pat_birthday = myDate;
+        }
+
+        CargarDatosFormulario(Insurer); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+
+        $("#divInsurer").find("#Nombre").focus();
+        $("#apos").val(aPos);
+    }
+
+
+    function EliminarInsurer(CodigoInsurer) 
+    {
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoInsurer) }),
+            url: '@Url.Action("Delete", "Insurer")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                //console.clear();
+                console.log(Data);
+                if (Data[0].ErrorMessage == "") { /// 50000 es el nro de error general 
+                    //Insurer = (Data);
+                    //otable.fnDeleteRow(pos);
+                    dato="";
+                    recargaInformacionTabla(dato);
+                    controlaTab();
+
+
+                    websocket.emit('funcionActualizacionTablaInsurerNode', 'Mantenedor_Insurer');
+                    websocket.on('funcionInsurerDesdeNode', function (data) {
+                        funcionInsurerDesdeNode_llamada(data);
+                    });
+
+                }
+                else
+                {
+                    mensaje = Data[0].ErrorMessage;
+                    MensajeError("Error!", mensaje);
+                }
+            }
+        });
+    }
+ 
+
+    //function AgregaFila(Insurer, CodPatNew) {
+    function AgregaFila(Insurer) {
+        console.log(Insurer);
+
+        //$('#tblInsurer').dataTable().fnAddData([
+        //   CodPatNew, Insurer.Ins_name, Insurer.Ins_address, Insurer.Ins_city, Insurer.Ins_state, Insurer.Ins_phone, Insurer.Ins_phoneExt, Insurer.Ins_fax, Insurer.Ins_zipCode,Insurer.Ins_zipExt, Insurer.Ins_scTpaCode,Insurer.Ins_feinSc,
+        //   Insurer.Ins_carrierCode, Insurer.Ins_feinCc, '<a class="btn EditarInsurer btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarInsurer  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>']);
+
+        //var otable = $("#tblInsurer").dataTable().fnDestroy();
+        //otable = $('#tblInsurer').DataTable({
+        //    columnDefs: [{ className: "hidden", "targets": [0] }],
+        //    dom: '<"html5buttons"B>lTfgitp',
+        //    buttons: [
+        //        { extend: 'copy' },
+        //        { extend: 'csv' },
+        //        { extend: 'excel', title: 'ExampleFile' },
+        //        { extend: 'pdf', title: 'ExampleFile' },
+
+        //        {
+        //            extend: 'print',
+        //            customize: function (win) {
+        //                $(win.document.body).addClass('white-bg');
+        //                $(win.document.body).css('font-size', '10px');
+
+        //                $(win.document.body).find('table')
+        //                        .addClass('compact')
+        //                        .css('font-size', 'inherit');
+        //            }
+        //        }
+        //    ]
+        //});
+        dato = Insurer.Ins_name;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+        //////////////////////////////////
+
+        websocket.emit('funcionActualizacionTablaInsurerNode', 'Mantenedor_Insurer');
+        websocket.on('funcionInsurerDesdeNode', function (data) {
+            funcionInsurerDesdeNode_llamada(data);
+        });
+
+    }
+
+    function EditaFila(Insurer)
+    {   
+        /////otable.fnUpdate([
+        /////Insurer.Ins_code, Insurer.Ins_name, Insurer.Ins_address, Insurer.Ins_city, Insurer.Ins_state, Insurer.Ins_phone, Insurer.Ins_phoneExt, Insurer.Ins_fax, Insurer.Ins_zipCode, Insurer.Ins_zipExt, Insurer.Ins_scTpaCode, Insurer.Ins_feinSc,
+        /////Insurer.Ins_carrierCode, Insurer.Ins_feinCc, '<a class="btn EditarInsurer btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarInsurer  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>'], pos, undefined, true);
+
+        /////dato = Insurer.Ins_name;
+        /////otable = $('.dataTables-example').dataTable().fnFilter(dato);
+
+        ////////////////////////////////////
+        dato = Insurer.Ins_name;        
+        recargaInformacionTabla(dato);
+        //////////////////////////////////
+        websocket.emit('funcionActualizacionTablaInsurerNode', 'Mantenedor_Insurer');
+        websocket.on('funcionInsurerDesdeNode', function (data) {
+            funcionInsurerDesdeNode_llamada(data);
+        });
+    }
+
+    function recargaInformacionTabla(dato_busca) {
+        console.log("recargaInformacionTabla");
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarInsurerTabla", "Insurer")',
+            contentType: false,
+            contentType: false,
+            success: function (Data) {
+                console.log("correcto");
+                $('#tblInsurer').DataTable().ajax.reload();
+                if (dato_busca != "")
+                    setTimeout(function () { otable = $('#tblInsurer').dataTable().fnFilter(dato_busca) }, "1000");
+                else 
+                    setTimeout(function () { otable = $('#tblInsurer').dataTable().fnFilter("") }, "1000");
+            }
+        });
+    }
+    ////////////////////////////////AUTOCOMPLETAR////////////////////////////////////////////////////////
+
+
+    var EstadosPais;
+    var Ciudades;
+
+    function OntenerEstadosPais() {
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: '@Url.Action("ListaEstados", "State")',
+            contentType: "application/json",
+            dataType: 'json',
+            cache: true,
+            headers: {
+                'Cache-Control': 'max-age=604800, public'
+            },
+            success: function (Data) {
+                EstadosPais = Data;
+            }
+        });
+    }
+
+    function OntenerCiudades() {
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: '@Url.Action("ListaCiudades", "City")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                Ciudades = Data;
+
+                //console.clear();
+                //console.log(Ciudades);
+            }
+        });
+    }
+
+    function AutocompletarEstadosPais()
+    {
+        var CodigoEstadoPais;
+
+        $("#EstadoPais").autocomplete(        {
+            source: function (request, response) {
+                var results = $.map(EstadosPais, function (tag) {
+                    if (tag.Sta_name.toUpperCase().indexOf(request.term.toUpperCase()) >= 0) {
+                        return {
+                            label: tag.Sta_name,
+                            value: tag.Sta_name, id:
+                                tag.Sta_abbreviation
+                        };
+                    }
+                });
+
+                response(results.slice(0, 10));
+            },
+            select: function (event, ui)
+            {
+                CodigoEstadoPais = ui.item.id;
+                $("#hdAbreviaturaEstadoPais").val(CodigoEstadoPais);
+
+                ValorOriginalEstadoPais = $(this).val().trim();
+
+                //$(this).blur();
+                $("#Ciudad").focus();
+            },
+            change: function (event, ui)
+            {
+                
+                if (ui.item == null)
+                    $(this).val(ValorOriginalEstadoPais);
+
+            }
+        });
+    }
+    function AutocompletarCiudades() {
+        var CodigoCiudad;
+        console.log("AutocompletarCiudades_Bd");
+        $("#Ciudad").autocomplete({
+            source: function (request, response) {
+                var results = $.map(Ciudades, function (tag) {
+                    if (tag.Cit_name.toUpperCase().indexOf(request.term.toUpperCase()) >= 0) {
+                        return {
+                            label: tag.Cit_name,
+                            value: tag.Cit_name, id:
+                            tag.Cit_code
+                        };
+                    }
+                });
+
+                        response(results.slice(0, 10));
+                    },
+                    select: function (event, ui) {
+                        CodigoCiudad = ui.item.id;
+                        $("#hdCiudad").val(CodigoCiudad);
+
+                        ValorOriginalCiudad = $(this).val().trim();
+                        console.log("SELECT");
+                        $(this).blur();
+                        $("#CodigoPostal").focus();
+                    },
+                    change: function (event, ui) {
+                        console.log("CHANGE");
+                        //if (ui.item == null)
+                          //  $(this).val(ValorOriginalCiudad);
+                    }
+                })
+            }
+   
+
+   @* function AutocompletarCiudades() {
+        var CodigoCiudad;
+        console.log("AutocompletarCiudades");
+        $("#Ciudad").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+
+                    url: '@Url.Content("~/Scripts/ciudades.js")',
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log("dataa result");
+                        //console.log(data);
+                        Ciudades = data.City;
+                        var results = $.map(Ciudades, function (tag) {
+                            if (tag.Cit_name.toUpperCase().indexOf(request.term.toUpperCase()) >= 0) {
+                                return {
+                                    label: tag.Cit_name,
+                                    value: tag.Cit_name,
+                                    id: tag.Cit_name
+                                };
+                            }
+                        });
+
+                        response(results.slice(0, 10));
+                    },
+                    select: function (event, ui) {
+                        CodigoCiudad = ui.item.id;
+                        $("#hdCiudad").val(CodigoCiudad);
+
+                        ValorOriginalCiudad = $(this).val().trim();
+
+                        $(this).blur();
+                        $("#CodigoPostal").focus();
+                    },
+                    change: function (event, ui) {
+                        if (ui.item == null)
+                            $(this).val(ValorOriginalCiudad);
+                    }
+                })
+            }
+        });
+    }*@
+    var ValorOriginalEstadoPais;
+    var ValorOriginalCiudad;
+
+    $(document).ready(function () 
+    {   
+        // Valores por defecto para prueba de homónimos
+        // ***************************************************************
+        //$("#Nombre").val("ABERCROMBIE, SIMMONS & GILLETTE OF FL, INC.");
+        //$("#Direccion").val("3390 KORI ROAD, SUITE 10");
+        
+        //$("#hdAbreviaturaEstadoPais").val("AZ");
+        //$("#EstadoPais").val("ARIZONA");
+        
+        //$("#hdCiudad").val("JACKSONVILLE");
+        //$("#Ciudad").val("JACKSONVILLE");
+        
+        //$("#CodigoPostal").val("32257");
+        // ***************************************************************
+
+        $(".input-group-addon").on("click", function ()
+        {
+            e.stopPropagation();
+            
+        });
+
+        ////////////////////////////////////////////////////////
+        OntenerEstadosPais();
+        OntenerCiudades();//brenher
+        AutocompletarEstadosPais();
+        AutocompletarCiudades();
+
+
+        ////////////////////////////////////////////////////////////////////////
+        //$("#tblModalInsurer tbody tr").on('click', function ()  //selecciona fila de tabla  
+        $("#tblModalInsurer tbody").on('click','tr', function ()  //selecciona fila de tabla  
+        {
+            
+            var name;  // Ins_name
+            var ciudad;// Ins_city            
+            var state; // Ins_state            
+            var zip_code; // Ins_zipCode
+            var status; // Ins_status
+            var codigo; // Ins_code
+            var seleccionado;
+
+
+            var aPos = $("#tblModalInsurer").dataTable().fnGetPosition(this);
+            var aData = $("#tblModalInsurer").dataTable().fnGetData(aPos);
+
+            codigo = aData[0];
+            name = aData[1];
+            ciudad = aData[2];
+            state = aData[3];
+            zip_code = aData[4];
+            status = aData[5];
+            seleccionado = aData[6];
+            
+
+            // console.log(seleccionado);
+            // console.log(codigo);
+            
+            var $radios = $("input:radio[name=idRadio]");
+            $radios.filter('[value=' + codigo + ']').prop('checked', true);
+            $("#seleccionado").val(codigo);
+            $("#estadoSeleccion").val(status);
+
+        });
+
+        //////////////////////////////////////////////////////////////////////
+      // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+      $("#EnlaceCrearNuevo").on("click", function (e) {
+            e.preventDefault();
+            
+            LimpiarControlesRegistro();
+
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+
+            $("#frmRegistroInsurer").css("display", "block");
+
+            var position = $("#divInsurer").position();
+            scroll(0, position.top);
+            $("#divInsurer").find("#Nombre").focus();
+        });
+
+        $("#btnRegistrar").on("click", RegistrarInsurer); // Dispara la función que registra un Insurer, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblInsurer > tbody").on("click", "tr > td > .EditarInsurer", EditarInsurer); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblInsurer > tbody").on("click", "tr > td > .EliminarInsurer", EliminaInsurerModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+        //$("#btnActualizarCoincidencia").on("click", ActualizaCoincidenciaAseguradora);
+        $("#btnRegistrarModal").on("click", registraActualizaModalAseguradora);
+        
+
+
+
+        $('input.letter').on('keypress', function (e)
+        {
+
+            if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218))
+            {
+
+            }
+            else
+            {
+                if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122)))
+                {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+
+        $('input.letterNombre').on('keypress', function (e) {
+
+            if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+            }
+            else {
+                if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 45) || (e.which >= 97 && e.which <= 122))) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+        
+
+
+    });
+
+    function registraActualizaModalAseguradora(e)
+    {
+        accion = $("#accion").val();
+        seleccionado = $("#seleccionado").val();
+        estadoSeleccion = $("#estadoSeleccion").val();
+        if (seleccionado > 0)
+        $("#hdCodigo").val(seleccionado);//doy valor al codigo de cliente, codigo tomado desde modal, para que asi se pueda modificar
+
+
+        var NombreCiudad;
+        var CodigoAseguradoraParaActualizar = null;
+
+        // Obtiene la el nombre de la ciudad seleccionada o ingresada
+        if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+            NombreCiudad = $("#Ciudad").val();
+        else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+            NombreCiudad = $("#hdCiudad").val();
+        // ----------------------------------------------------------
+
+        $.each($(".rdbSeleccionaCoincidencia"), function (i, val) {
+            if ($(val).prop("checked"))
+                CodigoAseguradoraParaActualizar = val.value;
+        });
+
+
+        ///////////////////////////////////////////////////////////
+
+        if (seleccionado > 0)//si selecciono alguna fila
+        {
+            
+            if (estadoSeleccion == "Inactive") // si el estado de la fila seleccionada es inactivo
+            {
+                ////////////////// Pregunta cuando esta inactivo
+                swal({
+                    title: "Do you want to active insurer?",
+                    text: "You will not be able to recover the information !",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, activate it!",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                },
+               function (isConfirm) {
+                   if (isConfirm) {
+                       //swal("Ok!", "Your information has been saved.", "success");
+
+                       metodoActualizaInsurer(e, "inactivo");
+                       $("#btnCancelarModal").trigger("click");
+                       $("#btnCancelar").trigger("click");
+                   }
+                   else {
+                       swal("Cancelled", "The information was not saved !!", "error");
+                       return 0;
+                   }
+               });
+
+            } // cuando el estado de la fila es activo
+            else
+            {
+                metodoActualizaInsurer(e, "activo");
+                mensaje = "Data Saved Successfully";
+                error = "Success";
+                MensajeError(mensaje, error);
+                $("#btnCancelarModal").trigger("click");
+                $("#btnCancelar").trigger("click");
+            }
+
+
+        }
+        else// cuando no selecciono nada
+        {
+
+
+            if (accion == 'registra')
+                metodoRegistraInsurer(e);
+            else
+                metodoActualizaInsurer(e, "activo");
+
+
+            $("#btnCancelarModal").trigger("click");
+            $("#btnCancelar").trigger("click");
+        }
+        ///////////////////////////////////////////////////////
+    }
+
+
+    function metodoRegistraInsurer(e)
+    {
+   
+        e.preventDefault();
+        // Obtiene la el nombre de la ciudad seleccionada o ingresada
+        if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+            NombreCiudad = $("#Ciudad").val();
+        else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+            NombreCiudad = $("#hdCiudad").val();
+
+        var Insurer = LlenarInsurer(null
+                              , $("#Nombre").val().trim()
+                              , $("#Telefono").val().trim()
+                              , $("#ExtensionTelefono").val().trim()
+                              , $("#Fax").val().trim()
+                              , $("#Direccion").val().trim()
+                              , NombreCiudad
+                              , $("#hdAbreviaturaEstadoPais").val().trim()
+                              , $("#CodigoPostal").val().trim()
+                              , $("#ExtensionCodigoPostal").val().trim()
+                              , $("#SCTpa").val().trim()
+                              , $("#FeinSC").val().trim()
+                              , $("#Carrier").val().trim()
+                              , $("#FeinCC").val().trim())
+        
+         $.ajax({
+             type: "POST",
+             async: false,
+             data: JSON.stringify(Insurer),
+             url: '@Url.Action("Create", "Insurer")',
+             contentType: "application/json",
+             dataType: 'json',
+             success: function (Data)
+             {
+                 if (Data[0].ErrorMessage == "")
+                 {
+                     AgregaFila(Insurer, Data[0].InsurerErrorCode);
+                     mensaje = "Success!";
+                     error = "Data Saved Successfully!!!";
+                     MensajeError(mensaje, error);
+                     $("#frmRegistroInsurer").css("display", "none");
+                     OntenerCiudades();
+                     // En "metodoRegistraInsurer".
+                     actualizaTrazabilidad(Insurer.Ins_code, Insurer.Ins_name)
+                 }
+                 else
+                 {
+                     
+                     mensaje = "Error in register!!";
+                     codigo = Data[0].PatientErrorCode;
+                     
+                     MensajeError(mensaje, Data[0].ErrorMessage);
+         
+                 }
+             }
+         });
+
+
+    
+    }
+
+    function metodoActualizaInsurer(e, activo)
+    {
+        e.preventDefault();
+
+        aPos = $("#apos").val();
+
+        // Obtiene la el nombre de la ciudad seleccionada o ingresada
+        if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+            NombreCiudad = $("#Ciudad").val();
+        else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+            NombreCiudad = $("#hdCiudad").val();
+
+
+        var Insurer = LlenarInsurer($("#hdCodigo").val()
+                      , $("#Nombre").val().trim()
+                      , $("#Telefono").val().trim()
+                      , $("#ExtensionTelefono").val().trim()
+                      , $("#Fax").val().trim()
+                      , $("#Direccion").val().trim()
+                      , NombreCiudad
+                      , $("#hdAbreviaturaEstadoPais").val().trim()
+                      , $("#CodigoPostal").val().trim()
+                      , $("#ExtensionCodigoPostal").val().trim()
+                      , $("#SCTpa").val().trim()
+                      , $("#FeinSC").val().trim()
+                      , $("#Carrier").val().trim()
+                      , $("#FeinCC").val().trim())
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Insurer),
+            url: '@Url.Action("ActualizarDatos", "Insurer")',
+             contentType: "application/json",
+             dataType: 'json',
+             success: function (Data)
+             {
+                 InsurerX = Insurer;
+
+                 if (Data[0].ErrorMessage == "")
+                 {
+                     if (activo == "inactivo")
+                         AgregaFila(InsurerX);
+                     if (activo == "activo")
+                         EditaFila(InsurerX);
+
+                     mensaje = "Success!";
+                     error = "Data Saved Successfully!!!";
+                     LimpiarControlesRegistro();
+                     $("#frmRegistroInsurer").css("display", "none");
+                     OntenerCiudades();
+                     // En "metodoActualizaInsurer".                     
+                     actualizaTrazabilidad(InsurerX.Ins_code, InsurerX.Ins_name)
+                 }
+                 else
+                 {
+
+                 }
+
+                 MensajeError(mensaje, error);
+             }
+         });
+    }
+
+    function llenaModal(Data, accion) {
+        
+        $("#seleccionado").val(0);
+     
+        //$("#tblModalInsurer").find("tr:gt(0)").remove();
+        $("#tblModalInsurer").DataTable().clear();
+        $.each(Data.Resultado, function (i, val) {
+            if (val.Ins_name != null)
+            {
+
+                if (val.Ins_status == true)
+                    status = "Active";
+                else
+                    status = "Inactive";
+               
+                $('#tblModalInsurer').dataTable().fnAddData([
+                    val.Ins_code,val.Ins_name, val.Ins_city, val.Ins_state, val.Ins_zipCode, status, "<input type='radio' class='rdbSeleccionaCoincidencia' name='idRadio' value='" + val.Ins_code + "' style='cursor: pointer;' >"]);
+            }
+        });
+
+
+        var otable = $("#tblModalInsurer").dataTable().fnDestroy();
+        otable = $('#tblModalInsurer').DataTable({
+            columnDefs: [{ className: "hidden", "targets": [0] }]
+        });
+        
+        $("#accion").val(accion);
+        $("#btnModal").trigger("click");
+
+    }
+   
+
+
+    function funcionInsurerDesdeNode_llamada(data)
+    {
+        dato_busca = ""; // este campo se usa para filtro en tabla        
+        recargaInformacionTabla(dato_busca);
+    }
+
+
+
+
+  </script>          

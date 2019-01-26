@@ -1,0 +1,193 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+
+
+
+
+<div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger"  id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+                         <button type="button" class="btn btn-primary"  id="btnModal" data-toggle="modal" data-target="#myModal4" style="display:none;"></button>
+                          
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblPacientes" >
+                    <thead class="th_tabla">
+                    <tr>
+        <th class="hidden">Pat_code</th>
+        <th >         
+            First Name
+        </th>
+        <th>
+            Patient's Last name
+        </th>
+        <th>
+            Birthday
+        </th>
+        <th>
+            SSNumber
+        </th>
+        <th>
+            Street
+        </th>
+        <th>
+            City
+        </th>
+        <th style="display: none;">
+            City code
+        </th>
+        <th>
+            State
+        </th>
+        <th style="display: none;">
+            State code
+        </th>
+        <th>
+            Zip
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>
+            Phone
+        </th>
+        <th>
+            Alt Phone
+        </th>
+        <th>
+            Sex
+        </th>                               
+        <th>Operations</th>
+                    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+   <tfoot>
+    <tr>
+        
+        <th style="display: none;">
+
+        </th>
+
+       <th >         
+            First Name
+        </th>
+        <th>
+            Patient's Last name
+        </th>
+        <th>
+            Birthday
+        </th>
+        <th>
+            SSNumber
+        </th>
+        <th>
+            Street
+        </th>
+        <th>
+            City
+        </th>
+        <th style="display: none;">
+            City code
+        </th>
+        <th>
+            State
+        </th>
+        <th style="display: none;">
+            State code
+        </th>
+        <th>
+            Zip
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>
+            Phone
+        </th>
+        <th>
+            Alt Phone
+        </th>
+        <th>
+            Sex
+        </th>         
+        <th>Operations</th>
+
+    </tr>
+   </tfoot>
+  </table>
+  </div>
+ </div>
+</div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('[data-toggle="tooltipB"]').tooltip();
+
+        $('#tblPacientes').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0, 7,9] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetData", "Patient")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Pat_code" },                        
+                        { "data": "Pat_firstName" },
+                        { "data": "Pat_lastName" },
+                        { "data": "Pat_birthday" },
+                        { "data": "Pat_socialSecurityNumberD" },
+                        { "data": "Pat_address" },
+                        { "data": "Pat_city" },
+                        { "data": "Cit_code" },
+                        { "data": "Pat_state" },
+                        { "data": "Sta_code" },
+                        { "data": "Pat_zipCode" },
+                        { "data": "Pat_zipCodeExt" },
+                        { "data": "Pat_phone" },
+                        { "data": "Pat_fax" },
+                        { "data": "Pat_sex" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" data-toggle="tooltipB" data-placement="top" title="Edit Patient"  class="btn EditarPaciente btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp;    <a class="btn EliminarPaciente btn-white btn-bitbucket" title="Delete Patient"><i class="fa fa-trash-o text-danger" /> </a>' } }
+                                                 
+                        
+            ]
+        });
+    });
+
+
+
+</script>
+
+
+
+
+
+
+
+
+

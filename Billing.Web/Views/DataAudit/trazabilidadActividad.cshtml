@@ -1,0 +1,225 @@
+﻿@model IEnumerable<Billing.Web.Models.TrazabilidadDeEntidad>
+
+@{
+    var antiguoValor = "";
+    var nuevoValor = "";
+}
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Activity Traceability</h5>
+</div>
+
+<div style="border: 1px solid #444444; padding: 0.5em; width: 142px;">
+    <span style="background-color: #c56d6d; border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span>
+    <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Last operation</span>
+</div>
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblTrazabilidadActividad" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">ACTIVITY CODE</th>
+                <th class="TextoAlineado">
+                    FIELD
+                </th>
+                <th class="TextoAlineado">
+                    @*<img src="../../images/undo.png" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 17px;" />*@
+                    OLD VALUE
+                </th>
+                <th class="TextoAlineado">
+                    @*<img src="../../images/redo.png" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 17px;" />*@
+                    NEW VALUE
+                </th>
+                <th class="TextoAlineado">
+                    OPERATION TYPE
+                </th>
+                <th class="TextoAlineado">
+                    @*<img src="../../images/fechaHora.png" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 16px;" />*@
+                    OPERATION DATE
+                </th>
+                <th class="TextoAlineado">
+                    @*<img src="../../images/user.png" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 16px;" />*@
+                    OPERATOR USER
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        { 
+            <tr>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.codigoEntidad)
+                </td>
+                <td class="TextoAlineado">
+                    @if (item.campo.Trim() != "ROW")
+                    { 
+                        <img src="@Url.Content("~/images/label.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 14px;" />
+                    }
+                    @Html.DisplayFor(modelItem => item.campo)
+                </td>
+                <td class="TextoAlineado">
+                    @if (item.antiguoValor.Trim() != "-")
+                    { 
+                        <img src="@Url.Content("~/images/undo.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 17px;" />
+                    }
+                    @if (item.antiguoValor.Trim() == "")
+                    {
+                        antiguoValor = "NONE";
+                    }
+                    else
+                    {
+                        antiguoValor = item.antiguoValor;
+                        // @Html.DisplayFor(modelItem => item.antiguoValor)
+                    }          
+                    @antiguoValor          
+                </td>
+                <td class="TextoAlineado">
+                    @if (item.nuevoValor.Trim() != "-")
+                    {                     
+                        <img src="@Url.Content("~/images/redo.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 17px;" />
+                    }
+                    @if (item.nuevoValor.Trim() == "")
+                    {
+                        nuevoValor = "NONE";
+                    }
+                    else
+                    {
+                        nuevoValor = item.nuevoValor;
+                    }          
+                    @nuevoValor
+                </td>
+                <td class="TextoAlineado">
+                    @if (item.tipoOperacion == "REGISTERED")
+                    {
+                        <img src="@Url.Content("~/images/new.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 17px;" />
+                    }
+                    else if (item.tipoOperacion == "UPDATED")
+                    {
+                        <img src="@Url.Content("~/images/update.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 16px;" />
+                    }
+                    else if (item.tipoOperacion == "DELETED")
+                    {
+                        <img src="@Url.Content("~/images/delete.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 17px;" />
+                    }
+                    @Html.DisplayFor(modelItem => item.tipoOperacion)
+                </td>
+                <td class="TextoAlineado">
+                    <img src="@Url.Content("~/images/fechaHora.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 16px;" />
+                    @Html.DisplayFor(modelItem => item.fechaAuditoria)
+                </td>
+                <td class="TextoAlineado">
+                    <img src="@Url.Content("~/images/user.png")" style="display: inline-block; float:left; margin-right: 4px; vertical-align: top; width: 16px;" />
+                    @Html.DisplayFor(modelItem => item.usuarioOperador)
+                </td>
+            </tr>  
+        }
+        </tbody>
+        <tfoot class="th_tabla">
+            <tr>
+                <th class="hidden">ACTIVITY CODE</th>
+                <th class="TextoAlineado">FIELD</th>
+                <th class="TextoAlineado">OLD VALUE</th>
+                <th class="TextoAlineado">NEW VALUE</th>
+                <th class="TextoAlineado">OPERATION TYPE</th>
+                <th class="TextoAlineado">OPERATION DATE</th>
+                <th class="TextoAlineado">OPERATOR USER</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(Inicio)
+
+    function Inicio()
+    {
+        var otable = $("#tblTrazabilidadActividad").dataTable().fnDestroy();
+        var IndicePrimeraColumna = 1;
+
+        otable = $("#tblTrazabilidadActividad").DataTable({
+            "pageLength": 20
+            , "ordering": false
+        });
+
+        ProcesarCadaColumna(otable, IndicePrimeraColumna);
+    }
+
+    function ProcesarCadaColumna(otable, IndicePrimeraColumna)
+    {
+        var colorAleatorio = dameColorAleatorio()
+
+        otable.column(0).nodes().to$().each(function (index)
+        {
+            
+        });
+        otable.column(2).nodes().to$().each(function (index)
+        {
+            var ultimaFechaOperacion = $('#tblTrazabilidadActividad > tbody > tr:eq(0) > td:eq(5)').text().trim()
+            var celdaActual = $(this)
+            var filaActual = $(this).parent()
+            var fechaOperacionActual = filaActual.find('td:eq(5)').text().trim()
+
+            if (ultimaFechaOperacion == fechaOperacionActual)
+                filaActual.css({ 'background-color': '#c56d6d', 'color': '#ffffff' })
+            else
+                celdaActual.css({ 'background-color':'#f3eae7', 'color':'#90655c' })
+        });
+        otable.column(3).nodes().to$().each(function (index)
+        {
+            var ultimaFechaOperacion = $('#tblTrazabilidadActividad > tbody > tr:eq(0) > td:eq(5)').text().trim()
+            var celdaActual = $(this)
+            var filaActual = $(this).parent()
+            var fechaOperacionActual = filaActual.find('td:eq(5)').text().trim()
+            
+            if (ultimaFechaOperacion == fechaOperacionActual)
+                filaActual.css({ 'background-color': '#c56d6d', 'color': '#ffffff', })
+            else
+                celdaActual.css({ 'background-color': '#f3eae7', 'color': '#90655c', 'font-weight': 'bold' })
+        });
+        otable.column(4).nodes().to$().each(function (index)
+        {
+            if ($(this)["0"].innerText.trim() == 'REGISTERED')
+            {
+                // $(this).css({ 'color': 'red' });
+            }
+            else if ($(this)["0"].innerText.trim() == 'UPDATED')
+            {
+                // $(this).css({ 'color':'blue' });
+            }
+            else if ($(this)["0"].innerText.trim() == 'DELETED')
+            {
+                // $(this).css({ 'color': '#847c71' });
+            }            
+        });
+        otable.column(5).nodes().to$().each(function (index)
+        {
+            var ultimaFechaOperacion = $('#tblTrazabilidadActividad > tbody > tr:eq(0) > td:eq(5)').text().trim()
+            var celdaActual = $(this)            
+            var fechaOperacionActual = celdaActual["0"].innerText.trim()
+
+            if (ultimaFechaOperacion == fechaOperacionActual)
+                celdaActual.parent().css({ 'color': '#ffffff', 'background': '#c56d6d' })
+        });
+    }
+
+    function aleatorio(inferior, superior)
+    {
+        numeroPosibilidades = superior - inferior
+        aleat = Math.random() * numeroPosibilidades
+        aleat = Math.floor(aleat)
+        return parseInt(inferior) + aleat
+    }
+
+    function dameColorAleatorio()
+    {
+        hexadecimal = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
+        colorAleatorio = '#'
+
+        for (i = 0 ; i < 6 ; i++) {
+            posicionArray = aleatorio(0, hexadecimal.length)
+            colorAleatorio += hexadecimal[posicionArray]
+        }
+
+        return colorAleatorio
+    }
+
+</script>

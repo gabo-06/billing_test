@@ -1,0 +1,147 @@
+﻿@model Billing.Web.Models.Medical
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Medical</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_code)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_code)
+            @Html.ValidationMessageFor(model => model.Med_code)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_code_old)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_code_old)
+            @Html.ValidationMessageFor(model => model.Med_code_old)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_firstName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_firstName)
+            @Html.ValidationMessageFor(model => model.Med_firstName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_lastName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_lastName)
+            @Html.ValidationMessageFor(model => model.Med_lastName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_address)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_address)
+            @Html.ValidationMessageFor(model => model.Med_address)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_phone)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_phone)
+            @Html.ValidationMessageFor(model => model.Med_phone)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_fax)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_fax)
+            @Html.ValidationMessageFor(model => model.Med_fax)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_zipCode)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_zipCode)
+            @Html.ValidationMessageFor(model => model.Med_zipCode)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_city)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_city)
+            @Html.ValidationMessageFor(model => model.Med_city)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_state)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_state)
+            @Html.ValidationMessageFor(model => model.Med_state)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_zipCodeExt)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_zipCodeExt)
+            @Html.ValidationMessageFor(model => model.Med_zipCodeExt)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_phoneExt)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_phoneExt)
+            @Html.ValidationMessageFor(model => model.Med_phoneExt)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_status)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_status)
+            @Html.ValidationMessageFor(model => model.Med_status)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Spe_code, "Specialty")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("Spe_code", String.Empty)
+            @Html.ValidationMessageFor(model => model.Spe_code)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Med_alternatePhone)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Med_alternatePhone)
+            @Html.ValidationMessageFor(model => model.Med_alternatePhone)
+        </div>
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

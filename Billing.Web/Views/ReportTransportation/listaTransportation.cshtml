@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_REPORT_TRANSPORTATION_Result >
+@{
+    var i = 0;
+}
+
+<div style="overflow: hidden;" class="ibox-content">                    
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblListaReporte" style="width:100%;">
+        <thead class="th_tabla" style="background-color:#b42734;color:white;font-family:Arial;">    
+         <tr>
+           <th></th>
+           <th style="font-size: 13px;font-family: Arial;">Patient </th>
+           <th style="font-size: 13px;font-family: Arial;">Insurer</th>           
+           <th style="font-size: 13px;font-family: Arial;">Adjuster </th>           
+           <th style="font-size: 13px;font-family: Arial;">Injury Date</th>           
+           <th style="font-size: 13px;font-family: Arial;">Company</th>           
+        </tr>
+       </thead>
+       <tbody>
+         @foreach (var item in Model)
+          {
+            i = i + 1;
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@i</td>
+                     <td width="200px" style="font-size:12px; font-family: Arial;border: 1px solid #cccbcb;">@item.patient</td>                          
+                     <td width="250px" style="font-size:12px; font-family: Arial;border: 1px solid #cccbcb;">@item.Ins_name</td>                          
+                     <td width="100px" style="font-size:12px; font-family: Arial;border: 1px solid #cccbcb;">@item.adjuster</td>                          
+                     <td style="border: 1px solid #cccbcb;">@item.Cis_accidentDate</td>                                   
+                     <td   style="border: 1px solid #cccbcb;">@item.Cis_transportationCompany</td>
+                 </tr>
+         }      
+        </tbody>
+        
+    </table>
+</div>
+</div>
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        $("#btnGeneraWord").on("click", generaWord); //edher
+        PaginarTabla();
+
+    }
+     
+    function generaWord() {
+        //alert("aki");
+        //var urlx = $("#linkPdf").attr("data-url");
+        var invoice = $("#invoice_btn").val();
+
+        var urlx = $("#linkWord").attr("data-url");
+        urlx = urlx;
+        window.open(urlx);
+    }
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblListaReporte').DataTable({
+            //"scrollY": 100,            
+            "scrollY": 600,
+            "bFilter": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bSort": false
+        });
+    }
+
+</script>

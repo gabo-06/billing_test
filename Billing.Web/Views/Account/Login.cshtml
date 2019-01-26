@@ -1,0 +1,81 @@
+﻿@model Billing.Web.Models.LoginModel
+
+@{
+    ViewBag.Title = "Login";
+}
+
+
+<body class="gray-bg">
+
+    <div class="middle-box text-center loginscreen animated fadeInDown">
+        <div>
+
+<div style="text-align:center;"> 
+    <h1 class="logo-name">OM+</h1>
+    
+</div>
+
+<h3>Welcome to Omnimedic</h3>
+
+<form class="m-t" role="form" method="post" action="@Url.Content("~/Account/Login")">
+    
+    @*<input name="__RequestVerificationToken" type="hidden" value="78NZ-XULFuy3x_bvcyx8mLdWF-bvcyvoTFb7I-fS6DwPrs2rnvGmDGMZ1R-OOp3RdXesMC5DdojwqiTcPBcTdBFJy_we7VP83Kg71cUeLXo1">*@
+    @Html.AntiForgeryToken()
+   
+
+    
+    <div class="form-group">
+        <input type="text" 
+               id="UserName" 
+               name="UserName" 
+               class="form-control" 
+               placeholder="Username" 
+               data-val="true"
+               data-val-required="The User name field is required.">
+
+        <span class="field-validation-valid" data-valmsg-for="UserName" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+        <input type="password" 
+               id="Password" 
+               name="Password" 
+               class="form-control" 
+               placeholder="Password" 
+               data-val="true"
+               data-val-required="The Password field is required.">
+
+        <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+        <input data-val="true" 
+               data-val-required="The Remember me? field is required." 
+               id="RememberMe" 
+               name="RememberMe" 
+               type="checkbox" 
+               value="true">
+
+               <input name="RememberMe" type="hidden" value="false">
+               <label class="checkbox" for="RememberMe">Remember me?</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+     @Html.ValidationSummary(true)
+
+</form>
+<br><br>
+<p class="m-t"> 
+<strong>Developed by </strong> <a href="http://www.itusaservices.com">Itusaservices</a>
+</p>
+ 
+        </div>
+    </div>
+
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+}
+
+    
+ 
+         
+</body>

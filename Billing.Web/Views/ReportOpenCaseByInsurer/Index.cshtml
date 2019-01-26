@@ -1,0 +1,126 @@
+﻿<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>OPEN CASES BY INSURER</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center">                          
+                            <label class="col-sm-3 control-label">Insurer </label>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="cmbAseguradora" tabindex="22">
+                                    <option selected value="0"></option>
+                                </select>                          
+                            </div>
+                            <div class="col-sm-1">                                
+                                    <button type="button" class="btn btn-primary" id="btnSearch">Search</button>
+                                    <a style="display:none;" target="_blank" class="btn btn-primary" data-url="/Billing/DownloadPDF" id="linkPdf" href="#"><i class="fa fa-file"></i>&nbsp;Generate link</a>
+                            </div> 
+                        </div>
+                    </form> 
+                </div>              
+
+            </div>
+        </div>  
+    </div>
+
+    <div class="row">        
+        <div class="col-lg-12" id="divResultado">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>RESULTS</h5>
+                </div> 
+                <div class="ibox-content" id="div_reporte" style="border-style: none; border-width: 0;display:none;">
+                    <div class="form-group">
+                    @using (Html.BeginForm("ExportToWordOpenCaseByInsurer", "ReportOpenCaseByInsurer", FormMethod.Post))
+                    {
+                      <button id="btnGeneraWord" class="btn btn-primary" type="submit" data-toggle="tooltipB"  data-placement="top" title="" data-original-title="Create a New case">
+                         <i class="fa fa-save"></i>&nbsp; Export to Word</button>
+                        
+                        <input type="hidden" value="0" id="codigoAseguradora" name="codigoAseguradora">
+                        <input type="hidden" value="0" id="Aseguradora" name="Aseguradora">
+                    }
+
+                         <div id ="resultadoReporte">
+                         </div> 
+                     </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+
+
+</div>
+
+@Html.Partial("footer")
+
+<script> 
+    var VecesSelecionaCaso = 0;
+
+    $(Inicio);
+
+    function Inicio()
+    {
+        ProcesoActual = "Reports";
+        ObtenerAutocompletarInsurer();
+        $("#btnSearch").on("click", cargaLista);        
+    }
+    function ancla() {
+        $("html,body").stop().animate({ scrollTop: $("#seleccionarCaso").offset().top }, 1000);
+    }
+    function ObtenerAutocompletarInsurer() // mg
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaAutocompletar", "Insurer")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                //console.log(Data);
+                //Aseguradoras = Data.Data.response['insurers']; // Obtiene datos de los aseguradoras para autocompletado     (INSURER)                   
+                Aseguradoras = Data; // Obtiene datos de los aseguradoras para autocompletado     (INSURER)                   
+                CargarAseguradorasEnCombo(Aseguradoras); // Carga las aseguradoras en el combo autocompletable de aseguradoras.
+            }
+        });
+
+    }
+    function CargarAseguradorasEnCombo(Aseguradoras) {
+        var CodigoAseguradora;
+        var NombreAseguradora;
+        $("#cmbAseguradora").empty();
+        $.map(Aseguradoras, function (val, i) {
+            CodigoAseguradora = val.Codigo;
+            NombreAseguradora = val.NombreCompleto;
+
+            $("#cmbAseguradora").append("<option value='" + CodigoAseguradora + "'>" + NombreAseguradora + "</option>");
+        });
+    }
+
+
+    function cargaLista() {
+        codigoIns = $("#cmbAseguradora option:selected").val();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("listaOpenCaseByInsurer", "ReportOpenCaseByInsurer")',
+            data: { codigoInsurer: codigoIns },
+            contentType: 'application/html;charset=utf-8',
+            dataType: 'html',
+            success: function (Data) {
+                $("#div_reporte").css("display", "block");
+                $("#resultadoReporte").html(Data);
+            }
+        });
+
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+</script>

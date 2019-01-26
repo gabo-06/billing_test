@@ -1,0 +1,229 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_LIST_PAYMENTS_BY_FILTERS_Result>
+
+<div class="table-responsive" id="EnvolturatblFacturas_tabla">
+    <!--<div style="border: 1px solid #444444; padding: 0.5em; width: 116px;">
+        <span style="background-color: rgb(254, 250, 173); border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span> <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Partially Paid</span>    
+        <br />
+        <span style="background-color: rgb(186, 255, 253); border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span> <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Unpaid</span>
+    </div>-->
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblFacturasPorPagar">
+        <thead class="th_tabla">
+            <tr>
+                <!-- 0   --> <th class="hidden" >PayCode</th>
+                <!-- 1   --> <th class="TextoAlineado" style="text-align: center;width:100px">Check #</th>
+                <!-- 3   --> <th class="TextoAlineado hidden" style="text-align: center;width:100px">Type Pay</th>
+                <!-- 4   --> <th class="TextoAlineado" style="text-align: center;width:100px">Amount</th>
+                <!-- 5   --> <th class="TextoAlineado" style="text-align: center;width:100px">Paid Date</th>
+                <!-- 6   --> <th class="TextoAlineado" style="text-align: center;width:45px">Select</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        { 
+            <tr>
+                <!-- 0  --> <td class="hidden">@item.PayCode</td>
+                <!-- 1  --> <td class="TextoAlineado" style="width:100px">@item.CheckNumber</td>
+                <!-- 3  --> <td class="TextoAlineado hidden" style="width:100px">@item.PayType</td>
+                <!-- 4  --> <td class="TextoAlineado" style="width:100px">@item.PayAmount</td>
+                <!-- 5  --> <td class="TextoAlineado" style="width:100px">@item.PayDate</td>
+                <!-- 6  --> <td class="TextoAlineado" style="text-align: center;width:45px;" ><a class="btn btn-primary seleccionarPago">Select</a></td>
+            </tr>
+        }
+        <tfoot>
+            <tr>
+                <!-- 0   --> <th class="hidden" >PayCode</th>
+                <!-- 1   --> <th class="TextoAlineado"  style="width:100px">Check #</th>
+                <!-- 3   --> <th class="TextoAlineado hidden"  style="width:100px">Type Pay</th>
+                <!-- 4   --> <th class="TextoAlineado"  style="width:100px">Amount</th>
+                <!-- 5   --> <th class="TextoAlineado"  style="width:100px">Paid Date</th>
+                <!-- 6   --> <th class="TextoAlineado"  style="width:100px">Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<script>
+    $(Inicio)
+
+    function Inicio() 
+    {
+        // Eventos
+        $('#tblFacturasPorPagar > tbody').on('click', 'tr > td > .seleccionarPago', function (e) {
+            e.preventDefault()
+
+            var codigoPago
+
+            codigoPago = parseInt($(this)["0"].parentNode.parentNode.children["0"].innerText.trim())
+
+            cargarDetallePago(codigoPago);
+
+            pintaFilaSeleccionada(e)
+        })
+
+
+        /////// BUSQUEDA DE FILTROS
+        $('#tblFacturasPorPagar tfoot th').each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text" id="' + title + '" placeholder="Search ' + title + '" />');
+
+        });
+        //////////////////////////////
+        PaginarTabla();
+        $("#tblFacturasPorPagar tfoot").css({ "display": "none" });
+        $("#tblFacturasPorPagar_filter").css({ "display": "none" });
+        $(".buttons-excel").css({ "display": "block" });
+
+
+        
+    }
+
+    function pintaFilaSeleccionada(e) {
+        // Establece a todas la filas su formato original.
+        $('#tblFacturasPorPagar > tbody > tr').css({'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#a1bccd";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+        function cargarDetallePago(codigoPago) {
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ "CodigoPago": codigoPago }),
+                url: '@Url.Action("CargarDetallePago", "PaymentReceived")',
+                contentType: "application/json",
+                success: function (VistaParcialDetallePago) {
+                    $("#EnvolturatblDetallePago").html(VistaParcialDetallePago);
+                }
+            });
+        }
+
+
+        function PaginarTabla() {
+            console.log("pagina tablaXX");
+            var i = 0;
+            var rowCount = $('#tblFacturasPorPagar tr').length;
+            var otable = $("#tblFacturasPorPagar").dataTable().fnDestroy();
+
+            otable = $("#tblFacturasPorPagar")
+            .DataTable({
+                "pageLength": 10
+                , "bFilter": true
+                , "bLengthChange": false
+                , "bInfo": false
+                , "paging": true
+                , dom: 'Bfrtip'             
+                ,buttons: [{                
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: ':visible',
+                        columns: [1,2, 3, 4]
+                    },
+                    customize: function (xlsx) {                    
+                console.log(xlsx);
+                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                var downrows = 4;
+                var clRow = $('row', sheet);
+
+                       
+
+                $('row c[r*="1"]', sheet).attr('s', '37');           
+
+
+                for (x = 2; x < rowCount + 2; x++)
+                {
+                    $('row c[r*=' + x + ']', sheet).attr('s', '25');
+                }
+
+                        //update Row
+                clRow.each(function () {
+                    var attr = $(this).attr('r');
+                    var ind = parseInt(attr);
+                    ind = ind + downrows;
+                    $(this).attr("r", ind);
+                });
+
+                        // Update  row > c
+                $('row c ', sheet).each(function () {
+                        
+                    var attr = $(this).attr('r');
+                    var pre = attr.substring(0, 1);
+                    var ind = parseInt(attr.substring(1, attr.length));
+                    ind = ind + downrows;
+                    $(this).attr("r", pre + ind);
+                });
+
+                function Addrow(index, data,mensaje) {
+                    console.log(index);
+                    console.log(data);
+                    console.log(data.length);
+                    msg = '<row r="' + index + '">'
+                    if(mensaje=="cuerpo")
+                    {
+                        for (i = 0; i < data.length; i++) {
+                            var key = data[i].k;
+                            var value = data[i].v;
+                            msg += '<c t="inlineStr" r="' + key + index + '" s="2">'; //42
+                            msg += '<is>';
+                            msg += '<t>' + value + '</t>';
+                            msg += '</is>';
+                            msg += '</c>';
+                        }
+                    }
+                    if (mensaje == "foot") {
+                        for (i = 0; i < data.length; i++) {
+                            var key = data[i].k;
+                            var value = data[i].v;
+                            msg += '<c t="inlineStr" r="' + key + index + '" s="2">'; //42
+                            msg += '<is>';
+                            msg += '<t>' + value + '</t>';
+                            msg += '</is>';
+                            msg += '</c>';
+                        }
+                        
+                    }
+                    msg += '</row>';
+
+                    return msg;
+                }
+              
+
+                console.log("AKI - " + i);
+                        //insert
+                var r1 = Addrow(1, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: 'REPORT PAYMENT' }, { k: 'D', v: '' }, { k: 'E', v: '' }],"cuerpo");
+                        //var r2 = Addrow(2, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: 'Insurer' }, { k: 'D', v: "XXXXXXXXXX" }]);
+                        //var r3 = Addrow(3, [{ k: 'A', v: '' }, { k: 'B', v: 'Start Date' }, { k: 'C', v: "20/12/2017" }, { k: 'D', v: 'End Date' }, { k: 'E', v: "20/12/2017" }]);
+                        //var r3 = Addrow(10, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: '' }, { k: 'D', v: '' }, { k: 'E', v: 'REPORT' }], "foot");
+                        //sheet.childNodes[0].childNodes[1].innerHTML = r3 + sheet.childNodes[0].childNodes[1].innerHTML;
+                sheet.childNodes[0].childNodes[1].innerHTML = r1 + sheet.childNodes[0].childNodes[1].innerHTML;
+                
+
+  
+                    }
+                          }]
+                });
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            //Apply the search
+            console.log("ssssssssssss");
+            otable.columns().every(function () {
+                var that = this;
+                $('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        }
+    
+</script>

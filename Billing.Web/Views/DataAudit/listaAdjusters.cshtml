@@ -1,0 +1,215 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Adjuster</h5>
+</div>
+
+<input type="hidden" id="hdCodigoAjustadorSeleccionado">
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblAjustadores" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">Adj_code</th>
+                <th>Adjuster's Name</th>
+                <th>Adjuster's Last name</th>       
+                <th>Phone</th>     
+                <th>Phone Ext</th>
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="hidden">Adj_code</th>
+                <th>Adjuster's Name</th>
+                <th>Adjuster's Last name</th>       
+                <th>Phone</th>     
+                <th>Phone Ext</th>
+                <th>Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<script>
+   
+    $(document).ready(function ()
+    {
+        $('[data-toggle="tooltipB"]').tooltip();
+     
+        $('#tblAjustadores').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetDataTrazabilidad", "Adjuster")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Adj_code" },
+                        { "data": "Adj_firstName" },
+                        { "data": "Adj_lastName" },
+                        { "data": "Adj_phone" },
+                        { "data": "Adj_phoneExt" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" data-toggle="tooltipB" data-placement="top" title="Select Adjuster"  class="btn selectAdjuster btn-danger btn-bitbucket text-center"> Select</a> ' } }                        
+            ]
+        });
+
+
+        // Evento para controlar la selección de un ajustador.
+        $('#tblAjustadores > tbody').on('click', 'tr > td > .selectAdjuster', SeleccionaAjustador_Click);
+        
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaAjustador_Click(e)
+    {
+        e.preventDefault()
+
+        var codigoAjustadorSeleccionado // Variable que almacenará el código del ajustador seleccionado.
+        var nombreAjustadorSeleccionado // Variable que almacenará el nombre del ajustador seleccionado.
+        var apellidoAjustadorSeleccionado // Variable que almacenará el apellido del ajustador seleccionado.
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre del ajustador seleccionado.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código, nombre y apellido del ajustador seleccionado.
+        codigoAjustadorSeleccionado = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombreAjustadorSeleccionado = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+        apellidoAjustadorSeleccionado = e.currentTarget.parentElement.parentElement.children[2].innerHTML
+
+        // Guarda el código del ajustador seleccionado en el campo oculto.
+        $('#hdCodigoAjustadorSeleccionado').val(codigoAjustadorSeleccionado)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+
+        ActualizaTrazabilidadAjustador(codigoAjustadorSeleccionado, nombreAjustadorSeleccionado, apellidoAjustadorSeleccionado)
+    }
+
+        function RecibeSeñalNode()
+        {
+            var websocket = io.connect(ServidorPuertoNode)
+
+            websocket.on('respuestaTrazabilidadAjustador', function (data)
+            {
+                MuestraTrazabilidadTiempoReal(data)
+            })
+        }
+
+        function MuestraTrazabilidadTiempoReal(data)
+        {
+            // Si lo que contiene data.codigoAjustadorActualizado es 'null' entonces tomará valor vacío.
+            var codigoAjustadorActualizado = data.codigoAjustadorActualizado || ''
+
+            // Esta función actualizará la tabla de búsqueda de ajustadores
+            ActualizaTablaBusqueda()
+
+            // Verifica que exista un ajustador seleccionado y que el código del ajustador
+            // seleccionado coincida con el código de ajustador traido desde node, si es así
+            // mostrará la trazabilidad del ajustador.
+            if ($('#hdCodigoAjustadorSeleccionado').val().trim() != ''
+             && $('#hdCodigoAjustadorSeleccionado').val().trim() == codigoAjustadorActualizado.trim())
+            {
+                ActualizaTrazabilidadAjustador(data.codigoAjustadorActualizado.trim()
+                                                , data.nombreAjustadorActualizado.trim()
+                                                , data.apellidoAjustadorActualizado.trim())
+            }
+        }
+
+        function ActualizaTrazabilidadAjustador(codigoAjustadorSeleccionado
+                                            , nombreAjustadorSeleccionado
+                                            , apellidoAjustadorSeleccionado)
+        {
+            // Muestra la trazabilida del ajustador seleccionado en la tabla de detalle "tblTrazabilidadAjustador".
+            MuestraTablaTrazabilidadAjustador(codigoAjustadorSeleccionado)
+
+            // Se obtiene el título de la vista parcial de la trazabilidad de ajustador, 
+            // para después concatenarlo con el nombre del ajustador seleccionado.
+            tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+            $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombreAjustadorSeleccionado + ' ' + apellidoAjustadorSeleccionado + ')')
+        }
+
+        function MuestraTablaTrazabilidadAjustador(codigo)
+        {
+            var trazabilidadAjustador
+
+            // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+            trazabilidadAjustador = ObtieneDataTrazabilidadAjustador(codigo)
+
+            // Muestra la vista parcial de la trazabilidad del ajustador seleccionado.
+            $('#DetalleInformacion').css({ 'display': 'block' });
+            $('#DetalleInformacion').html(trazabilidadAjustador);
+        }
+
+        function pintaFilaSeleccionada(e)
+        {
+            // Establece a todas la filas su formato original.
+            $('#tblAjustadores > tbody > tr').css({'background': 'transparent'
+                                                , 'color': 'black'
+                                                , 'font-style': 'normal'
+                                                , 'font-weight': 'normal'
+            });
+
+            // Coloreo la fila seleccionada
+            e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+            e.currentTarget.parentElement.parentElement.style.color = "#445463";
+            e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+            e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+        }
+
+        function ObtieneDataTrazabilidadAjustador(codigo)
+        {
+            var trazabilidadAjustador
+
+            $.ajax({
+                type: 'POST'
+                , async: false
+                , data: JSON.stringify({ 'codigoAjustador': parseInt(codigo) })
+                , url: '@Url.Action("trazabilidadAjustador", "DataAudit")'
+                , contentType: "application/json"
+                , dataType: 'html'
+                , success: function (Data)
+                {
+                    trazabilidadAjustador = Data
+                }
+            });
+
+            return trazabilidadAjustador
+        }
+
+        function ActualizaTablaBusqueda()
+        {
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '@Url.Action("ListarParaTrazabilidad", "Adjuster")',
+                contentType: false,
+                contentType: false,
+                success: function (Data)
+                {
+                    $('#tblAjustadores').DataTable().ajax.reload();
+                }
+            });
+        }
+
+</script>

@@ -1,0 +1,255 @@
+﻿<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos">
+        <thead class="th_tabla">    
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th> 
+                <th >         
+                    CLAIM # 
+                </th>
+                <th class="hidden"> 
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                               
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th> 
+                    STATUS
+                </th>
+                <th>
+                    SELECT
+                </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">
+     
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th class="hidden text-center">
+                    CASE CODE &nbsp;&nbsp;&nbsp;&nbsp;
+                </th>
+                <th class="text-center">
+                    CLAIM #       &nbsp;&nbsp;&nbsp;&nbsp;        
+                </th>
+                <th class="hidden">
+                    PATIENT CODE  &nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                         
+                </th>
+                <th class="text-center">
+                    PATIENT         &nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                          
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME    &nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                             
+                </th>
+                <th class="text-center">
+                    INSURER           &nbsp;&nbsp;&nbsp;&nbsp;                                                                                   
+                </th>
+                <th class="text-center">
+                    ACCIDENT DATE &nbsp;&nbsp;&nbsp;&nbsp;
+                </th>
+                <th class="text-center">
+                    STATUS &nbsp;&nbsp;&nbsp;&nbsp;
+                </th>
+                <th class="text-center">SELECT &nbsp;&nbsp;&nbsp;&nbsp;</th>
+            </tr> 
+        </tfoot>
+    </table>
+</div>
+
+
+<script>
+    $(Inicio);
+
+    var contador = 1
+
+    function Inicio() {
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('abreCierraCasoEnCalendar', function (data) {
+            var codigoDeCaso = data.codigoDeCaso
+            var estadoDeCaso = data.estadoDeCaso
+            
+            // Actualiza estado del caso en la tabla de casos (si es que el caso correspondiente está cargado).
+            $('#tblCasos > tbody > tr').each(function (indice, valor) {
+                if (parseInt(valor.children["0"].innerText.trim()) == data.codigoDeCaso) { 
+                    valor.children[7].innerText = data.estadoDeCaso
+                }
+            })
+
+            // Actualiza estado del caso en formulario del caso (si es que el caso correspondiente está cargado).            
+            if (parseInt($('#hdCodigoCaso').val().trim()) == data.codigoDeCaso)
+                $("#txtStatus").val(data.estadoDeCaso)
+        })
+
+        // console.log("vista_parcial");
+        //llenaTest();
+        // setInterval(function () {
+            PaginarTabla();
+        // }, 2000)
+        
+
+        OcultarControlesDecorativosDataTable();
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        /////$("#tblCasos_filter").css({ "display": "none" });
+        //antes en index
+        //$("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso);=> movido al index
+        //$(".SeleccionarCaso").on("click", SeleccionarCaso);
+
+        //agregado
+        //$("#tblCasos > tbody").css({ "display": "table-row-group" });
+        //$("#tblCasos_paginate").css("display", "block");
+                
+
+                
+        //////////////////////////////////////////////// PARA LEER LOS CAMBIOS DE ESTADO, CAMBIOS QUE SE HACEN EN CALENDAR SE DEBEN REFLEJAR AQUI
+        // Actualiza cada 30 segundos el campo "Status" del formulario del "CaseInformation"
+        // setInterval(function () {            
+        //      refrescaData();
+        // }, 300000)
+
+
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
+
+
+    function refrescaData()
+    {
+        /*if ($('#hdCodigoPaciente').val() == undefined)
+            return false
+        
+        if ($("#txtBuscaCaso").val() != "") {*/
+        sw = 0;
+        
+        $('#tblCasos > tbody > tr').each(function (i, val) {
+            //debugger
+                if (val.children[2] != undefined) {
+                    // dato = obtenerEstadoDeCaso(val.children[2].innerText.trim()) // funcion esta en index de case
+                    //console.log(val.children["0"].innerText.trim);
+                    dato = obtenerEstadoDeCaso(val.children["0"].innerText.trim())
+                    //valorActual = val.children[7].children[0].innerHTML.trim();
+                    valorActual = val.children[7].innerText.trim();
+                    if (dato)
+                        dato = "OPEN";
+                    else
+                        dato = "CLOSED";
+
+                    if (valorActual != dato) {
+                        console.log("hubo cambio");
+                        val.children[7].innerText = dato;
+
+                        sw = 1;
+                    }
+                    else
+                        console.log("NO hubo cambio");
+
+
+                }
+            })
+        //}
+        /// valida cuando en tabla no esta el paciente, pero ya se selecicono con aterioridad y su data esta cargada en el detalle
+        // if ($("#hdCodigoPaciente").val() != "" && $("#hdCodigoPaciente").val() != 0) {
+            if ($("#hdCodigoCaso").val() != "" && $("#hdCodigoCaso").val() != 0) {            
+                dato = obtenerEstadoDeCaso($("#hdCodigoCaso").val()); // funcion esta en index de case
+                if (dato)
+                    dato = "OPEN";
+                else
+                    dato = "CLOSED";
+        
+                $("#txtStatus").val(dato);
+            }
+
+
+            $("#cargaRefresh").css("display", "inline-block");
+            setTimeout(function () {$("#cargaRefresh").css("display", "none") }, 500);
+            
+        //if (sw == 1) {
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ "codigoPaciente": 0 }),
+                url: '@Url.Action("limpiaVariableGlobal", "CaseInformation")',
+                     contentType: "application/json",
+                     dataType: 'json',
+                     success: function (Data) {
+                         console.log("limpia");
+                         $("#txtBuscaCaso").focus();
+                         $("#cargaRefresh").css("display", "inline-block");
+                     }
+                 })
+             //}
+    }
+
+
+    function PaginarTabla() {
+        $('#tblCasos').dataTable({
+             "pageLength": 5,
+             "columnDefs": 
+             [
+                 { "targets": [1], "width": "15%" }, 
+                 { "targets": [0, 1, 2, 4, 5, 6], "searchable": false }, 
+                 { "targets": [0, 2, 4], className: "hidden"  }, 
+                 { "targets": [8]; className: "text-center" }, 
+                 { "targets": [7], className: "estadoDeCaso" }
+             ],
+             //"columnDefs": [{ "width": "15%", "targets": [1] }, { "targets": [0, 1, 2, 4, 5, 6, 7], "searchable": false }, { className: "hidden", "targets": [0, 2, 4] }, { className: "text-center", "targets": [8] }],
+             "language":
+                  { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"},
+             "processing": true,
+             "serverSide": true,
+             "ajax": {
+                    "url": '@Url.Action("GetData", "CaseInformation")',
+                    "type": "POST",
+                    "dataType": "JSON" 
+                     },
+             "columns": 
+             [
+                { "data": "CaseCode" },
+                { "data": "ClaimNumber" },
+                { "data": "PatientCode" },
+                { "data": "Patient" },
+                { "data": "Patient2" },
+                { "data": "Insurer" },
+                { "data": "AccidentDate" },
+                //{ "data": "Status", "render": function (data, type, full, meta) { return '<span class="estadoDeCaso"></a>' } },
+                { "data": "Status" },
+                { 
+                    "render": function (data, type, full, meta)
+                    {
+                        return '<a href="#detalleCase" class="btn SeleccionarCaso btn-danger btn-bitbucket" >Select</a>' 
+                    }
+                }
+             ]
+        });
+    }
+
+    function OcultarControlesDecorativosDataTable() {
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+    function MostrarOcultarCoincidencias(e) {
+        //console.log("ert");
+        //console.log($(this).val().trim());
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+</script>

@@ -1,0 +1,212 @@
+﻿<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>DATA ENTRY PER USER REPORTS</h5>
+                </div> 
+                <div class="ibox-content" style="padding-bottom:8px;">
+
+                  <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+
+                        <label class=" col-sm-2 control-label">Date input: </label>
+                            <div class="form-group text-center col-sm-3" id="FechaInicio_div">                            
+                            <div class=" input-group date">
+                                <span class="input-group-addon" id="addon_inicio"><i class="fa fa-calendar"></i></span>
+                                <input class="form-control ui-autocomplete-input dtpFecha" id="txtDateInput1" autocomplete="off" maxlength="10" data-mask="99/99/9999" type="text">
+                            </div>
+                            </div>
+
+                            <label class="col-sm-1 control-label" style="width:50px;">To</label>                            
+                            
+
+                            <div class="form-group text-center col-sm-3" id="FechaFin_div">
+                            
+                            <div class="input-group date">
+                                <span class="input-group-addon" id="addon_fin"><i class="fa fa-calendar"></i></span>
+                                <input class="form-control ui-autocomplete-input dtpFecha" id="txtDateInput2" autocomplete="off" maxlength="10" data-mask="99/99/9999" type="text">
+                            </div>
+                            </div>
+
+                        <div class="form-group text-center" id="botones">
+                            <div class="col-sm-2">                                
+                                    <button type="button" class="btn btn-primary" id="btnBusca">Search</button>
+                                    <input class="btn btn-primary" id="codigo_supervisor" value="0" type="hidden">
+                                    <a style="display:none;" target="_blank" class="btn btn-primary" data-url="/Billing/DownloadPDF" id="linkPdf" href="#"><i class="fa fa-file"></i>&nbsp;Generate link</a>
+                                    <input type="hidden" value=""id="fechaInicioTemp">
+                                    <input type="hidden" value=""id="fechaFinTemp">
+                            </div> 
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0px;">
+                            <div class="col-sm-8" style="text-align: center;">
+                                       <input type="checkbox" id="chbFiltrarconPrecio"><label for="checkbox6">&nbsp;Full Data of Description</label>
+                                        
+                            </div>
+                        </div>
+
+                    </form>
+                </div>              
+
+            </div>
+        </div>  
+    </div>
+
+    <div class="row">        
+        <div class="col-lg-12" id="divResultado">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>RESULTS</h5>
+                </div> 
+                
+
+                <div class="ibox-content" id="div_reporte" style="border-style: none; border-width: 0;">
+                    <div class="form-group">
+                    @using (Html.BeginForm("ExportToWordDataEntryPerUser", "ReportDataEntryPerUser", FormMethod.Post))
+                    {
+                      <button id="btnGeneraWord" class="btn btn-primary" disabled type="submit" data-toggle="tooltipB"  data-placement="top" title="" data-original-title="Create a New case">
+                         <i class="fa fa-save"></i>&nbsp; Export to Word</button>
+                        <input type="hidden" value="" id="fechaInicial" name="fechaInicial" validate>
+                        <input type="hidden" value="" id="fechaFin" name="fechaFin">
+                        <input type="hidden" value="0" id="filtro" name="filtro">
+                        <input type="hidden" value="0" id="codigoUser" name="codigoUser">
+                        <input type="hidden" value="0" id="supervisor" name="supervisor">
+                        <input type="hidden" value="0" id="permisoLocal" name="permisoLocal">
+                    }
+                        <div class="loadingBuscarPrincipal loading" style="display: none;text-align: center;"><img src="@Url.Content("images/loading.gif")"  style="width:80px;height:40px;" > Loading...</div>
+                         <div id ="resultadoReporte">
+                                @*@Html.Partial("../ReportDataEntryPerUser/lista_reporte_data_entry")*@
+                         </div> 
+                     </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+
+
+</div>
+
+
+
+
+@Html.Partial("footer")
+
+<script> 
+
+    $(Inicio);
+    function Inicio() {
+        ProcesoActual = "Reports";
+        $("#btnBusca").on("click", cargaLista);
+
+
+
+        $(".dtpFecha").parent(".input-group").find(".input-group-addon").on("click", function () {
+            // console.log($(this).parent(".input-group").find(".dtpFecha"));
+            $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+            $(this).parent(".input-group").find(".dtpFecha").focus();
+        });
+
+        $('.dtpFecha').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+
+    
+
+
+
+        // Asigna datepicker al campo "Fecha Fin"
+        $("#txtDateInput1").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+            
+            fecha = $("#txtDateInput1").val();
+            $("#fechaInicioTemp").val(fecha);
+            console.log("fechiat ");
+            var fecha = $.datepicker.formatDate("mm/dd/yy", $(this).datepicker('getDate'));
+            console.log(fecha);
+            $("#fechaInicioTemp").val(fecha);
+        });
+
+        // Asigna datepicker al campo "Fecha Fin"
+        $("#txtDateInput2").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+            fecha = $("#txtDateInput2").val();
+            $("#fechaFinTemp").val(fecha);
+            //var fecha = $.datepicker.formatDate("mm/dd/yy", $(this).datepicker('getDate'));
+            //console.log(fecha);
+            //$("#fechaInicioTemp").val(fecha);
+        });
+        $("#chbFiltrarconPrecio").on("change", function (e){
+
+            
+            completo = $("[id=chbFiltrarconPrecio]:checked").length; //1=si, 0 = no
+            $("#filtro").val(completo);
+
+        })
+
+
+        //$("#txtDateInput1").keypress(function (e) {
+        //    if (e.keyCode == 13) {
+        //        console.log("enter");
+        //        btnGenerate_click(e);
+        //    }
+        //});
+
+
+
+
+    }
+
+
+
+
+
+    function cargaLista() {
+     
+        txtDateInput1 = $("#txtDateInput1").val();
+        txtDateInput2 = $("#txtDateInput2").val();
+        completo = $("[id=chbFiltrarconPrecio]:checked").length; //1=si, 0 = no        
+        permiso = $('#permiso').val().trim();
+        $("#permisoLocal").val(permiso);
+
+                
+        usuario = ApellidoUsuarioGlobal + " " + NombreUsuarioGlobal;
+        $("#supervisor").val(usuario);
+        $("#codigoUser").val(CodigoUsuarioGlobal);
+        
+        
+        if (txtDateInput1 != "" && txtDateInput2 != "") {
+            $(".loadingBuscarPrincipal").show();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("listaDataEntryPerUser", "ReportDataEntryPerUser")',
+                data: { fechaInicial: txtDateInput1, fechaFin: txtDateInput2, filtro: completo, codigoUser: CodigoUsuarioGlobal, permiso: permiso },
+                contentType: 'application/html;charset=utf-8',
+                dataType: 'html',
+                success: function (Data) {
+                    $("#btnGeneraWord").removeAttr("disabled");
+                    $("#resultadoReporte").html(Data);
+                    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                    $(".loadingBuscarPrincipal").hide();
+                }
+            });
+
+        }
+        else {
+            error = "Error";
+            mensaje = "Please enter dates";
+            MensajeError(mensaje, error);
+        }
+
+    }
+
+function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+}
+</script>

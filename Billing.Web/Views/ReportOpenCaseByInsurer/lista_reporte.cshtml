@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_REPORT_OPEN_CASES_BY_INSURER_Result>
+@{
+    var i = 0;
+}
+<div style="overflow: hidden;" class="ibox-content">
+              
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblListaReporte" width="100%">
+        <thead class="th_tabla" style="background-color:#b42734;color:white;">  
+         <tr>
+           <th ></th>
+           <th style="font-size: 13px;font-family: Arial;">Date Of Referral </th>
+           <th style="font-size: 13px;font-family: Arial;">Patient's Name</th>           
+           <th style="font-size: 13px;font-family: Arial;">Insurer</th>           
+           <th style="font-size: 13px;font-family: Arial;">Adjuster</th>          
+           <th style="font-size: 13px;font-family: Arial;">Date of Injury</th>                     
+        </tr>
+       </thead>
+       <tbody>     
+        @foreach (var item in Model)
+         {
+            i = i + 1;
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;" >@i</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.ReferalDate</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.Patient</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.Ins_name</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.Adjuster</td>              
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.AccidentDate</td>                                               
+                 </tr>
+        }     
+       </tbody>
+        
+    </table>
+</div>
+</div>
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        $("#btnGeneraWord").on("click", generaWord); //edher
+        PaginarTabla();
+    }
+     
+    function generaWord() {
+
+        //var invoice = $("#invoice_btn").val();
+        var urlx = $("#linkWord").attr("data-url");
+        codigoIns = $("#cmbAseguradora option:selected").val();
+        nombreIns = $("#cmbAseguradora option:selected").text();
+   
+        $("#codigoAseguradora").val(codigoIns);
+        $("#Aseguradora").val(nombreIns);
+
+    }
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblListaReporte').DataTable({
+            //"scrollY": 100,            
+            "scrollY": 400,
+            "bFilter": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bSort": false
+        });
+    }
+
+
+
+</script>

@@ -1,0 +1,140 @@
+﻿<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>NEW REFERRAL BY SUPERVISOR</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center">                          
+                            <label class="col-sm-3 control-label">Supervisor Case </label>
+                            <div class="col-sm-4">
+                                 <select class="select2_demo_1 form-control" id="cmbSupervisor">
+                                 </select>                               
+                            </div>
+                        </div>
+                        <div class="form-group text-center">                          
+                            <label class="col-sm-3 control-label">The last </label>
+                             <div class="col-md-2"><input type="number" class="form-control" id="dias" value="60"></div>    
+                            <div class="col-sm-1">                                
+                                   <label class="col-sm-3 control-label">days </label>                                  
+                            </div>
+                            <div class="col-sm-1">                                
+                                    <button type="button" class="btn btn-primary" id="btnBusca">Search</button>
+                                    <input type="hidden" class="btn btn-primary" id="codigo_supervisor" value="0"/>
+                                    @*<a style="display:none;" target="_blank" class="btn btn-primary" data-url="/Billing/DownloadPDF" id="linkPdf" href="#"><i class="fa fa-file"></i>&nbsp;Generate link</a>*@
+                            </div> 
+                        </div>
+                    </form> 
+                </div>              
+
+            </div>
+        </div>  
+    </div>
+
+    <div class="row">        
+        <div class="col-lg-12" id="divResultado">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>RESULTS</h5>
+                </div> 
+                <div class="ibox-content" id="div_reporte" style="border-style: none; border-width: 0;">
+                    <div class="form-group">
+                      @using (Html.BeginForm("ExportToWordReferralbySupervisor", "ReportReferralSupervisor", FormMethod.Post))
+                       {
+                        <button id="btnGeneraWord" class="btn btn-primary" type="submit" data-toggle="tooltipB"  data-placement="top" title="" data-original-title="Create a New case">
+                         <i class="fa fa-save"></i>&nbsp; Export to Word</button>
+                        
+                        <input type="hidden" value="10" id="codigoSupervisor" name="codigoSupervisor">
+                        <input type="hidden" value="10" id="supervisor" name="supervisor">
+                        <input type="hidden" value="60" id="diasReporte" name="diasReporte">
+                       }
+                        <div id ="resultadoReporte">
+                             @*@Html.Partial("../ReportReferralSupervisor/lista_reporte")*@
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+
+
+</div>
+
+@Html.Partial("footer")
+
+<script> 
+    $(Inicio);
+
+    function Inicio() {
+        ProcesoActual = "Reports";
+        cargaCombo();
+        $("#btnBusca").on("click", cargaLista);
+
+    }
+
+    function cargaCombo() // mg
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarSupervisoresParaReporte", "User")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                Supervisores = Data; // Obtiene datos de los aseguradoras para autocompletado     (INSURER)                   
+
+                console.log(Supervisores);
+                CargarSupervisorEnCombo(Supervisores); // Carga las aseguradoras en el combo autocompletable de aseguradoras.
+            }
+        });
+
+    }
+    function CargarSupervisorEnCombo(Supervisores) {
+        var CodigoSupervisor;
+        var NombreSupervisor;
+        $("#cmbSupervisor").empty();
+        $.map(Supervisores, function (val, i) {
+            CodigoSupervisor = val.Codigo;
+            NombreSupervisor = val.NombreCompleto;
+            $("#cmbSupervisor").append("<option value='" + CodigoSupervisor + "'>" + NombreSupervisor + "</option>");
+        });
+    }
+
+    function cargaLista() {
+        codigoSup = $("#cmbSupervisor option:selected").val();
+        dias = $("#dias").val();
+        
+        if (dias <= 0 || dias == "")
+        {
+            error = "Error";
+            mensaje = "Put the last days";
+            MensajeError(mensaje, error);            
+            return false;
+        }
+
+        $("#diasReporte").val(dias);
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("listaReferralBySupervisor", "ReportReferralSupervisor")',
+            data: { codigoSupervisor: codigoSup, dias: dias },
+            contentType: 'application/html;charset=utf-8',
+            dataType: 'html',
+            success: function (Data) {
+                $("#resultadoReporte").html(Data);
+            }
+        });
+
+    }
+    function MensajeError(mensaje, error) {
+        console.log("mensajeError");
+        swal({
+            title: error,
+            text: mensaje,
+            html: true
+        });
+    }
+
+</script>

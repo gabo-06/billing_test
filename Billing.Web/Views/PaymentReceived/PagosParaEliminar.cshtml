@@ -1,0 +1,223 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_LIST_PAYMENTS_TO_BE_REMOVED_Result>
+<br />
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblPagosParaEliminar">
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">Pay Code</th>        <!-- Código de pago -->
+                <th class="TextoAlineado">Date Pay </th> <!-- Fecha de pago -->
+                <th class="TextoAlineado">Amount</th>          <!-- Monto del pago -->
+                <th class="TextoAlineado">Type Pay</th> <!-- Tipo del pago -->
+                <th class="TextoAlineado">Check #</th>      <!-- Número de transacción -->
+                <th ></th>                <!-- Botón Eliminar -->
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        { 
+            <tr>
+                <td class="hidden">@item.Pah_code</td>
+                <td class="TextoAlineado">@item.PayDate</td>
+                <td class="TextoAlineado">@item.Pah_amount</td>
+                <td class="TextoAlineado">@item.Pty_description</td>
+                <td class="TextoAlineado">@item.Pah_number</td>
+                <td style="text-align: center;"><a href="#" class="btn btn-danger  btn-bitbucket EliminarPago">Delete</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var FacturasParaRevertir = new Array();
+
+    $(Inicio)
+    
+    function Inicio()
+    {
+        PaginarTabla();
+
+        // Controla el evento click en los botones "Delete"
+        $("#tblPagosParaEliminar > tbody").on("click", "tr > td > .EliminarPago", EliminarPago_click );
+    }
+
+    function EliminarPago_click(e)
+    {
+        e.preventDefault();
+
+        MensajeConfirmacionMenu('Do you want to delete this payment?', 'Confirmation', RespuestaConfirmacionPago, [{ 'BotonEliminaPago': $(this) }]);
+    }
+
+    function EliminaPago(objetoArgumentos)
+    {
+        var BotonEliminaPago = objetoArgumentos["0"].BotonEliminaPago;
+        
+        var Pago // Aquí se obtiene un pago, es decir el conjunto de facturas que conforman un pago
+        var CodigoPago;
+        var FechaPago;
+
+        CodigoPago = parseInt(BotonEliminaPago["0"].parentElement.parentElement.children["0"].innerHTML);
+
+        FechaPago = BotonEliminaPago["0"].parentElement.parentElement.children["1"].innerHTML.trim();
+    
+        // Obtiene un pago, es decir el conjunto de facturas que conforman un pago.
+        Pago = ObtienePago(CodigoPago);
+
+        // console.log(Pago);
+        // return false;
+
+        $.each(Pago, function (Indice, Valor)
+        {
+            var objFacturaParaRevertir = new FacturaParaRevertir();
+
+            objFacturaParaRevertir.CodigoFactura = Valor.Bih_code;
+            objFacturaParaRevertir.Monto = parseFloat(Valor.Pab_amount);
+
+            // console.log(objFacturaParaRevertir);
+            
+
+            FacturasParaRevertir.push(objFacturaParaRevertir);
+        });
+
+        console.log(FacturasParaRevertir);
+        // return false;
+
+
+        // Este llamada actualiza los montos en las facturas (reversión de los montos) y actualiza el estado de las mismas.
+        RevierteMontosEnFactura(FacturasParaRevertir);
+        // return false;
+
+
+
+        // Esta llamada elimina el pago de la tabla "PayHead" y "PayBody".
+        EliminaPagoFisico(CodigoPago);        
+        
+        CargarAseguradorasParaEliminacion();
+        $("#EnvolturaPagosParaEliminar").html('');
+        $("#btnCancelarModalElimina").trigger("click");
+
+    }
+
+        function FacturaParaRevertir()
+        {
+            var CodigoFactura;
+            var Monto;
+        }
+
+        // Elimina el pago de la tabla "PayHead" y "PayBody".
+        function EliminaPagoFisico(CodigoPago)
+        {
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ "CodigoPago": CodigoPago }),
+                url: '@Url.Action("EliminaPago", "Payment")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+
+                }
+            });
+        }
+
+        // Esta función actualiza los montos en las facturas (reversión de los montos) y actualiza el estado de las mismas.
+        function RevierteMontosEnFactura(Pago)
+        {
+            console.log(Pago);
+            // return false;         
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ "FacturasParaRevertir": Pago }),
+                url: '@Url.Action("RevierteMontosEnFactura", "Payment")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                
+                }
+            });
+        }
+
+        // Función que obtiene un pago, es decir el conjunto de facturas que conforman un pago
+        function ObtienePago(CodigoPago)
+        {
+            var Pago;
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify({ "CodigoPago": CodigoPago }),
+                url: '@Url.Action("ListaPago", "Payment")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    Pago = Data;
+                }
+            });
+
+            return Pago;
+        }
+
+        function PaginarTabla()
+        {
+            var otable = $("#tblPagosParaEliminar").dataTable().fnDestroy();
+
+            otable = $("#tblPagosParaEliminar")
+            .DataTable({
+                "pageLength": 10
+                , "bFilter": false
+                , "bLengthChange": false
+                , "bInfo": false
+                , "dom": '<"toolbar">frtip'
+                , "ordering": false
+            });
+        }
+
+
+        function MensajeConfirmacionMenu(mensaje, titulo , miFuncion, objetoArgumentos)
+        {
+            swal({
+                title: titulo,
+                text: mensaje,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            },
+            function (isConfirm) 
+            {       
+                miFuncion(isConfirm, objetoArgumentos);
+            })
+        }
+
+        var RespuestaConfirmacionPago = function (Respuesta, objetoArgumentos)
+        {
+            // si confirma la eliminación.
+            if (Respuesta)
+            {
+                EliminaPago(objetoArgumentos);
+                MensajeError('Payment deleted Successfully!!!', '');
+                // RespuestaConfirmacionPago
+                ObtenerAseguradorasParaPago();
+                CargarAseguradorasParaPago();
+            }
+            // si cancela la eliminación.
+            else 
+            {
+                // $("#btnCancelarModalElimina").trigger("click");
+            }
+            // debugger;
+            // Hace que después de revertir el pago todo vuelva a la normalidad, es decir los valores 
+            // de la página principal de pago vuelven a su estado original.
+            $("#cmbFilter").val(CodigoAseguradoraSeleccionada).trigger("change");
+        }
+
+
+</script>

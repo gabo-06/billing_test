@@ -1,0 +1,149 @@
+﻿<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos">
+        <thead class="th_tabla">    
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th> 
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden"> 
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                               
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th> 
+                    STATUS
+                </th>
+                <th>
+                    SELECT
+                </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">
+     
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th>
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden">
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                              
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th>
+                    STATUS
+                </th>
+                <th>SELECT</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        PaginarTabla();
+        OcultarControlesDecorativosDataTable();
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        //$("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso); => movido a index
+
+
+        //agregado
+        //$("#tblCasos > tbody").css({ "display": "table-row-group" });
+        //$("#tblCasos_paginate").css({ "display": "block" });
+    }
+     
+    //function PaginarTabla()
+    //{
+    //    var otable = $("#tblCasos").dataTable().fnDestroy();
+    //    otable = $("#tblCasos").dataTable({
+    //        "pageLength": 5,
+    //        "columnDefs": [{ "targets": [0, 1, 2, 4,  5, 6, 7], "searchable": false }]
+
+    //    });
+
+    //}
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblCasos').DataTable({
+            "pageLength": 5,
+            "columnDefs": [{ "width": "15%", "targets": [1] }, { "targets": [0, 1, 2, 4, 5, 6, 7], "searchable": false }, { className: "hidden", "targets": [0, 2, 4] }],
+            "language":
+                 { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>" },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": '@Url.Action("GetData", "DataEntry")',
+                 "type": "POST",
+                 "dataType": "JSON"
+             },
+            "columns": [
+                       { "data": "CaseCode" },
+                       { "data": "ClaimNumber" },
+                       { "data": "PatientCode" },
+                       { "data": "Patient" },
+                       { "data": "Patient2" },
+                       { "data": "Insurer" },
+                       { "data": "AccidentDate" },
+                       { "data": "Status" },
+                       { "render": function (data, type, full, meta) { return '<a href="#detalleCase" class="btn SeleccionarCaso btn-danger btn-bitbucket" >Select</a>' } }
+            ]
+        });
+    }
+
+
+
+
+    function OcultarControlesDecorativosDataTable()
+    {
+        $("#tblCasos_filter").css("display", "none");
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+
+    function MostrarOcultarCoincidencias(e)
+    {
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+</script>

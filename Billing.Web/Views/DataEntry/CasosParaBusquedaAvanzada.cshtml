@@ -1,0 +1,280 @@
+﻿<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos">
+        <thead class="th_tabla">    
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th> 
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden"> 
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                               
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th> 
+                    STATUS
+                </th>
+                <th>
+                    SELECT
+                </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">
+     
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th>
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden">
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                              
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th>
+                    STATUS
+                </th>
+                <th>SELECT</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {        
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('abreCierraCasoEnCalendar', function (data) {
+            var codigoDeCaso = data.codigoDeCaso
+            var estadoDeCaso = data.estadoDeCaso
+
+            // Actualiza estado del caso en la tabla de casos (si es que el caso correspondiente está cargado).
+            $('#tblCasos > tbody > tr').each(function (indice, valor) {
+                if (parseInt(valor.children["0"].innerText.trim()) == data.codigoDeCaso) {
+                    valor.children[7].innerText = data.estadoDeCaso
+                }
+            })
+
+            // Actualiza estado del caso en formulario del caso (si es que el caso correspondiente está cargado).            
+            if (parseInt($('#hdCodigoCaso').val().trim()) == data.codigoDeCaso)
+                $("#txtStatus").val(data.estadoDeCaso)
+        })
+
+        PaginarTabla();
+        OcultarControlesDecorativosDataTable();
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        //$("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso); => movido a index
+
+
+        //agregado
+        //$("#tblCasos > tbody").css({ "display": "table-row-group" });
+        //$("#tblCasos_paginate").css({ "display": "block" });
+
+
+        //////////////////////////////////////////////// PARA LEER LOS CAMBIOS DE ESTADO, CAMBIOS QUE SE HACEN EN CALENDAR SE DEBEN REFLEJAR AQUI
+        // setInterval(function () {
+        //     refrescaData()
+        // }, 300000)
+
+     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    }
+
+    function obtenerEstadoDeCaso(codigoDeCaso) {
+        var estadoDeCaso
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "codigoDeCaso": codigoDeCaso }),
+            url: '@Url.Action("obtenerEstadoDeCaso", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                estadoDeCaso = Data
+            }
+        })
+
+        return estadoDeCaso
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @*function obtenerEstadoDeCaso(codigoDePaciente) {
+        var estadoDeCaso
+
+        $.ajax({
+            type: "POST",
+            async: false,            
+            data: JSON.stringify({ "codigoPaciente": parseInt(codigoDePaciente) }),
+            url: '@Url.Action("obtenerEstadoDeCaso", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                estadoDeCaso = Data
+            }
+        })
+
+        return estadoDeCaso
+    }*@
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    function refrescaData() {
+        /*if ($('#hdCodigoPaciente').val() == undefined)
+            return false
+        
+        if ($("#txtBuscaCaso").val() != "") {*/
+        sw = 0;
+        $('#tblCasos > tbody > tr').each(function (i, val) {
+
+            if (val.children[2] != undefined) {
+
+                dato = obtenerEstadoDeCaso(val.children[0].innerText.trim()) // funcion esta en index de case
+                //valorActual = val.children[7].children[0].innerHTML.trim();
+                valorActual = val.children[7].innerText.trim();
+                if (dato)
+                    dato = "OPEN";
+                else
+                    dato = "CLOSED";
+
+                if (valorActual != dato) {
+                    console.log("hubo cambio");
+                    val.children[7].innerText = dato;
+
+                    sw = 1;
+                }
+                else
+                    console.log("NO hubo cambio");
+
+
+            }
+        })
+        //}
+        /// valida cuando en tabla no esta el paciente, pero ya se selecicono con aterioridad y su data esta cargada en el detalle
+        if ($("#hdCodigoPaciente").val() != "" && $("#hdCodigoPaciente").val() != 0) {
+            dato = obtenerEstadoDeCaso($("#hdCodigoPaciente").val()); // funcion esta en index de case
+            if (dato)
+                dato = "OPEN";
+            else
+                dato = "CLOSED";
+
+            $("#txtStatus").val(dato);
+        }
+
+
+        $("#cargaRefresh").css("display", "inline-block");
+        setTimeout(function () { $("#cargaRefresh").css("display", "none") }, 500);
+
+        //if (sw == 1) {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "codigoPaciente": 0 }),
+            url: '@Url.Action("limpiaVariableGlobal", "CaseInformation")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    console.log("limpia");
+                    $("#txtBuscaCaso").focus();
+                    $("#cargaRefresh").css("display", "inline-block");
+                }
+            })
+             //}
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //function PaginarTabla()
+    //{
+    //    var otable = $("#tblCasos").dataTable().fnDestroy();
+    //    otable = $("#tblCasos").dataTable({
+    //        "pageLength": 5,
+    //        "columnDefs": [{ "targets": [0, 1, 2, 4,  5, 6, 7], "searchable": false }]
+
+    //    });
+
+    //}
+
+
+    function PaginarTabla() {
+        // console.log("PaginarTabla");
+        $('#tblCasos').DataTable({
+            "pageLength": 5,
+            "columnDefs": [{ "width": "15%", "targets": [1] }, { "targets": [0, 1, 2, 4, 5, 6, 7], "searchable": false }, { className: "hidden", "targets": [0, 2, 4] }, { className: "text-center", "targets": [8] }],
+
+            "language":
+                 { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>" },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": '@Url.Action("GetData", "DataEntry")',
+                 "type": "POST",
+                 "dataType": "JSON"
+             },
+            "columns": [
+                       { "data": "CaseCode" },
+                       { "data": "ClaimNumber" },
+                       { "data": "PatientCode" },
+                       { "data": "Patient" },
+                       { "data": "Patient2" },
+                       { "data": "Insurer" },
+                       { "data": "AccidentDate" },
+                       { "data": "Status" },
+                       { "render": function (data, type, full, meta) { return '<a href="#detalleCase" class="btn SeleccionarCaso btn-danger btn-bitbucket" >Select</a>' } }
+                       // { "render": function (data, type, full, meta) { return '<button type="button" class="btn SeleccionarCaso btn-danger btn-bitbucket" >Select</button>' } }
+            ]
+        });
+    }
+
+    function OcultarControlesDecorativosDataTable()
+    {
+        $("#tblCasos_filter").css("display", "none");
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+
+    function MostrarOcultarCoincidencias(e)
+    {
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+</script>

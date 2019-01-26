@@ -1,0 +1,99 @@
+﻿<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos">
+        <thead class="th_tabla">    
+            <tr>
+                <th>NAME</th> 
+                <th>TELEPHONE</th>
+                <th>EXT  </th>
+                <th class="hidden"> </th>                
+                <th>SELECT </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">
+     
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th >
+                    NAME
+                </th>
+                <th >         
+                    TELEPHONE
+                </th>
+                <th >
+                    EXT                                                                                                                                                                           
+                </th>
+                <th class="hidden">
+                    codigo                                                                                                                                                                           
+                </th>
+                <th>SELECT</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        PaginarTabla();
+        console.log()
+        OcultarControlesDecorativosDataTable();
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+
+
+    }
+
+
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblCasos').DataTable({
+            "pageLength": 5,
+            "columnDefs": [{ "width": "15%", "targets": [1] }, { "targets": [3], "searchable": false }, { className: "hidden", "targets": [3] }, { className: "text-center", "targets": [4] }],
+            "language":
+                 { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>" },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": '@Url.Action("GetData", "ReportAdjuster")',
+                 "type": "POST",
+                 "dataType": "JSON"
+             },
+            "columns": [
+                       { "data": "Adjuster" },
+                       { "data": "Adj_phone" },
+                       { "data": "Adj_phoneExt" },
+                       { "data": "Adj_code" },
+                       { "render": function (data, type, full, meta) { return '<a href="#resultadoReporte"  class="btn SeleccionarCaso btn-danger btn-bitbucket" >View</a>' } }
+            ]
+        });
+    }
+
+
+
+
+    function OcultarControlesDecorativosDataTable()
+    {
+        $("#tblCasos_filter").css("display", "none");
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+
+    function MostrarOcultarCoincidencias(e)
+    {
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+</script>

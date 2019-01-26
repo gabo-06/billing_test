@@ -1,0 +1,86 @@
+﻿<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblAjustador" >
+        <thead class ="th_tabla">
+        <tr>
+        <th class="hidden"></th>
+        <th>         
+            First Name
+        </th>
+        <th>
+            Last Name
+        </th>
+        <th>
+            Phone
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>Operations</th>
+        </tr>
+        </thead>
+       <tbody></tbody>
+        <tfoot>
+        <tr>        
+        <th class="hidden"></th>
+        <th >         
+            First Name
+        </th>
+        <th>
+            Last Name
+        </th>
+        <th>
+            Phone
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>Operations</th>
+        </tr>
+                    </tfoot>
+                    </table>
+</div>
+
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        PaginarTabla();
+    }
+
+
+    function PaginarTabla() {
+        console.log("hola");
+
+        $('#tblAjustador').DataTable({
+              order: [[1, "asc"]],
+             "pageLength": 10,
+             "columnDefs": [ { className: "hidden", "targets": [0] }],
+             "language":
+                  { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"},
+             "processing": true,
+             "serverSide": true,
+             "ajax": {
+                    "url": '@Url.Action("GetData", "Adjuster")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                     },
+             "columns": [
+                        { "data": "Adj_code" },
+                        { "data": "Adj_firstName" },
+                        { "data": "Adj_lastName" },
+                        { "data": "Adj_phone" },
+                        { "data": "Adj_phoneExt" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" title="Edit Adjuster" class="btn EditarAjustador btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a  title="Delete Adjuster" class="btn EliminarAjustador btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger" /> </a>' } }
+                        ]
+        });
+        ////////////////////////////////////////////////////////////////////////
+    }
+
+
+
+
+ 
+
+
+</script>

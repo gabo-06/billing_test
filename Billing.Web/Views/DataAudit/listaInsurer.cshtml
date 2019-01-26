@@ -1,0 +1,203 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Insurer</h5>
+</div>
+
+<input type="hidden" id="hdCodigoAseguradoraSeleccionada">
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblInsurer" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">Ins_code</th>
+                <th>Insurer's Name</th>
+                <th>Street</th>       
+                <th>City</th>     
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="hidden">Ins_code</th>
+                <th>Insurer's Name</th>
+                <th>Street</th>       
+                <th>City</th>     
+                <th>Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltipB"]').tooltip();
+        $('#tblInsurer').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetDataTrazabilidad", "Insurer")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Ins_code" },
+                        { "data": "Ins_name" },
+                        { "data": "Ins_address" },
+                        { "data": "Ins_city" },
+                        { "render": function (data, type, full, meta) { return ' <a class="btn selectInsurer btn-danger btn-bitbucket" title="Select Insurer" href="#divInsurer">Select</a>' } }
+            ]
+        });
+
+        // Evento para controlar la selección de una aseguradora.
+        $('#tblInsurer > tbody').on('click', 'tr > td > .selectInsurer', SeleccionaAseguradora_Click);
+
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaAseguradora_Click(e) {
+        e.preventDefault()
+
+        var codigoAseguradoraSeleccionada // Variable que almacenará el código de la aseguradora seleccionado.
+        var nombreAseguradoraSeleccionada // Variable que almacenará el nombre de la aseguradora seleccionado.        
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre de la aseguradora seleccionado.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código y nombre de la asegurabdora seleccionada.
+        codigoAseguradoraSeleccionada = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombreAseguradoraSeleccionada = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+
+        // Guarda el código de la aseguradora seleccionada en el campo oculto.
+        $('#hdCodigoAseguradoraSeleccionada').val(codigoAseguradoraSeleccionada)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+
+        ActualizaTrazabilidadAseguradora(codigoAseguradoraSeleccionada, nombreAseguradoraSeleccionada)
+    }
+
+    function RecibeSeñalNode() {
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('respuestaTrazabilidadAseguradora', function (data) {
+            MuestraTrazabilidadTiempoReal(data)
+        })
+    }
+
+    function MuestraTrazabilidadTiempoReal(data)
+    {
+        // Si lo que contiene data.codigoAseguradoraActualizada es 'null' entonces tomará valor vacío.
+        var codigoAseguradoraActualizada = data.codigoAseguradoraActualizada || ''
+
+        // Esta función actualizará la tabla de búsqueda de aseguradoras
+        ActualizaTablaBusqueda()
+        
+        // Verifica que exista una aseguradora seleccionada y que el código de la aseguradora 
+        // seleccionada coincida con el código de aseguradora traida desde node, si es así
+        // mostrará la trazabilidad de la aseguradora.
+        if ($('#hdCodigoAseguradoraSeleccionada').val().trim() != ''
+         && $('#hdCodigoAseguradoraSeleccionada').val().trim() == codigoAseguradoraActualizada.trim())
+        {
+            ActualizaTrazabilidadAseguradora(data.codigoAseguradoraActualizada.trim()
+                                            , data.nombreAseguradoraActualizada.trim())
+        }
+    }
+
+    function ActualizaTrazabilidadAseguradora(codigoAseguradoraSeleccionada
+                                    , nombreAseguradoraSeleccionada)
+    {
+        
+        // Muestra la trazabilida de la aseguradora seleccionada en la tabla de detalle "tblTrazabilidadAseguradora".
+        MuestraTablaTrazabilidadAseguradora(codigoAseguradoraSeleccionada)
+
+        // Se obtiene el título de la vista parcial de la trazabilidad de aseguradora, 
+        // para después concatenarlo con el nombre del aseguradora seleccionado.
+        tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+        $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombreAseguradoraSeleccionada + ')')
+    }
+
+    function MuestraTablaTrazabilidadAseguradora(codigo)
+    {
+        
+        var trazabilidadAseguradora
+
+        // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+        trazabilidadAseguradora = ObtieneDataTrazabilidadAseguradora(codigo)
+
+        // Muestra la vista parcial de la trazabilidad de la aseguradora seleccionada.
+        $('#DetalleInformacion').css({ 'display': 'block' });
+        $('#DetalleInformacion').html(trazabilidadAseguradora);
+    }
+
+    function pintaFilaSeleccionada(e) {
+        // Establece a todas la filas su formato original.
+        $('#tblInsurer > tbody > tr').css({
+            'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+    function ObtieneDataTrazabilidadAseguradora(codigo)
+    {
+        
+        var trazabilidadAseguradora
+
+        $.ajax({
+            type: 'POST'
+            , async: false
+            , data: JSON.stringify({ 'codigoAseguradora': parseInt(codigo) })
+            , url: '@Url.Action("trazabilidadAseguradora", "DataAudit")'
+            , contentType: "application/json"
+            , dataType: 'html'
+            , success: function (Data)
+            {
+                trazabilidadAseguradora = Data
+            }
+        });
+
+        return trazabilidadAseguradora
+    }
+
+    function ActualizaTablaBusqueda()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaTrazabilidad", "Insurer")',
+            contentType: false,
+            contentType: false,
+            success: function (Data)
+            {
+                $('#tblInsurer').DataTable().ajax.reload();
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,1043 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_SEARCH_BILLING_FOR_PAYMENT_Result>
+
+
+<script src="@Url.Content("~/scripts/js/plugins/dataTables/buttons.html5.min.js")"></script>
+<style>
+    .TextoAlineado
+    {
+        text-align: center;
+        vertical-align: middle !important;
+    }
+</style>
+
+<div class="table-responsive" id="EnvolturatblFacturas_tabla">
+<div style="border: 1px solid #444444; padding: 0.5em; width: 116px;">
+    <span style="background-color: rgb(254, 250, 173); border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span> <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Partially Paid</span>    
+    <br />
+    <span style="background-color: rgb(186, 255, 253); border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span> <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Unpaid</span>
+</div>
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblFacturasPorPagar" style="width:100%">
+        <thead class="th_tabla">
+            <tr>
+                <!-- 0   --> <th class="hidden">Bih_code</th>
+                <!-- 1   --> <th class="TextoAlineado">Bill Number</th>
+                <!-- 2   --> <th class="hidden">Cis_code</th>
+                <!-- 3   --> <th class="TextoAlineado">Claim #</th>
+                <!-- 4   --> <th class="TextoAlineado">Insurer</th>
+                <!-- 5   --> <th class="TextoAlineado">Patient</th>
+                <!-- 6   --> <th class="TextoAlineado">DOI</th>
+                <!-- 7   --> <th class="TextoAlineado">Closing Date</th>
+                <!-- 8   --> <th class="TextoAlineado">Total Amount</th>
+                <!-- 9   --> <th class="TextoAlineado">Balance Due</th>
+                <!-- 10  --> <th class="TextoAlineado">Payment Amount</th>
+                <!-- 11  --> <th class="hidden">FullyPaid</th> <!-- "PP" => Parcialmente pagado "NP" => No Pagado -->
+                <!-- 12  --> <th class="TextoAlineado">Check #</th>
+                <!-- 13  --> <th class="TextoAlineado"><input type="checkbox" id="CheckBoxCabecera"></th>
+                <!-- 14  --><th class="hidden">Payment Amount Info</th>
+                <!-- 15  --><td class="hidden">Patient LastName</td>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        { 
+            <tr>
+                <!-- 0  --> <td class="hidden">@item.Bih_code</td>
+                <!-- 1  --> <td class="TextoAlineado">@item.Bih_code_old</td>
+                <!-- 2  --> <td class="hidden">@item.Cis_code</td>
+                <!-- 3  --> <td class="TextoAlineado">@item.Cis_caseCode</td>
+                <!-- 4  --> <td class="TextoAlineado">@item.Insurer</td>
+                <!-- 5  --> <td class="TextoAlineado">@item.Patient</td>
+                <!-- 6  --> <td class="TextoAlineado">@item.AccidentDate</td>
+                <!-- 7  --> <td class="TextoAlineado">@item.ClosingDate</td>
+                <!-- 8  --> <td class="TextoAlineado">@item.Total</td>
+                <!-- 9  --> <td class="TextoAlineado">@item.Balance</td>
+                <!-- 10 --> <td class="TextoAlineado">@*<input class="form-control numeros txPay" type="text" style=" width: 100%;"  value="0" />*@ --</td>
+                <!-- 11 --> <td class="hidden">@item.PaidLevel</td> <!-- "PP" => Parcialmente pagado "NP" => No Pagado -->
+                <!-- 12 --> <td class="TextoAlineado">--</td>
+                <!-- 13 --> <td class="TextoAlineado"></td>
+                <!-- 14  --><td class="hidden">0</td>
+                <!-- 15  --><td class="hidden">@item.PatientLastName</td>
+                
+            </tr>
+        }
+        <tfoot>
+            <tr>
+                <th class="hidden">Bih_code</th>
+                <th class="TextoAlineado">Bill</th>
+                <th class="hidden">Cis_code</th>
+                <th class="TextoAlineado">Claim</th>
+                <th class="TextoAlineado">Insurer</th>
+                <th class="TextoAlineado">Patient</th>
+                <th class="TextoAlineado">DOI</th>
+                <th class="TextoAlineado">Closing Date</th>
+                <th class="TextoAlineado">Total Amount</th>
+                <th class="TextoAlineado">Balance Due</th>
+                <th class="TextoAlineado">Payment Amount</th>
+                <th class="hidden">FullyPaid</th>
+                <th class="TextoAlineado" >Check #</th>
+                <th class="TextoAlineado"></th>
+    <!-- 14  --><th class="hidden">Payment Amount Info</th>
+    <!-- 15  --><th class="hidden">PatientLastName</th>
+
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    // var ArregloFacturas = new Array();
+    var RegExpDecimal = /^[0-9]+(\.[0-9]+)?$/; // Expresión regular para forzar el punto decimal.
+    
+
+    $(Inicio)
+
+    function Inicio()
+    {
+        // Inicializa
+        SumaTotalPago = 0.00
+        
+        LimpiarArreglos();
+
+        fechaActual = $.datepicker.formatDate("mm/dd/yy", new Date());
+
+    
+        fechaInicio= '@ViewBag.fechaInicio';
+        fechaFin= '@ViewBag.fechaFin';
+
+        if (fechaInicio != null && fechaFin != null && fechaInicio != "" && fechaFin != "")
+        {
+            $("#txtDateInicio").datepicker("setDate", fechaInicio);
+            $("#txtDateFinal").datepicker("setDate", fechaFin);
+        }
+        else
+        {
+            //$("#txtDateInicio").datepicker("setDate", fechaActual);
+            ///$("#txtDateFinal").datepicker("setDate", fechaActual);
+        }
+
+        
+
+
+        $(".dtpFecha").parent(".input-group").find(".input-group-addon").on("click", function () {
+            // console.log($(this).parent(".input-group").find(".dtpFecha"));
+            $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+            $(this).parent(".input-group").find(".dtpFecha").focus();
+        });
+        
+
+        $('.dtpFecha').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+        $("#txtDateInicio").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+
+        });
+        $("#txtDateFinal").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+        });
+
+
+        /////// BUSQUEDA DE FILTROS
+        $('#tblFacturasPorPagar tfoot th').each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text" id="' + title + '" placeholder="Search ' + title + '" />');
+
+        });
+        //////////////////////////////
+
+        PaginarTabla();
+        $("#tblFacturasPorPagar tfoot").css({ "display": "none" });
+        $("#tblFacturasPorPagar_filter").css({ "display": "none" });
+        $(".buttons-excel").css({ "display": "block" });
+        
+    }
+
+
+    /* function test()
+    {
+        var otable = $("#tblFacturasPorPagar").dataTable().fnDestroy();
+        otable = $("#tblFacturasPorPagar").dataTable();
+    }*/
+
+    function PaginarTabla()
+    {
+        console.log("pagina tablaXXXX");
+        var i = 0;
+        var rowCount = $('#tblFacturasPorPagar tr').length;
+        var otable = $("#tblFacturasPorPagar").dataTable().fnDestroy();
+
+
+
+        otable = $("#tblFacturasPorPagar")
+        .DataTable({
+            "pageLength": 10
+            , "bFilter": true
+            , "bLengthChange": false 
+            , "bInfo": false
+            , "paging": false
+            , dom: 'Bfrtip'
+            ,"order": [[ 15, "asc" ]]
+            ,buttons: [{                
+            extend: 'excelHtml5',
+            "bFooter": true,
+            exportOptions: {                
+                columns: ':visible',
+                columns: [1,3,4,5,6,7,8,9],
+                orthogonal: {
+                    display: ':null'
+                }      
+            },
+            customize: function (xlsx) {                    
+                console.log(xlsx);
+                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                var downrows = 4;
+                var clRow = $('row', sheet);
+
+                //console.log("ssssDDFFFGGG");
+                //console.table(ArregloFacturas.rowCount);
+                //console.table(ArregloFacturas);
+
+
+
+                /*$.map(ArregloFacturas, function (Valor, Indice)
+                {
+                    console.log(Valor.Pago);
+
+                    $('is t', $('row c[r^="L"]', sheet)).text(Valor.Pago);
+                })*/
+
+
+
+               /* $('row c[r^="D"]', sheet).each(function () {
+
+                    //console.log(ArregloFacturas[i]["Pago"]);
+                   
+                    //if (ArregloFacturas[i] != null) {
+                        //console.log(ArregloFacturas[i]["Pago"]);
+                        //$('is t', $('row c[r^="L"]', sheet)).text(ArregloFacturas[i]["Pago"]);
+
+                        //$('is t', this).text(1);
+                    //}
+
+                    if ($('is t', this).text() == "JEYSER ACIERNA")
+                    {
+                        $('is t', $('row c[r^="L"]', sheet)).text(12);
+                    } else {
+                        console.log(i + "X-----------------------------");
+                        $('is t', this).text(ArregloFacturas[i]["Pago"]);
+                        i = i + 1;
+                    }
+                    
+                    
+                });*/
+
+                /*$('row c[r^="H"]', sheet).each(function () {
+                    console.log("xxxx - " + i);
+                    i = i + 1;
+                    if(i==2)
+                        $('is t', $('row c[r^="H"]', sheet)).text("XX");
+                       
+                });*/
+
+
+                /*$('row c[r^="K"]', sheet).each(function () {
+                    
+                    //$('is t', this).text(ArregloFacturas[i]["Pago"]);
+                    //i = i + 1;
+
+                    //$('is t', $('row c[r^="K"]', sheet)).text(ArregloFacturas[i]["Pago"]);
+
+                    if ($('is t', this).html() == "JEYSER ACIERNA")
+                    {
+                        //$('is t', this).text(1);
+                        //$('is t', this).text(ArregloFacturas[i]["Pago"]);
+
+                    }
+                    else
+                    {
+                        //$('is t', this).text(ArregloFacturas[i]["Pago"]);
+                        $('is t', this).text("ssssssssssssss");                        
+                    }
+                    
+                });*/
+
+
+
+                $('row c[r*="1"]', sheet).attr('s', '37');           
+
+
+                for (x = 2; x < rowCount + 2; x++)
+                {
+                    $('row c[r*=' + x + ']', sheet).attr('s', '25');
+                }
+
+                //update Row
+                clRow.each(function () {
+                    var attr = $(this).attr('r');
+                    var ind = parseInt(attr);
+                    ind = ind + downrows;
+                    $(this).attr("r", ind);
+                });
+
+                // Update  row > c
+                $('row c ', sheet).each(function () {
+                        
+                    var attr = $(this).attr('r');
+                    var pre = attr.substring(0, 1);
+                    var ind = parseInt(attr.substring(1, attr.length));
+                    ind = ind + downrows;
+                    $(this).attr("r", pre + ind);
+                });
+
+                function Addrow(index, data,mensaje) {
+                    console.log(index);
+                    console.log(data);
+                    console.log(data.length);
+                    msg = '<row r="' + index + '">'
+                    if(mensaje=="cuerpo")
+                    {
+                    for (i = 0; i < data.length; i++) {
+                        var key = data[i].k;
+                        var value = data[i].v;
+                        msg += '<c t="inlineStr" r="' + key + index + '" s="2">'; //42
+                        msg += '<is>';
+                        msg += '<t>' + value + '</t>';
+                        msg += '</is>';
+                        msg += '</c>';
+                      }
+                    }
+                    if (mensaje == "foot") {
+                        for (i = 0; i < data.length; i++) {
+                            var key = data[i].k;
+                            var value = data[i].v;
+                            msg += '<c t="inlineStr" r="' + key + index + '" s="2">'; //42
+                            msg += '<is>';
+                            msg += '<t>' + value + '</t>';
+                            msg += '</is>';
+                            msg += '</c>';
+                        }
+                        
+                    }
+                    msg += '</row>';
+
+                    return msg;
+                }
+              
+
+                console.log("AKI - " + i);
+                //insert
+                var r1 = Addrow(1, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: 'REPORT PAYMENT' }, { k: 'D', v: '' }, { k: 'E', v: '' }],"cuerpo");
+                //var r2 = Addrow(2, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: 'Insurer' }, { k: 'D', v: "XXXXXXXXXX" }]);
+                //var r3 = Addrow(3, [{ k: 'A', v: '' }, { k: 'B', v: 'Start Date' }, { k: 'C', v: "20/12/2017" }, { k: 'D', v: 'End Date' }, { k: 'E', v: "20/12/2017" }]);
+                //var r3 = Addrow(10, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: '' }, { k: 'D', v: '' }, { k: 'E', v: 'REPORT' }], "foot");
+                //sheet.childNodes[0].childNodes[1].innerHTML = r3 + sheet.childNodes[0].childNodes[1].innerHTML;
+                sheet.childNodes[0].childNodes[1].innerHTML = r1 + sheet.childNodes[0].childNodes[1].innerHTML;
+                
+
+  
+            }
+            }]
+
+            
+          
+            , "columnDefs": [
+            {
+                "targets": [0, 2, 3, 4,5,6,7,8,9,10,11,12,13],
+                "orderable": false  // set orderable for selected columns              
+            },
+            
+            {
+                "targets": [1]
+               ,"orderable": true  // set orderable for selected columns                             
+            },
+            {
+                "targets": 10
+                 ,"orderable": false  // set orderable for selected columns
+              , "render": function (data, type, full, meta)
+                {
+                  return '<input class="form-control numeros txPay" readonly style="display: block; width: 100px;" placeholder="0.00" />';                  
+                }
+            },
+            {
+                "targets": 12
+               ,"orderable": false  // set orderable for selected columns
+              , "render": function (data, type, full, meta) {
+                  return '<input type="text" class="form-control numeros txtNumeroCheke" maxlength="25" style="display: block; width: 100px;" />';
+              }
+            },
+            {
+                "targets": 13
+               ,"orderable": false  // set orderable for selected columns
+              , "render": function (data, type, full, meta) {
+                  // return '<input type="checkbox" class="chbLlenarPago" style="display: block; width: 100%;" />';
+                  return '<input type="checkbox" class="chbLlenarPago" />';
+              }
+            }]
+        });
+
+        // Permite que cuando se seleccione o deseleccione el check que está en la cebecera de la tabla también se seleccionen o deseleccionen los checks de las filas de la tabla.
+        $("#CheckBoxCabecera").on("click", function (e) {
+            var rows = otable.rows({ 'search': 'applied' }).nodes();
+
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            $('input[type="checkbox"]', rows).trigger("change");
+        });
+
+        // Código nuevo de factura (Bih_code)
+        otable.column(0).nodes().to$().each(function (index)
+        {
+            var CodigoNuevoFactura = $(this)["0"].innerHTML.trim();
+
+            ArregloFacturas[index] = Array();
+
+            ArregloFacturas[index]["CodigoNuevoFactura"] = (CodigoNuevoFactura == "") ? null : parseInt(CodigoNuevoFactura);
+        });
+        // Monto por pagar.
+        otable.column(9).nodes().to$().each(function (index)
+        {
+            Balance = (isNaN($(this)["0"].innerText.trim())) ? "" : $(this)["0"].innerText.trim();
+
+            ArregloFacturas[index]["Balance"] = parseFloat(Balance);
+        });
+        // Pago que será abonado.
+        otable.column(10).nodes().to$().each(function (index)
+        {
+            var SaldoFactura; // Variable donde se obtendrá el saldo real que debe pagarse de la factura.
+            var PagoFactura; // Variable donde se obtendrá el pago que se hará de la factura.
+            var NumeroFactura; // Variable donde se obtendrá el número de la factura;
+            var Paciente;
+            var PagoOriginal; // Variable que almacena el monto original a pagar de la factura, se llena cuando el usuario ingresa en la caja de texto de la columna "Pay Now" (es decir en el evento "focusin" de la caja de texto).
+            var txtPago
+
+            $(this).off("focusin");
+            $(this).off("focusout");
+            $(this).off("keyup");
+            $(this).off("keypress");
+            $(this).off("keydown");
+            $(this).off("change");
+            
+            // Obtiene la caja de texto del pago.
+            txtPago = $(this)["0"].children["0"]
+
+            // Obtiene el paciente al que corresponde la factura.
+            Paciente = $(this)["0"].parentElement.children[5].innerHTML.trim();
+            
+            // Obtiene el saldo real que se debe pagar de la factura extraído de la columna "Balance".
+            SaldoFactura = parseFloat($(this)["0"].parentElement.children[9].innerHTML.trim()).toFixed(2);
+
+            // Pone el valor del saldo de la factura en la caja de texto de la columna "Pay Now".            
+            //$(this).find(".txPay").val(SaldoFactura);
+            $(this).find(".txPay").val('0.00');
+
+            // Pone el valor del saldo de la factura en el arreglo "ArregloFacturas".
+            // ArregloFacturas[index]["Pago"] = parseFloat(SaldoFactura);
+            ArregloFacturas[index]["Pago"] = 0.00;
+
+            // Va sumando lo que se pagará de cada factura (suma los valores de la columna "Balance".).
+            // SumaTotalPago += parseFloat(SaldoFactura);
+            $("#PagoAjustadoSegunDistribucion").html(parseFloat(SumaTotalPago).toFixed(2));
+            
+            // Obtiene el número de la factura que se está pagando extraído de la columna "Bill Number".
+            NumeroFactura = $(this)["0"].parentElement.children[1].innerHTML.trim();
+
+
+            $(this).on("keydown", function (e) 
+            { 
+                if (!($('#chbMultiPago')["0"].checked))
+                {
+                // Si el check de la fila actual está seleccionado entonces se permitirá 
+                // editar el valor de la caja de texto de la columna "Payment Amount".
+                if (ArregloFacturas[index]["FacturaSeleccionada"])                
+                    return
+                // De lo contrario no se permitirá editar el valor de la caja de texto de la columna "Payment Amount".
+                else
+                    return false
+                }
+                else
+                    return false
+            });
+            $(this).on("keyup", function (e)
+            {
+                var txtPago = $(this)["0"].children["0"]
+
+                // Comprueba si es una cadena vacía que se puede dar al suprimir el contenido de frente con las teclas: 
+                // "Backspace" o "Delete".
+                // Si no toma el valor ingresado convertido en real.
+                var ValorIngresado = ($(txtPago).val().trim() == "") ? 0 : parseFloat($(txtPago).val().trim());
+                
+                // Si el valor es distinto de cero y no cumple con la expresión regular de número decimal, 
+                // aborta el proceso.
+                if (ValorIngresado != 0 && e.target.value.match(RegExpDecimal) == null)
+                {
+                    return false;
+                }
+                
+                try
+                {
+                    if (!isNaN(ValorIngresado))
+                    {
+                        ArregloFacturas[index]["Pago"] = parseFloat(ValorIngresado);
+                    }
+
+                    var Pagos = $.map(ArregloFacturas, function (Valor, Indice)
+                    {
+                        if (Valor.FacturaSeleccionada)
+                        return Valor.Pago;
+                    });
+
+                    var SumaEnTiempoReal = 0.00;
+
+                    $.each(Pagos, function ()
+                    {
+                        SumaEnTiempoReal += this || 0;
+                    });
+
+                    // Sólo si el check de multicheque no está seleccionado se actualiza el monto total de pago.
+                    if ((!($('#chbMultiPago')["0"].checked)))
+                    { 
+                        $("#PagoAjustadoSegunDistribucion").html(parseFloat(SumaEnTiempoReal).toFixed(2))
+                        $('#txtAmount').val(parseFloat(SumaEnTiempoReal).toFixed(2))
+                    }
+                    SumaTotalPago = parseFloat(SumaEnTiempoReal).toFixed(2)
+                }
+                catch (Ecepcion)
+                {
+                    console.log(Ecepcion.message);
+                }
+            });
+
+            $(this).on("focusin", function (e)
+            {
+                // Obtiene el monto que se está pagando de la factura extraído de la caja de texto de la columna "Pay Now".
+                PagoOriginal = e.target.value.trim();
+                PagoOriginal = (PagoOriginal == "") ? parseFloat(0).toFixed(2) : parseFloat(PagoOriginal).toFixed(2);
+
+                // console.log("PagoOriginal: " + PagoOriginal);
+            });
+
+            $(this).on("focusout", function (e)
+            {
+
+                Paciente = $(this)["0"].parentElement.children[5].textContent;
+                if ($('#chbMultiPago')["0"].checked)
+                {
+                    
+                    var Paciente        = $(this)["0"].parentElement.children[5].textContent;
+                    var MontoFactura    = $(this)["0"].parentElement.children[9].textContent;
+                    var txtSaldoFactura = $(this)["0"].parentElement.children[10].children["0"].value.trim();
+                    var txtNumeroCheque = $(this)["0"].parentElement.children[12].children["0"].value.trim();
+                
+                    if (txtNumeroCheque != '' && (parseFloat(txtSaldoFactura) == 0) || txtSaldoFactura == '')
+                    {
+                        setTimeout(function () {
+                            $('.txPay:eq('+index+')').focus();                        
+                        }, 500)
+
+                        MensajeError('The ' + Paciente + ' invoice has no balance', '');
+                        ExitoPago = false;
+
+                        return false;
+                    }
+
+                    if (txtNumeroCheque != '' && (parseFloat(txtSaldoFactura) != parseFloat(MontoFactura)))
+                    {
+                        setTimeout(function () {
+                            $('.txPay:eq(' + index + ')').focus();
+                        }, 500)
+
+                        MensajeError('The ' + Paciente + ' payment does not match with the amount', '');
+                        ExitoPago = false;
+
+                        return false;
+                    }
+                }
+
+                $("#txtBalanceCopia").val($("#PagoAjustadoSegunDistribucion").html().trim());
+
+                // Obtiene el monto que se está pagando de la factura extraído de la columna "Pay Now".
+                PagoFactura = e.target.value.trim();
+                PagoFactura = (PagoFactura == "") ? parseFloat(0).toFixed(2) : parseFloat(PagoFactura).toFixed(2);
+
+                ///////////////// ArregloFacturas[index]["Pago"] = PagoFactura;
+
+                // Importante: En este caso no se puede usar:
+                //      SumaTotalPago -= parseFloat(PagoOriginal).toFixed(2)
+                // por que se está realizando una operación aritmética.
+                // ".toFixed(2)" se utiliza para dar formato a un valor ya calculado, 
+                // pero no se puede realizar dentro de una operación aritmética.
+                ///////////////// SumaTotalPago -= parseFloat(PagoOriginal);
+                ///////////////// SumaTotalPago += parseFloat(PagoFactura);
+
+                ///////////////// $("#PagoAjustadoSegunDistribucion").html(SumaTotalPago.toFixed(2));
+      
+                if (parseFloat(PagoFactura) > parseFloat(SaldoFactura))
+                {
+                    error = "Alert!";
+                    mensaje = "The amount must not exceed the balance due.<br>";
+                    mensaje = mensaje + "<table class='table table-striped table-bordered'><tr><td>Bill: </td><td style='text-align: left;'>" + NumeroFactura + "</td></tr><tr><td>Patient: </td><td style='text-align: left;'>" + Paciente + "</td></tr><td> Balance: </td><td style='text-align: left;'>" + SaldoFactura + "</td></tr>";
+
+                    MensajeError(mensaje, error);
+
+                    setTimeout(function () {
+                        e.target.parentElement.parentElement.children[10].children["0"].style.border = "4px solid red";
+                    }, 0);
+
+                    Intervalo1 = setInterval(function () {
+                        if (!(e.target.parentElement.parentElement.children[10].children["0"].style.borderColor == 'red'))
+                            e.target.parentElement.parentElement.children[10].children["0"].style.border = "4px solid red";
+                        else
+                            e.target.parentElement.parentElement.children[10].children["0"].style.border = "2px solid pink";
+                    }, 180);
+
+                    setTimeout(function ()
+                    {
+                        clearInterval(Intervalo1);
+                        e.target.parentElement.parentElement.children[10].children["0"].style.border = "1px solid #b3b4b9";
+                        $(txtPago).select()
+                    }, 2500);
+
+                    return false;
+                }
+
+                // Esto es para que al momento que salga de la caja de texto le ponga formato de dos decimales al valor que ahí se encuentra.
+                e.target.value = PagoFactura;
+            });
+
+            $(this).on("keypress", validaNumeros);
+        });
+        // Evalua si ya se completó el pago para la factura actual.
+        otable.column(11).nodes().to$().each(function (index)
+        {
+            var NivelPago;
+            NivelPago = $(this)["0"].innerHTML.trim();
+
+            if (NivelPago == 'PP')
+                $(this)["0"].parentElement.style.backgroundColor = "rgb(254, 250, 173)";
+            else
+                $(this)["0"].parentElement.style.backgroundColor = "rgb(186, 255, 253)";
+        });
+        otable.column(12).nodes().to$().each(function (index)
+        {
+            var cambio;
+
+            ArregloFacturas[index]["numeroCheke"] = $(this)["0"].children["0"].defaultValue;
+
+            $("#PagoAjustadoSegunDistribucion").html(parseFloat(SumaTotalPago).toFixed(2));
+
+            $(this).off("change");
+            $(this).off("keydown");
+            $(this).off("focusout");
+
+            // Verifica si se ha seleccionado el check.
+            if ($('#chbMultiPago')["0"].checked)
+            {
+                // Muestra la cabecera de la columna "Check #".
+                $('#tblFacturasPorPagar > thead > tr > th:eq(12)').css({ 'display': 'table-cell' });
+                // Muestra la columna completa "Check #".
+                $(this).css({ 'display': 'table-cell' });
+
+                $("#tblFacturasPorPagar_filter").css({ "display": "none" });
+            }
+            // Verifica si se ha deseleccionado el check.
+            else
+            {
+                // Oculta la cabecera de la columna "Check #".
+                $('#tblFacturasPorPagar > thead > tr > th:eq(12)').css({ 'display' : 'none' });
+                // Oculta la columna completa "Check #".
+                $(this).css({ 'display': 'none' });
+
+                $("#tblFacturasPorPagar_filter").css({ "display": "none" });
+            }
+
+            $(this).on("change", function (e) {
+                var numeroChequeIngresado = e.target.value.trim();
+
+                // Almacena en el "ArregloFacturas" el número de cheque ingresado.
+                ArregloFacturas[index]["numeroCheke"] = numeroChequeIngresado || "";
+                // Hace que el valor del cheque ingresado quede pegado al control.
+                $(this)["0"].children["0"].defaultValue = numeroChequeIngresado
+            });
+
+            $(this).on("keydown", function (e) {
+                
+                if (ArregloFacturas[index]["FacturaSeleccionada"])
+                    return
+                else
+                    return false
+            });
+
+            $(this).on("focusout", function () {
+                if ($('#chbMultiPago')["0"].checked) {
+                    var Paciente = $(this)["0"].parentElement.children[5].textContent;
+                    var MontoFactura = $(this)["0"].parentElement.children[9].textContent;
+                    var txtSaldoFactura = $(this)["0"].parentElement.children[10].children["0"].value.trim();
+                    var txtNumeroCheque = $(this)["0"].parentElement.children[12].children["0"].value.trim();
+
+                    if (txtNumeroCheque != '' && (parseFloat(txtSaldoFactura) == 0) || txtSaldoFactura == '') {
+                        setTimeout(function () {
+                            $('.txPay:eq(' + index + ')').focus();
+                        }, 500)
+
+                        MensajeError('The ' + Paciente + ' invoice has no balance', '');
+                        ExitoPago = false;
+
+                        return false;
+                    }
+
+                    if (txtNumeroCheque != '' && (parseFloat(txtSaldoFactura) != parseFloat(MontoFactura))) {
+                        setTimeout(function () {
+                            $('.txPay:eq(' + index + ')').focus();
+                        }, 500)
+
+                        MensajeError('The ' + Paciente + ' payment does not match with the amount', '');
+                        ExitoPago = false;
+
+                        return false;
+                    }
+                }
+            });
+        });
+        otable.column(13).nodes().to$().each(function (index)
+        {
+            var checkBox // checkbox que está dentro de la celda actual
+            var BalanceDue
+            var PaymentAmount
+            var numeroCheque
+
+            ArregloFacturas[index]["FacturaSeleccionada"] = false;
+
+            checkBox = $(this)["0"].children["0"]
+            //console.log("xxxxBENHEREDHER");
+
+            $(checkBox).off('change')
+            $(checkBox).off('click')
+
+            $(checkBox).on('change', function (e)
+            {
+                BalanceDue = $(this)["0"].parentNode.parentNode.children[9].innerText             
+                PaymentAmount = $(this)["0"].parentElement.parentElement.children[10].children["0"]
+                numeroCheque = $(this)["0"].parentElement.parentElement.children[12].children["0"]
+
+                if (e.currentTarget.checked) {
+                    // Habilita la caja de texto.
+                    $(PaymentAmount).attr('readonly', false)                    
+
+                    if ($(PaymentAmount).val() == 0)
+                    $(PaymentAmount).val(BalanceDue)
+
+                    ArregloFacturas[index]["FacturaSeleccionada"] = true;
+                    ArregloFacturas[index]["Pago"] = parseFloat($(PaymentAmount).val());
+
+                    // Selecciona el contenido de la caja de texto del pago (columna "Payment Amount") por si el usuario desea ingresar otro monto (pago parcial).
+                    // Nota: Si la selección del checkbox viene a partir de la selección del checkbox que está en la cabecera entonces la caja de texto cuyo contenido 
+                    // se seleccionará será la que aparece en la primera fila.
+                    if ($('#CheckBoxCabecera')["0"].checked)
+                        $('.txPay:eq(0)').select()
+                    else
+                        $(PaymentAmount).select()
+                }
+                else {
+                    // Deshabilita la caja de texto.
+                    $(PaymentAmount).attr('readonly', true)
+
+                    $(PaymentAmount).val('0.00')
+
+                    ArregloFacturas[index]["FacturaSeleccionada"] = false;
+                    ArregloFacturas[index]["Pago"] = 0.00;
+                }
+
+                sumar(ArregloFacturas);
+
+                // Cuando se active el check para ingresar un número de cheque en la caja de texto "Check #" 
+                // esta estará vacía  y cuando se desactive se borrará el contenido que esta tiene.
+                if ($('#chbMultiPago')["0"].checked)
+                {
+                    $(numeroCheque).val('')
+                }
+            })
+        })
+ 
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+         //Apply the search
+         console.log("ssssssssssss");
+         otable.columns().every(function () {
+             var that = this;
+             $('input', this.footer()).on('keyup change', function () {
+                 if (that.search() !== this.value) {
+                     that
+                         .search(this.value)
+                         .draw();
+                 }
+             });
+        });
+    }
+   
+    function sumar(ArregloFacturas)
+    {        
+        var Pagos = $.map(ArregloFacturas, function (Valor, Indice) {
+            if (Valor.FacturaSeleccionada)
+                return Valor.Pago
+        } )
+
+        var SumaEnTiempoReal = 0.00
+
+        $.each(Pagos, function () {
+            SumaEnTiempoReal += this || 0
+        } )
+         
+        $("#PagoAjustadoSegunDistribucion").html(parseFloat(SumaEnTiempoReal).toFixed(2))
+        $('#txtAmount').val(parseFloat(SumaEnTiempoReal).toFixed(2))
+
+        SumaTotalPago = parseFloat(SumaEnTiempoReal).toFixed(2)
+         
+         $(".buttons-excel").css({ "display": "block" });
+    }
+   
+    function validaNumeros(e)
+    {     
+        
+        // var RegExpDecimal = /^[0-9]+(\.[0-9]+)?$/; // Expresión regular para forzar el punto decimal.
+        
+        // console.log(e);
+        // console.log(e.delegateTarget.children["0"].value);
+
+        if (!(   (e.which >= 48 && e.which <= 57)
+              || (e.which == 40 || e.which == 41)
+              || (e.which == 32
+              || e.which == 8
+              || e.which == 0
+              || e.which == 46)
+            ))//46punto
+        {
+            e.preventDefault();            
+            return false;
+        }
+        // 
+        // if (e.target.value.match(RegExpDecimal) == null)
+        // {
+        //     e.preventDefault();
+        //     return false;
+        // }
+    }
+
+    function buscaFechas()
+    {
+         
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje,
+            html: true
+        });
+    }
+
+    function MensajeErrorPersonalizado(mensaje, error, input)
+    {
+
+        swal({
+            title: error,
+            text: mensaje,
+            html: true
+        });
+
+        $(input).focus();
+    }
+
+
+    //////////////////////////////////////////////////////////////
+
+
+
+
+    ///* Custom filtering function which will search data in column four between two values */
+    //$.fn.dataTable.ext.search.push(
+    //    function (settings, data, dataIndex) {
+    //        var min = parseInt($('#min').val(), 10);
+    //        var max = parseInt($('#max').val(), 10);
+    //        var age = parseFloat(data[7]) || 0; // use data for the age column
+
+    //        if ((isNaN(min) && isNaN(max)) ||
+    //             (isNaN(min) && age <= max) ||
+    //             (min <= age && isNaN(max)) ||
+    //             (min <= age && age <= max)) {
+    //            return true;
+    //        }
+    //        return false;
+    //    }
+    //);
+
+    //$(document).ready(function () {
+    //    var table = $('#tblFacturasPorPagar').DataTable();
+
+    //    // Event listener to the two range filtering inputs to redraw on input
+    //    $('#min, #max').keyup(function () {
+    //        table.draw();
+    //    });
+    //});
+
+
+
+
+    
+    //////////Start of the data table	
+    ////////$(document).ready( function () {
+    ////////    //////var table = $('#tblFacturasPorPagar').DataTable({
+    ////////    //////    "dom": '<"toolbar">frtip'
+    ////////    //////});
+    ////////    $("div.toolbar").html('<input id="date_range" type="text">');  
+    ////////    //END of the data table
+
+    ////////    // Date range script - Start of the sscript
+    ////////    $("#date_range").daterangepicker({
+    ////////        autoUpdateInput: false,
+    ////////        locale: {
+    ////////            "cancelLabel": "Clear",
+    ////////        }
+    ////////    });
+
+    ////////    $("#date_range").on('apply.daterangepicker', function(ev, picker) {
+    ////////        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD'));
+    ////////        table.draw();
+    ////////    });
+
+    ////////    $("#date_range").on('cancel.daterangepicker', function(ev, picker) {
+    ////////        $(this).val('');
+    ////////        table.draw();
+    ////////    });
+    ////////    // Date range script - END of the script
+
+    ////////    $.fn.dataTableExt.afnFiltering.push(
+    ////////    function( oSettings, aData, iDataIndex ) {
+	
+    ////////        var grab_daterange = $("#date_range").val();
+    ////////        var give_results_daterange = grab_daterange.split(" to ");
+    ////////        var filterstart = give_results_daterange[0];
+    ////////        var filterend = give_results_daterange[1];
+    ////////        var iStartDateCol = 5; //using column 2 in this instance
+    ////////        var iEndDateCol = 5;
+    ////////        var tabledatestart = aData[iStartDateCol];
+    ////////        var tabledateend= aData[iEndDateCol];
+	
+    ////////        if ( filterstart === "" && filterend === "" )
+    ////////        {
+    ////////            return true;
+    ////////        }
+    ////////        else if ((moment(filterstart).isSame(tabledatestart) || moment(filterstart).isBefore(tabledatestart)) && filterend === "")
+    ////////        {
+    ////////            return true;
+    ////////        }
+    ////////        else if ((moment(filterstart).isSame(tabledatestart) || moment(filterstart).isAfter(tabledatestart)) && filterstart === "")
+    ////////        {
+    ////////            return true;
+    ////////        }
+    ////////        else if ((moment(filterstart).isSame(tabledatestart) || moment(filterstart).isBefore(tabledatestart)) && (moment(filterend).isSame(tabledateend) || moment(filterend).isAfter(tabledateend)))
+    ////////        {
+    ////////            return true;
+    ////////        }
+    ////////        return false;
+    ////////    }
+    ////////    );
+
+    ////////    //End of the datable
+    ////////});
+
+
+
+
+
+    //$(document).ready(function () {
+    //    $('#tblFacturasPorPagar').dataTable({
+    //        "sDom": '<lf<t>ip>',
+    //        "bScrollInfinite": false,
+    //        "bScrollCollapse": false,
+    //        "sScrollY": "150px"
+    //    });
+    //});
+
+    //$(function () {
+    //    $("div .divDatePicker").each(function () {
+    //        $(this).datepicker().on('changeDate', function (ev) {
+    //            $(this).datepicker("hide");
+    //        });
+    //    });
+    //    $(document).on('change', '#fromDate, #toDate', function () {
+    //        $('#tblFacturasPorPagar').dataTable().DataTable().draw();
+    //    });
+
+    //});
+
+
+    //$.fn.dataTableExt.afnFiltering.push(
+
+    //function (oSettings, aData, iDataIndex) {
+    //    if (($('#fromDate').length > 0 && $('#fromDate').val() !== '') || ($('#toDate').length > 0 && $('#toDate').val() !== '')) {
+    //        var today = new Date();
+    //        var dd = today.getDate();
+    //        var mm = today.getMonth();
+    //        var yyyy = today.getFullYear();
+    //        console.log(today + "-- " + dd + " --" + mm + " --" + yyyy);
+    //        if (dd < 10) dd = '0' + dd;
+
+    //        if (mm < 10) mm = '0' + mm;
+
+    //        today = mm + '/' + dd + '/' + yyyy;
+    //        var minVal = $('#fromDate').val();
+    //        var maxVal = $('#toDate').val();
+    //        //alert(minVal+"   ----   "+maxVal);
+    //        if (minVal !== '' || maxVal !== '') {
+    //            var iMin_temp = minVal;
+    //            if (iMin_temp === '') {
+    //                iMin_temp = '01/01/1980';
+    //            }
+
+    //            var iMax_temp = maxVal;
+    //            var arr_min = iMin_temp.split("/");
+
+    //            var arr_date = aData[2].split("/");
+    //            //console.log(arr_min[2]+"-- "+arr_min[0]+" --"+arr_min[1]);
+    //            var iMin = new Date(arr_min[2], arr_min[0] - 1, arr_min[1]);
+    //            //  console.log(iMin);
+    //            // console.log(" --"+yyy);
+
+
+    //            var iMax = '';
+    //            if (iMax_temp != '') {
+    //                var arr_max = iMax_temp.split("/");
+    //                iMax = new Date(arr_max[2], arr_max[0] - 1, arr_max[1], 0, 0, 0, 0);
+    //            }
+
+
+
+
+    //            var iDate = new Date(arr_date[2], arr_date[0] - 1, arr_date[1], 0, 0, 0, 0);
+    //            //alert(iMin+" -- "+iMax);
+    //            //  console.log("Test data "+iMin+" -- "+iMax+"-- "+iDate+" --"+(iMin <= iDate && iDate <= iMax));
+    //            if (iMin === "" && iMax === "") {
+    //                return true;
+    //            } else if (iMin === "" && iDate < iMax) {
+    //                // alert("inside max values"+iDate);
+    //                return true;
+    //            } else if (iMax === "" && iDate >= iMin) {
+    //                // alert("inside max value is null"+iDate);                    
+    //                return true;
+    //            } else if (iMin <= iDate && iDate <= iMax) {
+    //                //  alert("inside both values"+iDate);
+    //                return true;
+    //            }
+    //            return false;
+    //        }
+    //    }
+    //    return true;
+    //});
+
+
+
+</script>

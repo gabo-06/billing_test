@@ -1,0 +1,274 @@
+﻿
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>REPORT BY ADJUSTER</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center">
+                            <label class="col-sm-4 control-label">Adjuster Last Name	</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control ui-autocomplete-input" id="txtBuscaCaso" autocomplete="off">                                
+                            </div>
+                        </div>
+                    </form> 
+                </div>              
+                 
+                <div class="ibox-content" id="EnvolturatblCasos">
+                    <div class="form-group">
+                               <!--///////////////////LISTA///////////////////////-->
+                             @Html.Partial("../ReportAdjuster/listaAdjuster")
+                    </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+ 
+
+<div class="row">        
+        <div class="col-lg-12" id="divResultado">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>RESULTS</h5>
+                </div> 
+                <div class="ibox-content" id="div_reporte" style="border-style: none; border-width: 0;">
+                    <div class="form-group">
+                        @*<div style="overflow: hidden;" class="ibox-content">*@
+                    <div class="row">
+                        <form class="form-horizontal" method="get" role="form">
+                            <input type="hidden" value="0" id="hdCodigoCaso">
+                            <div  class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Company:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" readonly="" id="txtCompany" class="form-control l-i-de">                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="hdCodigoPaciente">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Adjuster:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" readonly="" id="txtPaciente" class="form-control l-i-de">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    
+                    
+                    <div class="ibox-content text-center" style="padding-bottom:0px;margin:0 auto;width:30%;">   
+                        <div style="float:left;margin-left:20px"> 
+                     @using (Html.BeginForm("ExportToWordAdjuster", "ReportAdjuster", FormMethod.Post))
+                    {     
+                                <div class="form-group" style="padding-bottom:0px;">     
+                                    <button id="btnGeneraWord" class="btn btn-primary" type="submit" data-toggle="tooltipB"   data-placement="top" title="" data-original-title="Create a New case">
+                                       <i class="fa fa-save"></i>&nbsp; Export to Word</button>
+                                    <input type="hidden"  id="CodigoCasoSeleccionadoWord" name="CodigoCasoSeleccionado"  value="0"/>      
+                                    <input type="hidden"  id="nombreAdjusterW" name="nombreAdjuster"  value="0"/>            
+
+                                </div>
+                          
+                    }</div>
+                    <div style="float:left;margin-left:20px">
+                     @using (Html.BeginForm("ExportToPdfAdjuster", "ReportAdjuster", FormMethod.Post))
+                    {       
+                                
+                                 <div class="form-group" style="padding-bottom:0px;">     
+                                    <button id="btnReportPdf" class="btn btn-primary" type="submit" data-toggle="tooltipB"   data-placement="top" title="" data-original-title="Create a New case">
+                                        <i class="fa fa-save"></i>&nbsp; Export to Pdf
+                                    </button>
+                                    <input type="hidden"  id="CodigoCasoSeleccionadoPdf" name="CodigoCasoSeleccionado"  value="0"/>                                                                         
+                                    <input type="hidden"  id="nombreAdjusterP" name="nombreAdjuster"  value="0"/>   
+
+                                                              
+                                </div>  
+                    }
+                    </div> 
+                    <div style="clear:both">
+                    </div>
+                   </div> 
+
+
+                            <div id="resultadoReporte">
+                           @*  @Html.Partial("../ReportAdjuster/listaAdjuster_reporte")*@
+                            </div>
+
+
+                    
+                </div> 
+            </div>
+        </div>  
+    </div>
+</div>
+
+@Html.Partial("footer")
+
+<script> 
+    var VecesSelecionaCaso = 0;
+
+    $(Inicio);
+
+    function Inicio()
+    {
+        // console.clear();
+
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "Reports";
+
+        //$("#btnGuardarEntradas").attr("disabled", true); // InHabilita el botón registrar.
+        $("#txtBuscaCaso").focus();
+        // Cuando se presiona TAB el botón para seleccionar un caso obtiene el foco (Temporal).
+        $("#txtBuscaCaso").on("keydown", function (e)
+        {
+            if (e.keyCode == 13)
+            {
+                e.preventDefault();
+                return false;
+            }
+            if (e.keyCode == 9)
+            {
+                e.preventDefault();
+                $(".SeleccionarCaso").focus();
+            }
+        });
+
+        // ******************************************************************************************************************
+
+        // Cuando se busca un caso, se van mostrando los resultados en la tabla de casos.
+        $("#txtBuscaCaso").on("keyup", BuscaCaso);
+        ////////CargarTablaCasos();                
+        ////$(".SeleccionarCaso").on("click", SeleccionarCaso);
+
+
+        ///////* Eliminar controles innecesarios de la tabla de controles */
+        //////$("#tblControlesDataEntry_length").css({ "display": "none" });
+        //////$("#tblControlesDataEntry_info").css({ "display": "none" });
+        //////$("#tblControlesDataEntry_filter").css({ "display": "none" });
+        console.log("zzzzzzzzzzzz");
+        $("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso);
+        
+    }
+    //function ancla() {
+    //    $("html,body").stop().animate({ scrollTop: $("#seleccionarCaso").offset().top }, 1000);
+    //}
+
+
+    function SeleccionarCaso(e)
+    {
+        //e.preventDefault();
+        console.log("--SeleccionarCaso--");
+        var control = $(this);
+        console.log(control.parent().parent());
+
+        adjusterSeleccionado = e.currentTarget.parentElement.parentElement.children["0"].innerHTML;
+        codigoSeleccionado = parseInt(e.currentTarget.parentElement.parentElement.children["3"].innerHTML);
+
+
+        $("input[name=CodigoCasoSeleccionado]").val(codigoSeleccionado);
+        $("input[name=nombreAdjuster]").val(adjusterSeleccionado);
+        $("#txtPaciente").val(adjusterSeleccionado);
+        $("#txtCompany").val("Omnimed Inc.");
+
+
+
+        CargarInformacionCaso(adjusterSeleccionado, codigoSeleccionado);
+        ///ancla();
+    }
+
+
+
+@*    function cargaLista() {
+        codigoSup = $("#cmbSupervisor option:selected").val();
+
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("listaOpenCaseBySupervisor", "ReportOpenCaseBySupervisor")',
+            data: { codigoSupervisor: codigoSup },
+            contentType: 'application/html;charset=utf-8',
+            dataType: 'html',
+            success: function (Data) {
+                $("#resultadoReporte").html(Data);
+            }
+        });
+
+    }*@
+
+    function CargarInformacionCaso(adjusterSeleccionado, codigoAdjuster)
+    {
+        console.log("-cargarinformacion-")
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("listaAdjuster", "ReportAdjuster")',
+            data: { codigoAdjuster: codigoAdjuster },
+            contentType: 'application/html;charset=utf-8',
+            dataType: 'html',
+            success: function (Data) {
+                $("#resultadoReporte").html(Data);
+            }
+         });
+    }
+
+
+
+
+  
+
+    function BuscaCaso(e)
+    {
+        $('#tblCasos').dataTable().fnFilter($("#txtBuscaCaso").val());
+
+        if ($(this).val().trim() == "")//oculta tabla
+        {
+            $("#tblCasos > tbody").css({ "display": "none" });
+            $("#tblCasos_paginate").css({ "display": "none" });
+        }
+        else
+        {
+            $("#tblCasos > tbody").css({ "display": "table-row-group" });
+            $("#tblCasos_paginate").css({ "display": "block" });
+        }
+    }
+
+
+
+    ////////function CargarCaso(Caso)
+    ////////{
+    ////////    $("#hdCodigoCaso").val(Caso.CaseCode);
+    ////////    $("#hdCodigoPaciente").val(Caso.PatientCode);
+
+    ////////    $("#txtClaim").val(Caso.CaseCaseCode);
+    ////////    $("#txtPaciente").val(Caso.Patient);
+
+    ////////    if (Caso.CaseAccidentDate == null || Caso.CaseAccidentDate == "" || Caso.CaseAccidentDate == "01/01/1900" || Caso.CaseAccidentDate == "1/1/1900" || Caso.CaseAccidentDate == "01/01/0001")
+    ////////    {
+    ////////        $("#txtFechaAccidente").val();
+    ////////    }
+    ////////    else
+    ////////        $("#txtFechaAccidente").val(Caso.CaseAccidentDate);
+        
+    ////////    $("#txtAseguradora").val(Caso.Insurer);
+    ////////    $("#txtAjustador").val(Caso.Adjuster);
+            
+    ////////    $("#txtContactoUno").val(Caso.CaseContact1);
+    ////////    $("#txtContactoDos").val(Caso.CaseContact2);
+    ////////    $("#txtSupervisor").val(Caso.CaseSupervisor);
+    ////////    //-------------------------------------------
+    ////////    //console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    ////////    //$("#txtUltimaFechaCierre").val("10/02/2016");
+    ////////}
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+</script>

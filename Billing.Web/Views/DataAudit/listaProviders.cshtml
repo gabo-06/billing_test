@@ -1,0 +1,220 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Provider</h5>
+</div>
+
+<input type="hidden" id="hdCodigoProveedorSeleccionado">
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblProveedor" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden"></th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Id Number</th>
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        </tbody>
+        <tfoot>
+            <tr>       
+                <th class="hidden"></th>
+                <th >First Name</th>
+                <th>Last Name</th>
+                <th>Id Number</th>
+                <th>Select</th>
+            </tr> 
+        </tfoot>
+    </table>
+</div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $('[data-toggle="tooltipB"]').tooltip();
+
+        $('#tblProveedor').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetDataTrazabilidad", "Provider")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Pro_code" },
+                        { "data": "Pro_firstName" },
+                        { "data": "Pro_lastName" },
+                        { "data": "Pro_number" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" data-toggle="tooltipB" data-placement="top" title="Select Patient"  class="btn selectProveedor btn-danger btn-bitbucket text-center"> Select</a> ' } }
+            ]
+        });
+
+        // Evento para controlar la selección de un proveedor.
+        $('#tblProveedor > tbody').on('click', 'tr > td > .selectProveedor', SeleccionaProveedor_Click);
+
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaProveedor_Click(e)
+    {
+        e.preventDefault()
+
+        var codigoProveedorSeleccionado // Variable que almacenará el código del proveedor seleccionado.
+        var nombreProveedorSeleccionado // Variable que almacenará el nombre del proveedor seleccionado.
+        var apellidoProveedorSeleccionado // Variable que almacenará el apellido del proveedor seleccionado.
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre del proveedor seleccionado.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código, nombre y apellido del proveedor seleccionado.
+        codigoProveedorSeleccionado = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombreProveedorSeleccionado = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+        apellidoProveedorSeleccionado = e.currentTarget.parentElement.parentElement.children[2].innerHTML
+
+        // Guarda el código del proveedor seleccionado en el campo oculto.
+        $('#hdCodigoProveedorSeleccionado').val(codigoProveedorSeleccionado)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+
+        ActualizaTrazabilidadProveedor(codigoProveedorSeleccionado, nombreProveedorSeleccionado, apellidoProveedorSeleccionado)
+    }
+
+    function RecibeSeñalNode()
+    {
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('respuestaTrazabilidadProveedor', function (data)
+        {
+            MuestraTrazabilidadTiempoReal(data)
+        })
+    }
+
+    function MuestraTrazabilidadTiempoReal(data) {
+        // Si lo que contiene data.codigoProveedorActualizado es 'null' entonces tomará valor vacío.
+        var codigoProveedorActualizado = data.codigoProveedorActualizado || ''
+
+        // Esta función actualizará la tabla de búsqueda de pacientes
+        ActualizaTablaBusqueda()
+
+        // Verifica que exista un proveedor seleccionado y que el código del proveedor
+        // seleccionado coincida con el código de proveedor traido desde node, si es así
+        // mostrará la trazabilidad del proveedor.
+        if ($('#hdCodigoProveedorSeleccionado').val().trim() != ''
+         && $('#hdCodigoProveedorSeleccionado').val().trim() == codigoProveedorActualizado.trim())
+        {
+            ActualizaTrazabilidadProveedor(data.codigoProveedorActualizado.trim()
+                                            , data.nombreProveedorActualizado.trim()
+                                            , data.apellidoProveedorActualizado.trim())
+        }
+    }
+
+    function ActualizaTrazabilidadProveedor(codigoProveedorSeleccionado
+                                        , nombreProveedorSeleccionado
+                                        , apellidoProveedorSeleccionado)
+    {
+        // Muestra la trazabilida del proveedor seleccionado en la tabla de detalle "tblTrazabilidadProveedor".
+        MuestraTablaTrazabilidadProveedor(codigoProveedorSeleccionado)
+
+        // Se obtiene el título de la vista parcial de la trazabilidad de proveedor, 
+        // para después concatenarlo con el nombre del proveedor seleccionado.
+        tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+        $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombreProveedorSeleccionado + ' ' + apellidoProveedorSeleccionado + ')')
+    }
+
+    function MuestraTablaTrazabilidadProveedor(codigo)
+    {
+        var trazabilidadProveedor
+
+        // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+        trazabilidadProveedor = ObtieneDataTrazabilidadProveedor(codigo)
+
+        // Muestra la vista parcial de la trazabilidad del proveedor seleccionado.
+        $('#DetalleInformacion').css({ 'display': 'block' });
+        $('#DetalleInformacion').html(trazabilidadProveedor);
+    }
+
+    function pintaFilaSeleccionada(e)
+    {
+        // Establece a todas la filas su formato original.
+        $('#tblProveedor > tbody > tr').css({'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+    function ObtieneDataTrazabilidadProveedor(codigo)
+    {
+        var trazabilidadProveedor
+
+        $.ajax({
+            type: 'POST'
+            , async: false
+            , data: JSON.stringify({ 'codigoProveedor': parseInt(codigo) })
+            , url: '@Url.Action("trazabilidadProveedor", "DataAudit")'
+            , contentType: "application/json"
+            , dataType: 'html'
+            , success: function (Data)
+            {
+                trazabilidadProveedor = Data
+            }
+        });
+
+        return trazabilidadProveedor
+    }
+
+    function ActualizaTablaBusqueda()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaTrazabilidad", "Provider")',
+            contentType: false,
+            contentType: false,
+            success: function (Data)
+            {
+                $('#tblProveedor').DataTable().ajax.reload();
+            }
+        });
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+
+

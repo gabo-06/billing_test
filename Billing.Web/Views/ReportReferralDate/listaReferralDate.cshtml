@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_OPEN_CASES_BY_REFERRAL_DATE_Result>
+@{
+    var i = 0;
+}
+<div style="overflow: hidden;" class="ibox-content">
+         
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblListaReporte" border=0>
+        <thead class="th_tabla" style="background-color:#b42734;color:white;">    
+         <tr>
+           <th style="width:30px"></th>
+           <th style="font-size: 10px;font-family: sans-serif;width: 70px">Date of Referral </th>
+           <th style="font-size: 10px;font-family: sans-serif;">Patient </th>
+           <th style="font-size: 10px;font-family: sans-serif;">Insurer</th>           
+           <th style="font-size: 10px;font-family: sans-serif;">Adjuster</th>           
+           <th style="font-size: 10px;font-family: sans-serif;width: 70px">Date of injury</th>           
+           <th style="font-size: 10px;font-family: sans-serif;">Acuity</th>           
+        </tr>
+       </thead>
+       <tbody>       
+       @foreach (var item in Model)
+        {
+            i = i + 1;
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@i</td>      
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@item.Cis_referralDate</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@item.patient</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@item.Ins_name</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@item.adjuster</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@item.Cis_accidentDate</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 10px;font-family: sans-serif;">@item.acuity</td>
+                 </tr>
+       }
+        </tbody>
+        
+    </table>
+
+
+
+
+
+
+     
+</div>
+</div>
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        $("#btnGeneraWord").on("click", generaWord); //edher
+        PaginarTabla();
+
+    }
+     
+    function generaWord() {
+        //alert("aki");
+        //var urlx = $("#linkPdf").attr("data-url");
+        var invoice = $("#invoice_btn").val();
+
+
+        var urlx = $("#linkWord").attr("data-url");
+        urlx = urlx ;
+        window.open(urlx);
+
+
+
+    }
+
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblListaReporte').DataTable({
+            //"scrollY": 100,            
+            "scrollY": 600,
+            "bFilter": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bSort": false
+        });
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+   
+
+</script>

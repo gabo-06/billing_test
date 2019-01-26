@@ -1,0 +1,252 @@
+﻿@model IEnumerable<Billing.Web.Models.CasoCierreMes>
+
+@{
+    var NumeroCorrelativoCaso = 0;
+}
+ 
+@using System.Diagnostics;
+ 
+@section Css_Extras
+{ 
+   <link href="@Url.Content("~/Content/css/dataTables.checkboxes.css")" rel="stylesheet"  type="text/css" media="all" /> 
+}  
+ 
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <input type="checkbox" id="chbFiltrarconPrecio" /> Show Cases that has zero price.
+    <div id="pageInfo"></div>
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden"></th>                                @* Correlativo                                            (Indice 0)  *@ @* Esta columna sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de casos seleccionados "ArregloCasosSeleccionados"). *@
+                <th><input type="checkbox" id="CheckBoxCabecera"></th>  @* Check                                                  (Indice 1)  *@
+                <th class="hidden"></th>                                @* Código del caso                                        (Indice 2)  *@
+                <th>Claim #</th>                                        @* Claim                                                  (Indice 3)  *@
+                <th>Patient</th>                                        @* Paciente                                               (Indice 4)  *@
+                <th>SS#</th>                                            @* Número de seguro social                                (Indice 5)  *@
+                <th>Insurer</th>                                        @* Aseguradora                                            (Indice 6)  *@
+                <th>DOI</th>                                            @* Fecha de accidente                                     (Indice 7)  *@
+                <th>Hours</th>                                          @* Unit                                                   (Indice 8)  *@
+                <th>Last Service Date</th>                              @* La última fecha en la que se registró una entrada      (Indice 9)  *@
+                <th class="hidden">Fac Num</th>                         @* Factura                                                (Indice 10) *@
+                <th class="hidden">Precio</th>                          @* Precio del caso                                        (Indice 11) *@
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            NumeroCorrelativoCaso = NumeroCorrelativoCaso + 1;
+            <tr>
+                <td class="hidden">@item.Correlativo</td>               @* Correlativo                                            (Indice 0)  *@ @* Esta columna sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de casos seleccionados "ArregloCasosSeleccionados"). *@
+                <td></td>                                               @* Check                                                  (Indice 1)  *@
+                <td class="hidden">@item.Cis_code</td>                  @* Código del caso                                        (Indice 2)  *@
+                <td>@item.Cis_caseCode</td>                             @* Claim                                                  (Indice 3)  *@
+                <td>@item.Patient</td>                                  @* Paciente                                               (Indice 4)  *@
+                <td>@item.Pat_socialSecurityNumberD</td>                @* Número de seguro social                                (Indice 5)  *@
+                <td>@item.Ins_name</td>                                 @* Aseguradora                                            (Indice 6)  *@
+                <td>@item.Cis_accidentDate</td>                         @* Fecha de accidente                                     (Indice 7)  *@
+                <td>@item.Hours</td>                                    @* Unit                                                   (Indice 8)  *@
+                <td>@item.Date</td>                                     @* La última fecha en la que se registró una entrada      (Indice 9)  *@
+                <td class="hidden">@item.Dae_facNum</td>                @* Factura                                                (Indice 10) *@
+                <td class="hidden">@item.Cis_price.Trim()</td>                 @* Precio del caso                                        (Indice 11) *@
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+
+        </tfoot>
+    </table>
+</div> 
+
+@*<script src="@Url.Content("~/Scripts/js/dataTables.checkboxes.js")"></script>
+<script src="@Url.Content("~/Scripts/js/dataTables.checkboxes.min.js")"></script>*@
+
+<script>
+
+    $(Inicio);
+
+    function Inicio()
+    {
+        $("#dvLoading").css("display", "none"); 
+
+        PaginarTabla();
+
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+
+        $("#chbFiltrarconPrecio").on("change",  function(e)
+        {
+            var otable = $('#tblCasos').dataTable();
+
+            // console.clear();
+            // console.log(otable);
+            // return false;
+
+            if (e.currentTarget.checked)
+            {
+                otable.fnFilter("^cero", 11, true);
+                // otable.fnFilter("^/^0+$/", 11, true, false);
+                console.log("compara");
+            }
+            else
+                otable.fnFilter('', 11, true, false);
+        });
+    }
+
+    function PaginarTabla()
+    {
+        var otable;
+
+        otable = $("#tblCasos").dataTable().fnDestroy();
+
+        otable = $("#tblCasos")
+        .on("page.dt", function () 
+        {
+            var info = otable.page.info();
+            //$("#pageInfo").html("Mostrando página: " + info.page + " of " + info    .pages);
+        })
+        .DataTable
+            ({
+                //"pageLength": 10
+                "bLengthChange": false
+                , "bInfo": false
+                , "paging": false
+
+                , "columnDefs": [{
+                    'targets': 1
+                    ,"orderable": false, targets: [1]  
+                    ,"render": function (data, type, full, meta) {
+                        return '<input class="checkito" type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                }]
+
+                // , 'select': { 'style': 'multi' }                
+                , "ordering": true
+            });
+
+        // Permite que cuando se seleccione o deseleccione el check que está en la cebecera de la tabla también se seleccionen o deseleccionen los checks de las filas de la tabla.
+        $("#CheckBoxCabecera").on("click", function (e) {
+            var rows = otable.rows({ 'search': 'applied' }).nodes();
+
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            $('input[type="checkbox"]', rows).trigger("change");
+        });
+
+        // *********************************************************************************************************
+        // Check.
+        otable.column(1).nodes().to$().each(function (index)
+        {
+            var check = $(this).find("input[type='checkbox']");
+
+            check.css({"cursor":"pointer"});
+
+            check.on("change", function ()
+            {
+                // var FilaCheckeada = $(this)["0"].parentElement.parentElement;
+                // console.log($(FilaCheckeada)["0"].className);
+
+                // Muestra la lista de casos que se van a convertir en billing.
+                // console.clear();
+                // $.each(ArregloCasosSeleccionados, function (i, val)
+                // {
+                //     console.log(val);
+                // }); 
+
+                var CorrelativoCS;  // Variable donde se obtiene el número correlativo del caso (sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de casos seleccionados "ArregloCasosSeleccionados").
+                var EstadoCheck     // Variable donde se obtiene el valor del check (si está o no seleccionado).
+                var CodigoCS;       // Variable donde se almacena el código del caso seleccionado o deseleecionado.
+                var ClaimCS;        // Variable donde se almacena el claim del caso seleccionado o deseleecionado.
+                var PacienteCS;     // Variable donde se almacena el nombre del paciente del caso seleccionado o deseleecionado.
+                var FacNumCS;      // Variable donde se almacena el número correlativo correspondiente a un detalle de factura.
+
+                CorrelativoCS = $(this)["0"].parentElement.parentElement.children["0"].innerHTML.trim(); // Obtiene el número correlativo del caso seleccionado que sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de casos seleccionados "ArregloCasosSeleccionados"
+                EstadoCheck = $(this)["0"].checked; // Obtiene el valor del check (TRUE: "Seleccionado", FALSE: "No Seleccionado").
+                CodigoCS = $(this)["0"].parentElement.parentElement.children["2"].innerHTML.trim(); // Se obtiene el código del caso que se selecciona.
+                ClaimCS = $(this)["0"].parentElement.parentElement.children["3"].innerHTML.trim(); // Se obtiene el código del caso que se selecciona.
+                PacienteCS = $(this)["0"].parentElement.parentElement.children["4"].innerHTML.trim(); // Se obtiene el nombre completo del paciente del caso que se selecciona.
+                FacNumCS = $(this)["0"].parentElement.parentElement.children["10"].innerHTML.trim(); // Se obtiene el número correlativo correspondiente a un detalle de factura.
+                
+                // Si el arreglo de casos seleccionado aún no tiene elementos, se llena inicialmente con el código del primer caso que se selecciona.
+                // Esto es para el primer caso que se selecciona, para que el arreglo este lleno.
+                if (ArregloCasosSeleccionados.length == 0)
+                {
+                    // El prefijo CS que se usa al final del nombre de las variables es de "Caso Seleccionado".
+                    ArregloCasosSeleccionados[IndiceArregloCasos] = Array();
+                    ArregloCasosSeleccionados[IndiceArregloCasos]["IndiceArreglo"] = IndiceArregloCasos; 
+                    ArregloCasosSeleccionados[IndiceArregloCasos]["CorrelativoCS"] = CorrelativoCS;
+                    ArregloCasosSeleccionados[IndiceArregloCasos]["CodigoCS"] = CodigoCS;
+                    ArregloCasosSeleccionados[IndiceArregloCasos]["ClaimCS"] = ClaimCS;
+                    ArregloCasosSeleccionados[IndiceArregloCasos]["PacienteCS"] = PacienteCS;
+                    ArregloCasosSeleccionados[IndiceArregloCasos]["FacNumCS"] = FacNumCS;
+                }
+                  
+                if (EstadoCheck) // Si se selecciona el check actual.
+                {
+                    // $(FilaCheckeada).css({"background": "#666060", "color": "#dde5eb"});                
+
+                    // Primero verifica que el código del caso seleccionado se encuentre en el arreglo de casos seleccionados 
+                    // (el código del primer caso seleccionado siempre va a estar, se llena con este para tener con que comparar).
+                    if (ArregloCasosSeleccionados.map((el) =>  el.CorrelativoCS).indexOf(CorrelativoCS) != -1) 
+                    {
+                        // console.log("está");
+                    }
+                    else
+                    {                     
+                        IndiceArregloCasos += 1;
+                        
+                        // console.log("no está");
+                        // console.log(IndiceArregloCasos);
+
+                        ArregloCasosSeleccionados[IndiceArregloCasos] = Array();
+                        ArregloCasosSeleccionados[IndiceArregloCasos]["IndiceArreglo"] = IndiceArregloCasos; 
+                        ArregloCasosSeleccionados[IndiceArregloCasos]["CorrelativoCS"] = CorrelativoCS;
+                        ArregloCasosSeleccionados[IndiceArregloCasos]["CodigoCS"] = CodigoCS;
+                        ArregloCasosSeleccionados[IndiceArregloCasos]["ClaimCS"] = ClaimCS;
+                        ArregloCasosSeleccionados[IndiceArregloCasos]["PacienteCS"] = PacienteCS;
+                        ArregloCasosSeleccionados[IndiceArregloCasos]["FacNumCS"] = FacNumCS;
+                    }                
+                }
+                else // Si se deselecciona el check actual.
+                {
+                    // $(FilaCheckeada).removeClass("even");
+                    // $(FilaCheckeada).removeClass("odd");
+                    // $(FilaCheckeada).addClass("even");
+
+                    // Rescata el indice del elemento deseleccionado que servirá para eliminarlo del arreglo de casos.
+                    var IndiceCasoDeseleccionado = parseInt(ArregloCasosSeleccionados.map((el) => el.CorrelativoCS).indexOf(CorrelativoCS));
+
+                    ArregloCasosSeleccionados.splice(IndiceCasoDeseleccionado,1); // Elimina el caso del arreglo de casos seleccionados.         
+                    IndiceArregloCasos -= 1;
+                }
+            });            
+        });
+        // *********************************************************************************************************
+        // Código del caso.
+        otable.column(2).nodes().to$().each(function (index)
+        {
+
+        });
+        // *********************************************************************************************************
+        // Claim
+        // otable.column(2).nodes().to$().each(function (index)
+        // {
+        //     // console.log($(this)["0"].innerText.trim());
+        // });
+        // *********************************************************************************************************
+        // Paciente
+        // otable.column(3).nodes().to$().each(function (index)
+        // {
+        //     // console.log($(this)["0"].innerText.trim());
+        // });
+
+        // otable.draw();
+    }
+
+
+
+
+
+        
+        
+</script>

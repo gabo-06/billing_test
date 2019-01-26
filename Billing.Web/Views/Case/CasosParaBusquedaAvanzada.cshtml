@@ -1,0 +1,153 @@
+﻿@model IEnumerable<Billing.Web.Models.CasoBusquedaAvanzada>
+
+
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos">
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th> 
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden"> 
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th>
+                    INSURER                                                                                              
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th>
+                    STATUS
+                </th>
+                <th>
+                    SELECT
+                </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">
+        @foreach (var item in Model) 
+        {
+            <tr>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.CaseCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClaimNumber)
+                </td>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.PatientCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Patient)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Insurer)
+                </td>
+                <td>
+                    
+                    @Html.DisplayFor(modelItem => item.AccidentDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td style="text-align: center;">
+                    <a href="#detalleCase" class="btn SeleccionarCaso btn-white btn-bitbucket" ><i class="fa fa-check text-danger"></i> </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th>
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden">
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th>
+                    INSURER                                                                                              
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th>
+                    STATUS
+                </th>
+                <th>SELECT</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<script>
+    $(Inicio);
+
+    function Inicio() {
+        PaginarTabla();
+        OcultarControlesDecorativosDataTable();
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#tblCasos_filter").css({ "display": "none" });
+    }
+
+    function PaginarTabla() {
+        var otable = $("#tblCasos").dataTable().fnDestroy();
+
+        otable = $("#tblCasos").DataTable({
+            "pageLength": 5,
+            dom: '<"html5buttons"B>lTfgitp',
+            buttons: [
+                { extend: 'copy' },
+                { extend: 'csv' },
+                { extend: 'excel', title: 'ExampleFile' },
+                { extend: 'pdf', title: 'ExampleFile' },
+
+                {
+                    extend: 'print',
+                    customize: function (win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+
+                        $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                    }
+                }
+            ]
+        });
+    }
+
+    function OcultarControlesDecorativosDataTable() {
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+
+    function MostrarOcultarCoincidencias(e) {
+
+        //console.log("ert");
+        //console.log($(this).val().trim());
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+</script>

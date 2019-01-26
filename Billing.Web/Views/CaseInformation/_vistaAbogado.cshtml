@@ -1,0 +1,221 @@
+﻿<div class="panel-body">
+<fieldset class="form-horizontal">
+                        <div class="form-group">
+                        <label class="col-lg-3 control-label">Attorney Name</label> 
+                        <input type="hidden" id="hdCodigoAbogadoParaAsignar">
+                        <div class="col-lg-9">
+                        @*<input type="text" class="form-control ui-autocomplete-input" id="txtAbogado" autocomplete="off" disabled="disabled">*@     
+                    <select class="form-control" id="cmbAbogado">                                            
+                    </select>
+                        </div>                                           
+                        </div>
+                        <div class="form-group text-center"  style="margin-left: 130px;">                                                   
+                            <button style="display:none;" data-target="#myModalAbogadoHom" data-toggle="modal" id="btnModalAbogadoHom" class="btn btn-primary" type="button"></button>                                                                                    
+                            <button id="btnAsignaAbogado" class="btn btn-primary" type="submit" data-placement="top" title="Add attorney to table">Add Attorney</button>
+                            <button id="btnNuevoAbogado" class="btn btn-primary" id="btnModalTest" data-toggle="modal" data-target="#myModal55" type="button" data-placement="top" title="Register a new attorney">Add New Attorney</button>
+                            <!-- <button style="display:block;" data-target="#MyModal5" data-toggle="modal" id="btnModalaa" class="btn btn-primary" type="button"></button> -->
+                            <a role="menuitem" href="#finish" id="muestraDetalleAbogado"  style="color:#b73333;display:none;float: right;padding-right: 20px;" onclick="muestraDetalleAbogado()"  > >> Show Attorney Info</a>
+                        </div>         
+
+    <div class="table-responsive" id="div_detalle_abogado" style="display:none;">
+        <table class="table table-striped table-bordered table-hover dataTables-example" id="tabla_detalle_abogado" >
+        <thead class="th_tabla">
+            <tr style="background-color:#f26666;">             
+           
+                <th >
+                    Name
+                </th>
+                <th >         
+                    Street      
+                </th>
+                <th >
+                    City
+                </th>
+                <th>
+                    State
+                </th>
+                <th>
+                    Zip
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    Phone
+                </th>
+                <th>
+                    Fax
+                </th>
+                <th>
+                    Speciality
+                </th>
+                <th>
+                    Assistant
+                </th>
+            </tr>
+        
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+</fieldset>
+
+
+<div class="table-responsive" id="TablaParaBusquedaAttorney">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblAbogado" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden"></th>
+                <th >
+                    Name
+                </th>
+                <th >         
+                    Street      
+                </th>
+                <th >
+                    City
+                </th>
+                <th>
+                    State
+                </th>
+                <th>
+                    Zip
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    Phone
+                </th>
+                <th>
+                    Fax
+                </th>
+                <th>
+                    Speciality
+                </th>
+                <th>
+                    Assistant
+                </th>
+                <th>
+                    Delete
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+       
+        </tbody>
+        <tfoot>
+           <tr>
+               <th class="hidden"></th>
+                <th>
+                    Name
+                </th>
+                <th >         
+                    Street      
+                </th>
+                <th >
+                    City
+                </th>
+                <th>
+                    State
+                </th>
+                <th>
+                    Zip
+                </th>
+                <th>
+                    Ext
+                </th>
+                <th>
+                    Phone
+                </th>
+                <th>
+                    Fax
+                </th>
+                <th>
+                    Speciality
+                </th>
+                <th>
+                    Assistant
+                </th>
+                <th>
+                    Delete
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+</div>
+
+
+
+
+<script>
+    function muestraDetalleAbogado()
+    {
+        valorHdAbogado = $("#hdCodigoAbogadoParaAsignar").val();
+
+        if (valorHdAbogado != 0 && valorHdAbogado != "" && valorHdAbogado != null && valorHdAbogado != 85) {
+
+            visible = $("#div_detalle_abogado").is(":visible");
+
+            if (visible == true) {
+                $("#muestraDetalleAbogado").html(" >> Show Attorney Info");
+                $("#div_detalle_abogado").css("display", "none");
+            }
+            else {
+                llenaTablaDetalleAbogado(valorHdAbogado);
+            }
+        }
+        else
+        {
+            error = "Error";
+            mensaje = "Select a Attorney name";
+            MensajeError(mensaje,error);
+        }
+             
+
+    }
+
+
+    function llenaTablaDetalleAbogado(valorHdAbogado)
+    {
+        $.ajax({
+            type: "POST",
+            async: true,
+            data: JSON.stringify({ "Codigo": parseInt(valorHdAbogado) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Attorney")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    console.log(Data);
+                    console.log(Data.Specialty);
+    
+                    $("#tabla_detalle_abogado").DataTable().clear();
+                    nombreAbogado = Data.Att_firstName + " " + Data.Att_lastName;
+                    if (Data.Att_assistant == null || Data.Att_assistant == "")
+                        asistente = "--";
+                    else
+                        asistente = Data.Att_assistant.toUpperCase();
+                             $('#tabla_detalle_abogado').dataTable().fnAddData([
+                              nombreAbogado, Data.Att_address, Data.Att_city.toUpperCase(), Data.Att_state, Data.Att_zipCode, Data.Att_zipCodeExt, Data.Att_phone, Data.Att_fax, Data.Specialty.Spe_name.toUpperCase(), asistente]);
+                           
+
+                             var otable = $("#tabla_detalle_abogado").dataTable().fnDestroy();
+                             otable = $('#tabla_detalle_abogado').DataTable({ "searching": false, "paging": false, "ordering": false });
+
+                         $("#muestraDetalleAbogado").html(" >> Hide Attorney Info");
+                         $("#div_detalle_abogado").css("display", "block");
+                         $("#tabla_detalle_abogado_info").css("display", "none");
+    
+                }
+        });
+
+
+
+
+
+    }
+
+</script>                                

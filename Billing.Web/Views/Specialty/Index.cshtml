@@ -1,0 +1,660 @@
+﻿@model IEnumerable<Billing.Web.Models.Specialty>
+
+@{
+    ViewBag.Title = "Speciality";
+}
+
+<div >
+       <div class="row">
+           <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12" id="divEspecialidad">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title header_formulario">
+                            <h5>REGISTER SPECIALITY</h5>
+                            
+                        </div>
+                        <div class="ibox-content" id="frmRegistroEspecialidad" style="display: none;">
+                            <form method="get" class="form-horizontal">
+                                <input type="hidden" id="hdCodigo" />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Speciality<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text"   class="form-control" id="description" autofocus tabindex ="1" />
+                                    </div>
+                                </div>
+                                @*<div class="hr-line-dashed"></div>*@
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Type<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <select class="form-control m-b" id="cmbTipoEspecialidad" tabindex ="2">
+                                            <option value="">-- SELECTED --</option>
+                                            <option value="A">ATTORNEY</option>
+                                            <option value="M">MEDICAL</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-8 col-sm-offset-2 text-center">
+                                        <button id="btnRegistrar" class="btn btn-primary" type="submit" tabindex ="3">Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" disabled tabindex ="3">Update</button>
+                                        <button id="btnCancelar" class="btn btn-danger" type="button" tabindex ="4">Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Specialty")">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+           <!--///////////////////LISTA///////////////////////-->
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger color"   id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        @Html.Partial("Specialty_List")
+                    </div>
+                </div>
+            </div>
+    </div>    
+          
+</div>
+
+
+
+
+@Html.Partial("footer")
+
+
+
+
+
+<script>
+
+    var websocket = io.connect(ServidorPuertoNode);
+    websocket.on('funcionEspecialidadDesdeNode', function (data) {
+        funcionEspecialidadDesdeNode_llamada(data);
+    });
+
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function LiberaCasoDeUsuarioActual(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+
+    LiberaCasoDeUsuarioActual(CodigoUsuarioGlobal);
+
+    $('input:text').on('keypress', function (e) {
+
+        if (e.which == 13 || e.which == 9) {
+            currentTabIndex = parseInt($(this).attr("tabindex"));
+
+            currentTabIndex = currentTabIndex + 1;
+            $("input[tabindex=" + currentTabIndex + "]").select();
+            e.preventDefault();
+        }
+
+    });
+
+    $('input.letter').on('keypress', function (e) {
+
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    function LimpiarControlesRegistro()
+    {
+        $("#description").val("");        
+        $("#tipo").val("");
+    }
+
+    function VerificarContraccionFormularioRegistro() {
+        if ($("#frmRegistroEspecialidad").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    function LlenarEspecialidad(Codigo,
+                            Nombre,
+                            Tipo)
+    {
+        var especialidadJson =
+            {
+              "Spe_code": Codigo
+            , "Spe_name": Nombre
+            , "Spe_type": Tipo
+            , "Spe_operatorUser": CodigoUsuarioGlobal
+            
+        }
+        return especialidadJson;
+    }
+
+    // Esta función se ejecuta para actualizar el mantenedor de auditoría a través de node.
+    function actualizaTrazabilidad(codigoEspecialidad, nombreEspecialidad)
+    {
+        var parametros
+
+        parametros = {
+            'codigoEspecialidadActualizada': codigoEspecialidad
+           , 'nombreEspecialidadActualizada': nombreEspecialidad
+        }
+
+        websocket.emit('actualizaTrazabilidadEspecialidad', parametros)
+    }
+
+    function RegistrarEspecialidad(e)
+    {
+        if ($("#description").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#description").focus();
+            $("#description").addClass("has-error");
+
+
+            mensaje = "Error!";
+            error = "Required Description!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#cmbTipoEspecialidad").val() == "") // Valida la obligatoriedad del tipo de especialidad
+        {
+            e.stopPropagation();
+            $("#cmbTipoEspecialidad").focus();
+            $("#cmbTipoEspecialidad").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Activity Type!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else
+        {
+            e.preventDefault();
+
+            var Especialidad = LlenarEspecialidad(null
+                                          , $("#description").val().trim().toUpperCase()
+                                          , $("#cmbTipoEspecialidad").val())
+
+            // ************************* Verificaión de homónimos *******************************
+            // var CantidadHomonimos = 0;
+
+            // Primero verifica que no exista un proveedor homónimo.
+            // $.ajax({
+            //     type: "POST",
+            //     async: false,
+            //     data: JSON.stringify(proveedor),
+            //     url: '@Url.Action("BuscarHomonimos", "Specialty")',
+            //     contentType: "application/json",
+            //     dataType: 'json',
+            //     success: function (Data) {
+            //         CantidadHomonimos = Data;
+            //     }
+            // });
+
+            // if (CantidadHomonimos == 1) // Si encontró homónimos aborta el registro
+            // {
+            //     mensaje = "Successful!";
+            //     error = "Similar data were found,You want to register?";
+            //     MensajeError(mensaje, error);
+            //     return false; // Aquí sale fuera de la funcíón sin terminar el registro.
+            // }
+            // **************************************************************************************
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Especialidad),
+                url: '@Url.Action("Create", "Specialty")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data[0].ErrorMessage == "")
+                    {
+                        seleccionado = $("#cmbTipoEspecialidad option:selected").html();
+                        AgregaFila(Especialidad,seleccionado, Data[0].SpecialtyErrorCode);
+                        mensaje = "Success!";
+                        error = "Data Save Successfully!!!";
+                        MensajeError(mensaje, error);                        
+                        $("#frmRegistroEspecialidad").css("display", "none");
+
+                        // En "RegistrarEspecialidad".
+                        actualizaTrazabilidad(Especialidad.Spe_code, Especialidad.Spe_name)
+                    }
+                    else {
+                        if (Data[0].PatientErrorCode == 2601) {
+                            // $("#NumeroSeguroSocialD").focus();
+                            // mensaje = "The social security number already exists";
+                        }
+                        else
+                            mensaje = "Error in register!!";
+
+                        error = Data[0].ErrorMessage;
+                        codigo = Data[0].PatientErrorCode;
+                        MensajeError(mensaje, Data[0].ErrorMessage);
+                    }
+                }
+            });
+        }
+    }
+
+    function EditarEspecialidad(e)
+    {
+        e.preventDefault();
+
+        var otable = $("#tblEspecialidad").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+
+        /* 
+        La siguiente línea obtiene el código del proveedor seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del proveedor seleccionado. 
+        */
+        var CodigoEspecialidad = $(this).parent().parent().find("td:eq(0)").html();
+
+        var Especialidad;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoEspecialidad) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Specialty")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Especialidad = (Data);
+            }
+        });
+
+        var position = $("#divEspecialidad").position();
+        scroll(0, position.top);
+  
+        // myDate = convierteFecha(Proveedor.Pat_birthday);
+        // Proveedor.Pat_birthday = myDate;
+        console.log("cargando a");
+        CargarDatosFormulario(Especialidad); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+        // $("#divEscpecialidad").find("#Nombre").focus();
+        $("#apos").val(aPos);
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+    function MensajeError(mensaje,error)
+    {
+            swal({
+                title: mensaje,
+                text: error
+            });
+    }
+
+    function EliminaEspecialidadModal(e)
+    {
+        e.preventDefault();
+
+        var codSpe = $(this).parent().parent().find("td:eq(0)").html();
+        var nomSpe = $(this).parent().parent().find("td:eq(1)").html();
+
+        dato = nomSpe.trim();
+
+        var otable = $("#tblEspecialidad").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        if (VerificarContraccionFormularioRegistro() != true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+        ///
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover the information from " + dato +"!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                swal("Deleted!", "Your file information has been deleted.", "success");
+                EliminarEspecialidad(codSpe, aPos, otable);
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated :)", "error");
+                return 0;
+            }
+        });
+    }
+
+
+    function CancelarRegistro()
+    {
+
+
+
+
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            $("#frmRegistroEspecialidad").css("display", "block");
+        else
+            $("#frmRegistroEspecialidad").css("display", "none");
+
+
+        LimpiarControlesRegistro();
+        $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+        $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Especialidad)
+    {
+        console.log("cargando datos");
+
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            $("#frmRegistroEspecialidad").css("display", "block");
+            //ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+
+        $("#hdCodigo").val(Especialidad.Spe_code);
+        $("#description").val(Especialidad.Spe_name);
+        $("#cmbTipoEspecialidad").val(Especialidad.Spe_type);
+         
+    }
+
+    function ActualizarDatos(e)
+    {
+        if ($("#description").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#description").focus();
+            $("#description").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required Description!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#cmbTipoEspecialidad").val() == "") // Valida la obligatoriedad del tipo de especialidad
+        {
+            e.stopPropagation();
+            $("#cmbTipoEspecialidad").focus();
+            $("#cmbTipoEspecialidad").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Activity Type!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else
+        {
+            e.preventDefault();
+
+            var Especialidad = LlenarEspecialidad($("#hdCodigo").val()
+                                          , $("#description").val().trim().toUpperCase()
+                                          , $("#cmbTipoEspecialidad").val())
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Especialidad),
+                url: '@Url.Action("ActualizarDatos", "Specialty")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    EspecialidadX = Especialidad;
+                    seleccionado = $("#cmbTipoEspecialidad option:selected").html();
+                    Especialidad = (Data);                    
+
+                    if (Data[0].ErrorMessage == "")
+                    {
+                        aPos = $("#apos").val();
+                        var otable = $("#tblEspecialidad").dataTable();                        
+                        /*   EditaFila(EspecialidadX, seleccionado,aPos, otable);
+
+                        mensaje = "Successful!";
+                        error = "Data save correctly...";
+                        LimpiarControlesRegistro();
+                        ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));*/
+
+                        seleccionado = $("#cmbTipoEspecialidad option:selected").html();                        
+                        EditaFila(EspecialidadX, seleccionado, aPos, otable);
+                        mensaje = "Success!";
+                        error = "Data Save Successfully!!!";
+                        MensajeError(mensaje, error);
+                        //ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+                        $("#frmRegistroEspecialidad").css("display", "none");
+
+                        // En "ActualizarDatos".
+                        actualizaTrazabilidad(EspecialidadX.Spe_code, EspecialidadX.Spe_name)
+                    }
+                    else
+                    {
+                         mensaje = "Error!";
+                         error = Data[0].ErrorMessage + "...";
+                         $("#cmbTipoEspecialidad").focus();//el error solo se muestra en SSD
+                         //$("#frmRegistroEspecialidad").css("display", "none");
+                    }
+
+                    MensajeError(mensaje, error);
+                }
+            });
+        }
+    }
+                    
+@*    function EliminarEspecialidad(CodigoEspecialidad, pos, otable)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoEspecialidad) }),
+            url: '@Url.Action("Delete", "Specialty")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+
+                if (Data == 50000) { /// 50000 es el nro de error general 
+                    // mensaje = "You can not delete patient he has an active case!!!";
+                    // MensajeError("Error!", mensaje);
+                }
+                else
+                {
+                    Especialidad = (Data);
+                    otable.fnDeleteRow(pos);
+                }
+            }
+        });
+    }*@
+    
+
+
+    function AgregaFila(Especialidad) {
+    //function AgregaFila(Especialidad,seleccionado, CodPatNew) {
+        //console.log("brenher");
+        //console.log(CodPatNew);
+        //console.log(Especialidad);
+        
+        //$('#tblEspecialidad').dataTable().fnAddData([
+        //   CodPatNew, Especialidad.Spe_name, seleccionado, '<a class="btn EditarEspecialidad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> ']);
+
+        dato = Especialidad.Spe_name;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+        ///otable =  $("#tblPacientes").dataTable({ "columnDefs": [{className:"hidden","targets": [0,6,8]}]  });
+        websocket.emit('funcionActualizacionTablaEspecialidadNode', 'GaboSexEsp');
+        websocket.on('funcionEspecialidadDesdeNode', function (data) {
+            funcionEspecialidadDesdeNode_llamada(data);
+        });
+    }
+
+    function EditaFila(Especialidad) {
+    //function EditaFila(Especialidad, seleccionado,pos, otable) {
+        
+        ////otable.fnUpdate([
+        ////Especialidad.Spe_code, Especialidad.Spe_name, seleccionado, '<a class="btn EditarEspecialidad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a>'], pos, undefined, true);
+
+        dato = Especialidad.Spe_name;
+        recargaInformacionTabla(dato);
+
+
+        websocket.emit('funcionActualizacionTablaEspecialidadNode', 'GaboSexEsp');
+        websocket.on('funcionEspecialidadDesdeNode', function (data) {
+            funcionEspecialidadDesdeNode_llamada(data);
+        });
+
+    }
+
+    function recargaInformacionTabla(dato_busca) {
+        console.log("recargaInformacionTabla");
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarEspecialidadTabla", "Specialty")',
+            contentType: false,
+            contentType: false,
+            success: function (Data) {
+                console.log("correcto");
+                $('#tblEspecialidad').DataTable().ajax.reload();
+                if (dato_busca != "")
+                    setTimeout(function () { otable = $('#tblEspecialidad').dataTable().fnFilter(dato_busca) }, "1000");
+                else 
+                    setTimeout(function () { otable = $('#tblEspecialidad').dataTable().fnFilter("") }, "1000");
+
+            }
+        });
+    }
+
+
+    function controlaTab() {
+
+        $('.form-control').on('keydown', function (e) {
+            //
+            console.log("control_keydown");
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var tabindex = $(this).attr('tabindex');
+                console.log(tabindex);
+                tabindex++;
+                console.log(tabindex);
+                $("[tabindex='" + tabindex + "']").focus();
+            }
+
+        });
+    }
+
+    var websocket = io.connect(ServidorPuertoNode);
+
+    $(document).ready(function () 
+    {
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "";
+        // console.log(ProcesoActual);        
+
+
+
+        // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+        $("#EnlaceCrearNuevo").on("click", function (e) {
+
+            e.preventDefault();
+            LimpiarControlesRegistro();
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+
+            if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+                $("#frmRegistroEspecialidad").css("display", "block");
+            //ExpandirFormularioRegistro($("#frmRegistroPaciente").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+
+            var position = $("#divEspecialidad").position();
+            scroll(0, position.top);
+            $("#divPatient").find("#Nombre").focus();
+        });
+
+        $("#btnRegistrar").on("click", RegistrarEspecialidad); // Dispara la función que registra un Proveedor, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblEspecialidad > tbody").on("click", "tr > td > .EditarEspecialidad", EditarEspecialidad); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblEspecialidad > tbody").on("click", "tr > td > .EliminarEspecialidad", EliminaEspecialidadModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+
+
+        controlaTab();
+
+
+
+
+
+    });
+
+
+
+    function funcionEspecialidadDesdeNode_llamada(data) {
+        // debugger;
+        console.log("funcion_n_especialidad");
+        console.log(data);
+        dato_busca = ""; // este campo se usa para filtro en tabla
+        var otable = $("#tblEspecialidad").dataTable();
+        recargaInformacionTabla(dato_busca, otable);
+    }
+
+   
+
+  </script>          
+
+

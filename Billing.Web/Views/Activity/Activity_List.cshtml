@@ -1,0 +1,73 @@
+﻿ <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblActividad" >
+                    <thead class ="th_tabla">
+                    <tr>
+        <th class="hidden"></th>
+        <th >         
+            Description
+        </th>
+        <th>
+            Type
+        </th>      
+        <th>Operations</th>
+         </tr>
+         </thead>
+         <tbody></tbody>
+         <tfoot>
+         <tr>
+        
+        <th class="hidden"></th>
+        <th >         
+            Description
+        </th>
+        <th>
+            Type
+        </th>                           
+        <th></th>
+       </tr>
+                    </tfoot>
+                    </table>
+</div>
+
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        PaginarTabla();
+    }
+
+
+    function PaginarTabla() {
+        console.log("hola");
+
+        $('#tblActividad').DataTable({
+              order: [[1, "asc"]],
+             "pageLength": 10,
+             "columnDefs": [ { className: "hidden", "targets": [0] }],
+             "language":
+                  { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"},
+             "processing": true,
+             "serverSide": true,
+             "ajax": {
+                    "url": '@Url.Action("GetData", "Activity")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                     },
+             "columns": [
+                        { "data": "Act_code" },
+                        { "data": "Act_description" },
+                        { "data": "ActivityType.Aty_description" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" title="Edit Activity" class="btn EditarActividad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a>' } }
+                        ]
+        });
+        ////////////////////////////////////////////////////////////////////////
+    }
+
+
+
+
+ 
+
+
+</script>

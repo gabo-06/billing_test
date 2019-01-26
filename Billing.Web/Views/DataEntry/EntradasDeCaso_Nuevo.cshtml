@@ -1,0 +1,1208 @@
+﻿@* 
+cambio 10
+Be advised that the value is 
+ *@
+@using System.Diagnostics;
+
+@model IEnumerable<Billing.Web.Models.PDataEntry_Lista>
+@{
+    var i = 0;
+    var CodigoEntradaVacio = (string)null;
+    var FechaEntradaDateTime = DateTime.Now;
+    var Unit = (string)null;
+    var PriceUnit = (string)null;
+    var RunningTotal = (string)null;
+    var CantidadEntradasDeCaso = 0;
+}
+<style>
+.pagination {
+    display: inline-block;
+}
+
+
+.pagination a {
+    color: black; 
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+}
+
+.pagination a.active {
+    background-color: #b42734;
+    color: white;
+    border: 1px solid #ed5565;
+}
+
+.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+<div class="table-responsive" id="TablaParaControles">    
+    <table class="table table-striped table-bordered " id="tblEntradas">
+        <thead class="th_tabla">
+            <tr>
+                <th>                        @* Columna 1 (Indice 0)*@
+
+                </th> 
+                <th class="hidden">         @* Columna 2 (Indice 1)*@
+                    Dae_code
+                </th>
+                <th class="hidden">         @* Columna 3 (Indice 2)*@
+                    Dae_code_old
+                </th>
+                <th >                       @* Columna 4 (Indice 3)*@
+                    Service Date
+                </th> 
+                <th>                        @* Columna 5 (Indice 4)*@
+                    Billing Activities
+                </th> 
+                <th>                        @* Columna 6 (Indice 5)*@
+                    Unit
+                </th>
+                <th>                        @* Columna 7 (Indice 6)*@
+                    Price Unit
+                </th>
+                <th>                        @* Columna 8 (Indice 7)*@
+                    Running Total
+                </th>
+                <th>                        @* Columna 9 (Indice 8)*@
+                    Description 
+                </th> 
+                <th>                        @* Columna 10 (Indice 9)*@
+
+                </th> 
+                <th class="hidden">         @* Columna 11 (Indice 10)*@
+                    Service Date
+                </th>
+                <th class="hidden">         @* Columna 12 (Indice 11)*@
+                    Numero Pagina
+                </th>
+                <th class="hidden">         @* Columna 13 (Indice 12)*@
+                    Código Evento
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @{
+            CantidadEntradasDeCaso = Model.Count();
+            Int32 NroPagina = ViewBag.CurrentPage;
+            Int32 nroFinal = NroPagina * 10;
+            Int32 nroInicial = nroFinal - 9;
+            i = nroInicial;
+            Int32 paginaMostrar = 0;
+        }
+
+        @foreach (var item in Model)
+        {            
+            
+            
+            <tr>
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle;">  @i </td>
+                <td style="display: none;" class="CodigoEntrada"> @item.Dae_code </td> 
+                <td style="display: none;"> @item.Dae_code_old </td>
+                <td style="vertical-align: middle; width: 6000px;" >
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                        @{
+                            FechaEntradaDateTime = Convert.ToDateTime(@item.Dae_date);
+                            Debug.Write(FechaEntradaDateTime);
+                        }
+                        <input class="form-control dtpFecha" type="text" style="background: #ffffff; width: 100%;" maxlength="10" data-mask="99/99/9999" value="@FechaEntradaDateTime.ToString("MM/dd/yyyy")" />
+                    </div>
+                </td>  
+                <td  CodigoActividad="@item.Act_code"   >
+                   <select class="form-control cmbActividades" style="width: 100%;">
+                      <option value=""></option>
+                   </select>
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                    @if (item.Dae_hourAct == 0)
+                    {
+                        Unit = "";
+                    }
+                    else
+                    {
+                        Unit = item.Dae_hourAct.ToString();
+                    }
+                    <input class="form-control numeros txtUnit" type="text" style="width: 100%;"  maxlength="5"  value="@Unit"  />
+                    <input type="hidden" value="@Unit" /> 
+                </td>
+                <td style="vertical-align: middle; width: 2000px">
+                    @if (item.Dae_milesAct == 0)
+                    { 
+                        PriceUnit = "";
+                    } 
+                    else 
+                    {
+                        PriceUnit = item.Dae_milesAct.ToString(); 
+                    } 
+                    <input class="form-control txtPriceUnit" type="text" style="width: 100%;" maxlength="8"  value="@PriceUnit" />
+                </td>
+                <td style="vertical-align: middle; width: 900px">
+                   <input class="form-control txtRunningTotal" type="text" style="width: 100%;"tabindex ="5000"  readonly />
+                </td>
+                <td style="width: 13000px">
+                    @*<textarea class="form-control Comentario" style="height: 100px;  width: 100%;">@item.Dae_comment</textarea>*@
+                    <textarea class="form-control Comentario" style="height: 100px;   width: 100%;">@item.Dae_comment.Replace('\t', ' ').Replace('\n', ' ').Replace("\"", "\\\"")</textarea>
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 22px;">
+                   <a href="#" class="btn btn-danger  btn-bitbucket EliminarEntrada">
+                     Delete
+                   </a>
+                   <input class="form-control InicialesUsuario" type="text" style="background-color: #ffffff; width: 100%;" value="@item.InicialesUsuario" disabled />
+                </td>
+                <td class="hidden">
+                    @FechaEntradaDateTime
+                    @*@FechaEntradaDateTime.ToString("MM/dd/yyyy")*@
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+                <td class="hidden"> @* Código de evento *@
+                    @item.Eve_codigo
+                </td>
+            </tr>
+            i = i + 1;
+            paginaMostrar = i;
+        }
+
+       @for (var Indice = i; Indice <= nroFinal; Indice++)
+        {
+            <tr>      
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle;">  @Indice </td>
+                <td style="display: none;"></td>
+                <td style="display: none;"> </td>
+                <td style="vertical-align: middle; width: 6000px;">
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                                               
+                        @if (Indice == Model.Count())
+                        {
+                            // FechaEntradaDateTime
+                            <input class="form-control dtpFecha" type="text"    style ="background: #ffffff; width: 100%;" data-mask="99/99/9999" maxlength="10" value="@FechaEntradaDateTime.ToString("MM/dd/yyyy")" />                       
+                        }
+                        else
+                        {
+                            <input class="form-control dtpFecha FechaNoMostrada"    type="text" data-mask="99/99/9999" style="background: #ffffff; width: 100%;" maxlength="10" />
+                        }
+                    </div>
+                </td>
+                <td style="vertical-align: middle; width: 12000px;">
+                   <select class="form-control cmbActividades" style="width: 100%;" >
+                      <option value=""></option>
+                   </select>
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtUnit" type="text"  maxlength="5" style="width: 100%;"   />
+                </td>
+                <td style="vertical-align: middle; width: 2000px">
+                   <input class="form-control txtPriceUnit" type="text" maxlength="8" style="width: 100%;"   />
+                </td>
+                <td style="vertical-align: middle; width: 900px">
+                   <input class="form-control txtRunningTotal" type="text" tabindex ="5000" style="width: 100%;"  readonly />
+                </td>
+                <td style="width: 13000px">
+                    <textarea class="form-control Comentario" style="height: 100px; vertical-align: middle; width: 100%;" ></textarea>
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 22px;">
+                   <a href="#" class="btn btn-danger  btn-bitbucket EliminarEntrada" style="display:none;">
+                      Delete
+                   </a>
+                   <input class="form-control InicialesUsuario" type="text" style="background-color: #ffffff; width: 100%;" disabled />
+                </td>
+                <td class="hidden">
+                    @{
+                        var FechaMayor = Convert.ToDateTime("12/28/2050");                            
+                    }
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+                <td class="hidden"> @* Código de evento *@
+                    
+                </td>
+            </tr>      
+        }
+        </tbody>
+
+       <tfoot>
+        <tr>
+            <td colspan="8" style="text-align: right;">
+               <div class="pagination">
+      
+                @for (int xx = 1; xx <= ViewBag.NumberOfPages; xx++)
+                {
+                    if (xx == ViewBag.CurrentPage)
+                    {
+                    <a class="page-number active" id="page_@xx" >@xx</a>
+                    <input type="hidden" id="PaginaActual"  value="@xx"/>
+                    }
+                    else
+                    {
+                        <a class="page-number"  id="page_@xx" href="#">@xx</a>
+                    }                    
+                }
+                    <input type="hidden" value="@ViewBag.NumberOfPages" id="UltimaPagina" >
+                    
+               </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="col-sm-8 col-sm-offset-2 text-center">
+    <!-- <button id="btnGuardarEntradas" class="btn btn-primary" type="button"  tabindex="500" >&nbsp;&nbsp;&nbsp; Save &nbsp;&nbsp;&nbsp;</button> -->
+    <button id="btnGuardarEntradas" class="btn btn-primary" type="submit"  tabindex="500" >&nbsp;&nbsp;&nbsp; Save &nbsp;&nbsp;&nbsp;</button>
+    
+</div>   
+<script type="text/javascript">
+        
+    var Actividades;
+    var arrEntradas = new Array(); // Arreglo que almacenará objetos de tipo "Entrada" y que será el que se enviará al controlador para serializar como XML.
+    var RolUsuarioLogueado
+    var controlActual    
+
+    $(Inicio);
+
+    $('.pace-done').on('click', '.sweet-alert > .sa-button-container > .confirm', function (e) {        
+        if (controlActual == undefined)
+            return false;
+
+        var indiceDeFila = (controlActual.indiceDeFila - 1)
+        var celda = $('#tblEntradas > tbody > tr:eq(' + (controlActual.indiceDeFila - 1) + ') > td:eq(' + controlActual.indiceDeColumna + ')')
+
+        if (controlActual.motivoDeError == 'valorMayorOIgualAUno') // Si el motivo del error es que que cuando sale de la caja de texto del Unit hay un valor mayor o igual a 1.
+            $('#tblEntradas > tbody > tr:eq(' + indiceDeFila + ') > td:eq(' + (controlActual.indiceDeColumna + 1) + ') > .txtPriceUnit').focus()
+
+        if (controlActual.motivoDeError == 'noHayUnit') // Si el motivo del error es que cuando sale de la caja de texto del Unit no hay un valor.
+            $('#tblEntradas > tbody > tr:eq(' + indiceDeFila + ') > td:eq(' + controlActual.indiceDeColumna + ') > .txtUnit').focus()
+
+        if (controlActual.motivoDeError == 'noHayPriceUnit') // Si el motivo del error es que cuando sale de la caja de texto del Unit no hay un valor.
+            $('#tblEntradas > tbody > tr:eq(' + indiceDeFila + ') > td:eq(' + controlActual.indiceDeColumna + ') > .txtPriceUnit').focus()
+        
+        /*
+        setTimeout(function () {
+            setTimeout(function () { celda.css({'background-color':'#b42734'})  }, 100)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 200)
+            
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 300)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 400)
+            
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 500)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 600)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 700)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' })  }, 800)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 900)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 1000)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 1100)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 1200)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 1300)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 1400)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 1500)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 1600)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 1700)
+            setTimeout(function () { ((indiceDeFila % 2) == 0) ? celda.css({ 'background-color': '#f9f9f9' }) : celda.css({ 'background-color': 'white' }) }, 1800)
+
+            setTimeout(function () { celda.css({ 'background-color': '#b42734' }) }, 1900)
+        }, 0)
+        
+        setTimeout(function () {
+            if ((indiceDeFila % 2) == 0)
+                celda.css({ 'background-color': '#f9f9f9' }) 
+            else
+                celda.css({ 'background-color': 'white' }) 
+        }, 2000)
+        */
+    })
+
+    function Inicio()
+    {
+        // Asignaciones        
+        if (paginaActual == 0)
+            paginaActual = LeeUltimaPagina(parseInt($('#hdCantidadTotalEntradas').val())) // La primera vez que se cargan las entradas de un caso el valor de la variable "paginaActual" será 1.
+
+        RolUsuarioLogueado = $('#permiso').val().trim()
+        // Entradas = ""
+        var BanderaValidaciones = false
+        var ArregloValidacionesPendientes = new Array()
+        AcumuladoUnit = 0
+
+        // Funciones
+        removerGifAlCompletarCarga()
+        crearControlesFecha()
+        cargarActividadesEnCombos()
+        // habilitarBotonGuardar()
+        setearFechaEnPrimeraFilaSinDatos()
+        // bloquearFilasEnBlanco() // Bloquea las entradas cuando es un caso que está ocupado por otro usuario.
+
+        // Eventos
+        $(".input-group-addon").off("click");
+        $(".input-group-addon").on("click", dibujaControlFecha);
+        $('.page-number').on('click', irAPaginaDestino)
+        $('#btnGuardarEntradas').on('click', btnGuardarEntradas_click)
+        $('.Comentario').on('keyup', Comentario_keyup)        
+        $('.cmbActividades').on('focusout', abandonaFoco)
+        $('.EliminarEntrada').on('click', eliminaEntrada)
+        $('.txtUnit').on('focusout', mostrarAdvertencia)
+        $('.txtUnit').on('keypress', validaNumeros)
+        $('.txtPriceUnit').on('keypress', validaNumeros)
+
+        entradasOriginales = []
+        entradasOriginales = obtenerEntradasOriginales() // Asigna las entradas que vienen de base al arreglo "entradasOriginales" para tenerlas en memoria y después comparar esta data original con la data que incluya los cambios realizados por el usuario.
+
+        if (indiceQueGeneraActualizacion != -1 && paginaQueGeneroActualizacion == paginaActual)
+            $('.Comentario:eq(' + (indiceQueGeneraActualizacion-1) + ')').focus()
+    }
+
+    function obtenerEntradasOriginales() {
+        var arregloDeEntradas = new Array()
+
+        $('#tblEntradas > tbody > tr').each(function (indice, valor) { // Recorre las filas de la tabla.
+            var codigoDeEntrada = isNaN(parseInt(valor.children[1].innerText.trim())) ? 0 : parseInt(valor.children[1].innerText.trim())
+
+            if (codigoDeEntrada == 0) // Para que sólo obtenga los datos de las entradas existentes y no de las filas que están sin valores
+                return false
+
+            var fechaDeEntrada = valor.children[3].children[0].children[1].value.trim()
+            var codigoDeActividad = parseInt(valor.children[4].children[0].value.trim())
+            var unit = parseFloat(valor.children[5].children[0].value.trim())
+            var price = isNaN(parseFloat(valor.children[6].children[0].value.trim())) ? 0 : parseFloat(valor.children[6].children[0].value.trim())
+            var descripcion = valor.children[8].children[0].value.trim()
+
+            arregloDeEntradas.push({
+                codigoDeEntrada: codigoDeEntrada
+                                    , fechaDeEntrada: fechaDeEntrada
+                                    , codigoDeActividad: codigoDeActividad
+                                    , unit: unit
+                                    , price: price
+                                    , descripcion: descripcion
+            })
+        })
+
+        return arregloDeEntradas
+    }
+
+    function bloquearFilasEnBlanco()
+    {        
+        $('#tblEntradas > tbody > tr').each(function (i, val) {
+            if (EstadoOcupacion) {
+                // ... bloquea los controles.
+                val.children[3].children[0].children[0].disabled = true // Bloquea el ícono de la fecha.
+                val.children[3].children[0].children[1].disabled = true // Bloquea la caja de texto de la fecha.
+                val.children[4].children[0].disabled = true             // Bloquea el combo de actividades.
+                val.children[5].children[0].disabled = true             // Bloquea el unit.
+                val.children[6].children[0].disabled = true             // Bloquea el price unit.
+                val.children[8].children[0].disabled = true             // Bloquea el comentario.
+                $('.EliminarEntrada:eq(' + i + ')').css({ 'visibility': 'hidden' })
+            }
+            else { // Desbloquea los controles.
+                val.children[3].children[0].children[0].disabled = false // Bloquea el ícono de la fecha.
+                val.children[3].children[0].children[1].disabled = false // Bloquea la caja de texto de la fecha.
+                val.children[4].children[0].disabled = false             // Bloquea el combo de actividades.
+                val.children[5].children[0].disabled = false             // Bloquea el unit.
+                val.children[6].children[0].disabled = false             // Bloquea el price unit.
+                val.children[8].children[0].disabled = false             // Bloquea el comentario.
+                $('.EliminarEntrada:eq(' + i + ')').css({ 'visibility': 'visible' })
+            }
+        })
+    }
+
+    // Esta función se encaraga de setear una fecha en la primera fila de la tabla que carezca de ella,
+    // tomará como referencia la fecha de a fila anterior.
+    function setearFechaEnPrimeraFilaSinDatos()
+    {
+        $('#tblEntradas > tbody > tr').each(function (i, val) {
+            if (val.children[3].children[0].children[1].value.trim() == '' && // Valida que sólo se debe setear la fecha en la primera fila en blanco que encuentre, 
+                val.parentElement.children[i - 1] != undefined) // excepto en la primera fila de una tabla ya que en ese caso no existe una fila anterior.
+            {
+                val.children[3].children[0].children[1].value = val.parentElement.children[i-1].children[3].children[0].children[1].value.trim()
+                return false // Para que aborte el bucle y no continue con las demás fechas, y sólo afecte a la primera fila donde no haya fecha.
+            }
+        })
+    }
+
+    function abandonaFoco(e)
+    {        
+        // console.clear()
+        // console.dir(e.currentTarget.parentElement.parentElement.rowIndex)
+
+        var filaActual = parseInt(e.currentTarget.parentElement.parentElement.rowIndex)
+        var indiceDeFilaActual = e.currentTarget.parentElement.parentElement.rowIndex
+        var FechaFilaActual = e.currentTarget.parentElement.parentElement.children[3].children[0].children[1].value
+        
+        if (filaActual != 10) // Hace que la fecha posterior cambie para todas las filas excepto cuando se abandona el foco del combo de actividades de la fila (10, 20, 30, etc...) ya que no encontrará nada en la siguiente fila.
+        { 
+            if (e.currentTarget.parentElement.parentElement.parentElement.children[indiceDeFilaActual].children[3].children[0].children[1].value.trim() == '')
+                e.currentTarget.parentElement.parentElement.parentElement.children[indiceDeFilaActual].children[3].children[0].children[1].value = FechaFilaActual
+        }
+    }
+
+    // Guardar si se hace click en el botón "btnGuardarEntradas".
+    function btnGuardarEntradas_click()
+    {        
+        // Llama al método "validaciones" que se encargar de validar los campos requeridos. 
+        // Retorna un objeto "objetoValidacion" que contiene: 
+        //      - Una bandera de error (true: Encontró error, false: No encontró error)
+        //      - Un mensaje que corresponde a la fila y el campo donde se encontró el error.
+        var objetoValidacion = validaciones()
+
+        if (objetoValidacion.banderaValidacion) // Si se encontró un error...
+        {
+            if (objetoValidacion.campo == 'Unit') {
+                controlActual = new controlDeError()
+                controlActual.indiceDeColumna = objetoValidacion.indiceDeColumna
+                controlActual.indiceDeFila = objetoValidacion.linea // e.currentTarget.parentElement.parentElement.rowIndex
+                controlActual.motivoDeError = 'noHayUnit'
+            }
+
+            if (objetoValidacion.campo == 'PriceUnit') {
+                controlActual = new controlDeError()
+                controlActual.indiceDeColumna = objetoValidacion.indiceDeColumna
+                controlActual.indiceDeFila = objetoValidacion.linea // e.currentTarget.parentElement.parentElement.rowIndex
+                controlActual.motivoDeError = 'noHayPriceUnit'
+            }
+
+            MensajeError(objetoValidacion.mensaje, "Error")            
+            return false // ... y aborta el proceso.
+        }
+
+        guardaSinPaginar();
+
+        // ancla(); // Esta función hace que baje la pantalla.
+        //////////BRENHER
+        
+        //detectarRegistroOActualizacion();
+        return false
+        
+        /*paginaActual_temp = $("#PaginaActual").val();
+        paginaActual_temp = parseInt(paginaActual_temp) + 1;
+        $("#page_"+ paginaActual_temp).trigger("click");*/
+        //ancla();
+    }
+
+    function obtenerCodigosDeEntradasExistentes()
+    {
+        var codigosDeEntradas = new Array()
+        
+        $('#tblEntradas > tbody > tr').each(function (indice, valor) { // Recorre las filas de la tabla
+            // El prefijo "_T" de las variables sirve para denotar que son los valores de la tabla
+            var codigoDeEntrada_T = isNaN(parseInt(valor.children[1].innerText.trim())) ? 0 : parseInt(valor.children[1].innerText.trim())
+            var fechaDeEntrada_T = valor.children[3].children["0"].children[1].value.trim()
+            var codigoDeActividad_T = parseInt(valor.children[4].children["0"].value.trim())
+            var unit_T = parseFloat(valor.children[5].children["0"].value.trim())
+            var price_T = isNaN(parseFloat(valor.children[6].children["0"].value.trim())) ? 0 : parseFloat(valor.children[6].children["0"].value.trim())
+            var descripcion_T = valor.children[8].children["0"].value.trim()
+        
+            if (codigoDeEntrada_T != 0) // Va a empezar a comparar las entradas existentes en la tabla que hayan podido sufrir algún cambio en sus valores.
+            {                
+                if (codigoDeEntrada_T == entradasOriginales[indice].codigoDeEntrada && 
+                    (fechaDeEntrada_T != entradasOriginales[indice].fechaDeEntrada
+                    || codigoDeActividad_T != entradasOriginales[indice].codigoDeActividad
+                    || unit_T != entradasOriginales[indice].unit
+                    || price_T != entradasOriginales[indice].price
+                    || descripcion_T != entradasOriginales[indice].descripcion))
+                {
+                    // console.log('hubo un cambio en la fila ' + (indice + 1));
+                    codigosDeEntradas.push(codigoDeEntrada_T)
+                }
+            }
+        })
+
+        // codigosDeEntradas = $.map($('#tblEntradas > tbody > tr'), function (valor, indice) {
+        //     var codigoDeEntrada
+        // 
+        //     codigoDeEntrada = isNaN(parseInt(valor.children[1].innerText.trim())) ? 0 : parseInt(valor.children[1].innerText.trim())
+        // 
+        //     if (codigoDeEntrada != 0)
+        //         return codigoDeEntrada
+        // })
+
+        return codigosDeEntradas
+    }
+
+    function detectarCambiosEnValoresDeControlesDeEntradas() {
+
+    }
+
+    function guardaSinPaginar()
+    {        
+        var codigoCaso
+        var paginaDestino
+        var totalDeEntradas
+        var mensajeRepetidosAplicacion
+        // var codigoDeEntradaModificada
+        var codigosDeEntradas
+        var codigoDeEvento
+        
+        codigoCaso = parseInt($("#hdCodigoCaso").val())        
+        // codigoDeEntradaModificada = parseInt(e.currentTarget.parentElement.parentElement.children[1].innerText.trim())        
+        var codigosDeEntradas = obtenerCodigosDeEntradasExistentes()
+        // codigoDeEvento = parseInt(e.currentTarget.parentElement.parentElement.children[12].innerText.trim())        
+
+        //$('#hdCantidadTotalDeEntradas').val(arrEntradas.length);
+        //totalDeEntradas = parseInt(arrEntradas.length);
+        llenarEntradasParaInsertar(codigoCaso) // Llena las entradas en el arreglo "arrEntradas" que se van a insertar en base.
+
+        mensajeRepetidosAplicacion = validaRepetidosAplicacion()
+        
+        if (mensajeRepetidosAplicacion != '')
+        { 
+            MensajeError(mensajeRepetidosAplicacion, "Error");
+            return false
+        }
+
+        respuestaRegistraActualiza = registrarActualizarEntradas()
+        
+        if (respuestaRegistraActualiza.response.FilaRegistrada != 0)
+        {
+            MensajeError('You are trying to enter a duplicate entry. Please verify in row ' + ((paginaActual * 10) - (10 - (respuestaRegistraActualiza.response.FilaRegistrada))), 'Error')            
+            return
+        }
+
+        if (respuestaRegistraActualiza.response.FilaActualizada != 0)
+        {
+            MensajeError('You are trying to enter a duplicate entry. Please verify in row ' + ((paginaActual * 10) - (10 - (respuestaRegistraActualiza.response.FilaActualizada))), 'Error')            
+            return
+        }
+
+        paginaDestino = paginaActual // LeeUltimaPagina(totalDeEntradas);//brenher
+        tipo = detectarRegistroOActualizacion();
+        console.clear();
+        console.log(tipo);
+        totalDeEntradas = parseInt($('#hdCantidadTotalDeEntradas').val().trim())
+
+        // Cuando hay una actualización se genera una señal para node
+        // if (tipo == 'edicion' || tipo == 'registro') 
+        // {
+            var datos = {
+                codigoDeCasoSeleccionadoEnBilling: parseInt($("#hdCodigoCaso").val())
+              , codigoDeUsuarioLogueadoEnBilling: CodigoUsuarioGlobal
+              , aplicacion: 'Billing'
+              , tipoDeOperacion: 'A'
+              // , codigoDeEntradaActualizada: codigoDeEntradaModificada
+              , codigosDeEntradas: codigosDeEntradas
+              // , codigoDeEvento: codigoDeEvento
+            }
+
+            websocket.emit('manipulaEntradaEnBilling', datos);
+        // }
+
+        if (tipo == 'registro_paginado')
+        {
+            ////ancla();
+            paginaDestino = paginaDestino + 1;
+            paginaActual = paginaDestino
+        }
+        
+        listarEntradasEnPaginaDestino(codigoCaso, totalDeEntradas, paginaDestino)
+    }
+
+    function validaRepetidosAplicacion()
+    {
+        var arregoIndiceRepetidos = new Array();
+        var mensaje = ''
+
+        for (var i = 0; i < arrEntradas.length - 1; i++)        {
+            if (arrEntradas[i].fechaEntrada != "" &&
+               arrEntradas[i].codigoActividad != "" &&
+               arrEntradas[i].unit != "") {
+                for (var j = 1; j < arrEntradas.length; j++) {
+                    if (arrEntradas[i].fechaEntrada == arrEntradas[j].fechaEntrada &&
+                        arrEntradas[i].codigoActividad == arrEntradas[j].codigoActividad &&
+                        arrEntradas[i].unit == arrEntradas[j].unit &&
+                        arrEntradas[i].priceUnit == arrEntradas[j].priceUnit &&
+                        arrEntradas[i].comentario == arrEntradas[j].comentario &&
+                        arrEntradas[i].numeroCorrelativoEntrada != arrEntradas[j].numeroCorrelativoEntrada) {
+                        if (arregoIndiceRepetidos.indexOf(arrEntradas[i].numeroCorrelativoEntrada) == -1)
+                            arregoIndiceRepetidos.push(arrEntradas[i].numeroCorrelativoEntrada);
+
+                        if (arregoIndiceRepetidos.indexOf(arrEntradas[j].numeroCorrelativoEntrada) == -1)
+                            arregoIndiceRepetidos.push(arrEntradas[j].numeroCorrelativoEntrada);
+                    }
+                }
+            }
+        }
+
+        if (arregoIndiceRepetidos.length != 0) {
+            var indicesConcatenados = "";
+
+            for (var i = 0; i < arregoIndiceRepetidos.length; i++) {
+                indicesConcatenados += ((paginaActual * 10) - (10 - (arregoIndiceRepetidos[i]))) + ", ";
+                
+            }
+
+            mensaje = "You are trying to enter a duplicate entry. Please verify in rows: " + indicesConcatenados;            
+        }
+        
+        return mensaje
+    }
+
+    function crearControlesFecha()
+    {
+        var nowDate = new Date();
+        var today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+        
+        if (RolUsuarioLogueado == 'Administrator')
+            today = "1985-01-01";
+        else {
+            today = $("#txtUltimaFechaCierre").val();
+            today = new Date(today);
+            today = today.setDate(today.getDate() + 1);
+            today = new Date(today);
+        }
+
+        $('.input-group.date').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true,
+            //format: 'yyyy-mm-dd', 
+            format: 'mm/dd/yyyy',
+            startDate: today
+        });
+    }
+
+    function dibujaControlFecha()
+    {
+        console.log("click");
+        //$(this).datepicker("hide");
+        
+        //$(".dtpFecha").trigger("click");
+        //$(this).parent(".input-group").find(".dtpFecha").focus();
+        $(".datepicker").css("display","hide");
+        $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+        $(this).parent(".input-group").find(".dtpFecha").focus();
+    }
+
+    function Entrada() {
+        var numeroCorrelativoEntrada
+        var codigoCaso
+        var codigoNuevoEntrada
+        var codigoAntiguoEntrada
+        var fechaEntrada
+        var codigoActividad
+        var unit
+        var priceUnit
+        var comentario
+        var codigoUsuarioGlobal
+    }
+
+    function llenarEntradasParaInsertar(codigoCaso)
+    {
+        arrEntradas = new Array()
+        $('#tblEntradas > tbody > tr').each(function (i, val) {
+
+            var objEntrada = new Entrada()
+            var codigoNuevoEntrada = val.children[1].innerText            
+            var fechaEntrada = val.children[3].children[0].children[1].value
+            var unit = val.children[5].childNodes[1].value
+            var price = val.children[6].childNodes[1].value
+            var comentario = val.children[8].childNodes[1].value.trim()
+            //var usuarioLogeado = CodigoUsuarioGlobal;
+            //console.table(codigoNuevoEntrada, fechaEntrada, unit, price, comentario)
+
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.numeroCorrelativoEntrada = (i + 1)
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.codigoCaso = codigoCaso
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            if (codigoNuevoEntrada == null
+                || codigoNuevoEntrada.trim() == ''
+                || isNaN(codigoNuevoEntrada)
+                || parseInt(codigoNuevoEntrada.trim()) == 0)
+                objEntrada.codigoNuevoEntrada = 0
+            else
+                objEntrada.codigoNuevoEntrada = parseInt(codigoNuevoEntrada.trim())
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.codigoAntiguoEntrada = val.children[2].innerText.trim()
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.fechaEntrada = fechaEntrada.trim()
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.codigoActividad = isNaN(parseInt(val.children[4].children[0].value.trim())) ? 0 : parseInt(val.children[4].children[0].value.trim())
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            if (unit == null
+             || isNaN(unit)
+             || unit.trim() == ''
+             || parseFloat(unit) == 0)
+                objEntrada.unit = 0
+            else
+                objEntrada.unit = parseFloat(unit.trim())
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            if (price == null
+             || isNaN(price)
+             || price.trim() == ''
+             || parseFloat(price) == 0)
+                objEntrada.priceUnit = 0
+            else
+                objEntrada.priceUnit = parseFloat(price.trim())            
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.comentario = comentario.replace(/\t/g, ' ').replace('\t', ' ').replace(/\n/g, ' ').replace(/\'/g, "\'")// .replace("&", "&amp;")
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+            objEntrada.codigoUsuarioGlobal = CodigoUsuarioGlobal
+            // ----------------------------------------------------------------------------------------------------------------------------------------
+
+            arrEntradas.push(objEntrada)
+        })        
+    }
+
+    function irAPaginaDestino(e)
+    {
+        e.preventDefault();
+
+        var codigoCaso
+        var paginaDestino
+        var totalDeEntradas
+        var objetoValidacion
+        
+        objetoValidacion = validaciones()
+        
+        if (objetoValidacion.banderaValidacion) // Si se encontró un error...
+        {
+            if (objetoValidacion.campo == 'Unit') {
+                controlActual = new controlDeError()
+                controlActual.indiceDeColumna = objetoValidacion.indiceDeColumna
+                controlActual.indiceDeFila = objetoValidacion.linea // e.currentTarget.parentElement.parentElement.rowIndex
+                controlActual.motivoDeError = 'noHayUnit'
+            }
+
+            if (objetoValidacion.campo == 'PriceUnit') {
+                controlActual = new controlDeError()
+                controlActual.indiceDeColumna = objetoValidacion.indiceDeColumna
+                controlActual.indiceDeFila = objetoValidacion.linea // e.currentTarget.parentElement.parentElement.rowIndex
+                controlActual.motivoDeError = 'noHayPriceUnit'
+            }
+
+            MensajeError(objetoValidacion.mensaje, "Error")
+            return false // ... y aborta el proceso.
+        }
+
+        paginaDestino = parseInt(e.currentTarget.innerText.trim())
+        paginaActual = paginaDestino // La variable "paginaActual" cambiará su valor cada vez que se cambie de página y tomará el valor de página destino.
+        codigoCaso = parseInt($("#hdCodigoCaso").val())
+
+        llenarEntradasParaInsertar(codigoCaso) // Llena las entradas en el arreglo "arrEntradas" que se van a insertar en base.
+        registrarActualizarEntradas()
+        // Despues de registrar y/o actualizar entradas envía señal a node para que actualice en otras sesiones abiertas del mismo caso.
+        var codigosDeEntradas = obtenerCodigosDeEntradasExistentes()
+        var datos = {
+            codigoDeCasoSeleccionadoEnBilling: parseInt($("#hdCodigoCaso").val())
+          , codigoDeUsuarioLogueadoEnBilling: CodigoUsuarioGlobal
+          , aplicacion: 'Billing'
+          , tipoDeOperacion: 'A'
+            // , codigoDeEntradaActualizada: codigoDeEntradaModificada
+          , codigosDeEntradas: codigosDeEntradas
+          // , codigoDeEvento: codigoDeEvento
+        }
+        websocket.emit('manipulaEntradaEnBilling', datos);
+
+        detectarRegistroOActualizacion(); // aqui actualizo  input hdCantidadTotalDeEntradas 
+
+        totalDeEntradas = parseInt($('#hdCantidadTotalDeEntradas').val().trim())
+        listarEntradasEnPaginaDestino(codigoCaso, totalDeEntradas, paginaDestino)
+    }
+
+    function registrarActualizarEntradas()
+    {
+        var respuesta
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ 'Entradas' : arrEntradas }),
+            url: '@Url.Action("RegistraActualizaEntradas", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Datos)
+            {
+                respuesta = Datos
+            }
+        })
+
+        return respuesta
+    }
+
+    function listarEntradasEnPaginaDestino(codigoCaso, totalDeEntradas, paginaDestino)
+    {
+        $.ajax({
+            url: '@Url.Action("EntradasDeCaso")',
+            type: "POST",
+            data: {
+                "codigoCaso": codigoCaso
+                , "paginaDestino": paginaDestino
+                , "totalDeEntradas": totalDeEntradas
+            },
+            success: function (data) {
+                $("#EnvolturatblControlesDataEntry").html(data)
+            }
+        })
+    }
+
+    function cargarActividadesEnCombos()
+    {
+        var comboActividades 
+        var codigoActividadOriginal
+
+        // Llena todos los combos de actividades.
+        Actividades = ObtenerActividades()
+        $.each(Actividades, function (i, val) {
+            console.log("val.Act_description");
+            $('.cmbActividades').append("<option selected value=" + val.Act_code + ">" + val.Act_description + "</option>")
+        })
+
+        // Setea en cada combo la actividad que le corresponde.
+        $('#tblEntradas > tbody > tr').each(function (i, val) {
+            codigoActividadOriginal = parseInt(val.children[4].attributes[0].value)
+            comboActividades = val.children[4].children[0]
+            comboActividades.value = codigoActividadOriginal
+        })
+    }
+
+    function ObtenerActividades() {
+        var Actividades
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListaActividades", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                Actividades = Data
+            }
+        });
+
+        return Actividades
+    }
+
+    function removerGifAlCompletarCarga()
+    {
+        setTimeout(function()
+        {
+            $("#dvLoading").css("display", "none")
+        },1500);
+    }
+
+    function habilitarBotonGuardar()
+    {
+        if (EstadoOcupacion)
+            $('#btnGuardarEntradas').attr('disabled', true);
+        else
+            $('#btnGuardarEntradas').attr('disabled', false);
+    }
+
+    function detectarRegistroOActualizacion()
+    {
+        
+        var banderaRegistro = false
+        var codigoEntrada
+        var codigoActividad
+        var totalDeEntradas
+        //alert("detectarRegistroOActualizacion");
+
+        var cantidadTotal_temp = $("#hdCantidadTotalDeEntradas").val();
+        
+        $('#tblEntradas > tbody > tr').each(function (i, val) {
+            codigoEntrada = isNaN(parseInt(val.children[1].innerText.trim())) ? 0 : parseInt(val.children[1].innerText.trim())
+            codigoActividad = isNaN(parseInt($('.cmbActividades:eq(' + i + ')').val())) ? 0 : parseInt($('.cmbActividades:eq(' + i + ')').val())
+            //console.log(codigoEntrada, codigoActividad)
+
+            if (codigoEntrada == 0 && codigoActividad != 0)
+            {
+                
+                banderaRegistro = true
+                cantidadTotal_temp = parseInt(cantidadTotal_temp) + 1;
+                //alert("NUEVO REGISTRO");
+                console.log(i);//el ultimo manda 9
+                if (i == 9) // indica que se registro en la ultima pagina, por lo tanto ira a la siguiente pagina
+                {
+                   // console.log("registro_paginado");
+                    dato =  "registro_paginado";
+                }
+                else {
+                   // console.log("registro");
+                    dato =  "registro";
+                }
+                return false                
+            }
+            else
+            {
+                console.log("ACTUALIZACION ELIMINACION REGISTRO");
+                dato =  "edicion";
+            }
+            
+        })
+        $("#hdCantidadTotalDeEntradas").val(cantidadTotal_temp);
+        totalDeEntradas = cantidadTotal_temp;
+        //alert("333333333333333333333333333333333333333");
+        return dato;
+    }
+
+    function Comentario_keyup(e) {
+        var objetoValidacion
+
+        if (e.keyCode == 13) {            
+            indiceQueGeneraActualizacion = e.currentTarget.parentElement.parentElement.rowIndex
+            paginaQueGeneroActualizacion = paginaActual            
+
+            objetoValidacion = validaciones()
+
+            if (objetoValidacion.banderaValidacion) // Si se encontró un error...
+            {
+                if (objetoValidacion.campo == 'Unit') {
+                    controlActual = new controlDeError()
+                    controlActual.indiceDeColumna = objetoValidacion.indiceDeColumna
+                    controlActual.indiceDeFila = objetoValidacion.linea // e.currentTarget.parentElement.parentElement.rowIndex
+                    controlActual.motivoDeError = 'noHayUnit'
+                }
+
+                if (objetoValidacion.campo == 'PriceUnit') {
+                    controlActual = new controlDeError()
+                    controlActual.indiceDeColumna = objetoValidacion.indiceDeColumna
+                    controlActual.indiceDeFila = objetoValidacion.linea // e.currentTarget.parentElement.parentElement.rowIndex
+                    controlActual.motivoDeError = 'noHayPriceUnit'
+                }
+
+                MensajeError(objetoValidacion.mensaje, "Error")
+                return false
+            }
+
+            guardaSinPaginar()
+
+            //////////BRENHER
+            ////paginaActual_temp = $("#PaginaActual").val();
+            ////paginaActual_temp = parseInt(paginaActual_temp) + 1;
+            ////$("#page_" + paginaActual_temp).trigger("click");
+            ////ancla();
+        }
+    }
+
+    function validaciones()
+    {        
+        var objetoValidacion = new ObjetoValidacion()
+        var fechaEntrada
+        var codigoActividad
+        var unit
+        var priceUnit
+        var descripcionActividad
+        var RegExpFecha = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/ig // Expresión regular para forzar el formato de fecha americano.
+
+        $('#tblEntradas > tbody > tr').each(function (i, val) {
+
+            fechaEntrada = val.children[3].children[0].children[1].value.trim();
+            codigoActividad = isNaN(parseInt($('.cmbActividades:eq(' + i + ')').val())) ? 0 : parseInt($('.cmbActividades:eq(' + i + ')').val())
+            descripcionActividad = $('.cmbActividades:eq(' + i + ') > option:selected').text().trim()
+            unit = isNaN(parseFloat(val.children[5].children[0].value)) ? 0 : parseFloat(val.children[5].children[0].value)
+            priceUnit = isNaN(parseFloat(val.children[6].children[0].value)) ? 0 : parseFloat(val.children[6].children[0].value)
+                        
+            // Obliga la fecha
+            if (((fechaEntrada.trim() == '' || (!(fechaEntrada.trim().match(RegExpFecha)))) && codigoActividad != 0 && unit != 0) ||
+                ((fechaEntrada.trim() == '' || (!(fechaEntrada.trim().match(RegExpFecha)))) && codigoActividad == 0 && unit != 0) ||
+                ((fechaEntrada.trim() == '' || (!(fechaEntrada.trim().match(RegExpFecha)))) && codigoActividad != 0 && unit == 0))
+            {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'The date in row ' + ((paginaActual * 10) - (10 - (i + 1))) + ' is incorrect'
+                objetoValidacion.linea = i + 1
+                objetoValidacion.campo = 'Service Date'
+
+                return false
+            }
+
+            // Obliga la actividad
+            if (fechaEntrada != '' && codigoActividad == 0 && unit != 0)
+            {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'Activity is required for entry in row ' + ((paginaActual * 10) - (10 - (i + 1)))
+                objetoValidacion.linea = i + 1
+                objetoValidacion.campo = 'BillingActivity'
+
+                return false
+            }
+
+            // Obliga el unit
+            if (fechaEntrada != '' && codigoActividad != 0 && unit == 0) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'Missing data in row ' + ((paginaActual * 10) - (10 - (i + 1)))
+                objetoValidacion.linea = i + 1
+                objetoValidacion.indiceDeColumna = val.children[5].cellIndex
+                objetoValidacion.campo = 'Unit'
+
+                return false
+            }
+
+            // Fecha de entrada llena.
+            // Actividad diferente de "MILES" y precio mayor que 9.
+            // Unit lleno.
+            if (fechaEntrada != '' && descripcionActividad != "MILES" && unit > 9) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'The value is not allowed in row ' + ((paginaActual * 10) - (10 - (i + 1)))
+                objetoValidacion.linea = i + 1
+                objetoValidacion.indiceDeColumna = val.children[5].cellIndex
+                objetoValidacion.campo = 'Unit'
+
+                return false
+            }
+
+            // Si hay una fecha establecida y la actividad es de tipo:"MILES", "POSTAGE", 
+            // "EXPENSES", "MEDICAL RECORDS", "TOLLS", "CONFERENCE FEE", "PARKING" 
+            // y no se ha ingresado un valor en el campo "Price/Unit", lo fuerza a que se ingrese.
+            if (fechaEntrada != ''
+            && (descripcionActividad == "MILES"
+            || descripcionActividad == "POSTAGE"
+            || descripcionActividad == "EXPENSES"
+            || descripcionActividad == "MEDICAL RECORDS"
+            || descripcionActividad == "TOLLS"
+            || descripcionActividad == "CONFERENCE FEE"
+            || descripcionActividad == "PARKING")
+            && priceUnit == 0) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'The billed item on row ' + ((paginaActual * 10) - (10 - (i + 1))) + ' must have price.'
+                objetoValidacion.linea = i + 1
+                objetoValidacion.indiceDeColumna = val.children[6].cellIndex
+                objetoValidacion.campo = 'PriceUnit'
+
+                return false
+            }
+
+            // Si no se elige ninguna de las actividades mencionadas anteriormente  y si hay Price/Unit que advierta que no debe tener Price/Unit
+            if (fechaEntrada != ''
+                && (descripcionActividad != "MILES"
+                && descripcionActividad != "POSTAGE"
+                && descripcionActividad != "EXPENSES"
+                && descripcionActividad != "MEDICAL RECORDS"
+                && descripcionActividad != "TOLLS"
+                && descripcionActividad != "CONFERENCE FEE"
+                && descripcionActividad != "PARKING")
+                && priceUnit != 0)
+            {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'The billed item on row ' + ((paginaActual * 10) - (10 - (i + 1))) + ' must not have price.'
+                objetoValidacion.linea = i + 1
+                objetoValidacion.indiceDeColumna = val.children[6].cellIndex
+                objetoValidacion.campo = 'PriceUnit'
+
+                return false
+            }
+
+            if ((descripcionActividad == "MILES")
+                && (priceUnit < 0 || priceUnit > 1))
+            {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'If the activity is MILES the unit price must be greater than or equal to zero and less than equal to 1 in the row ' + ((paginaActual * 10) - (10 - (i + 1)))
+                objetoValidacion.linea = i + 1
+                objetoValidacion.indiceDeColumna = val.children[6].cellIndex
+                objetoValidacion.campo = 'PriceUnit'
+
+                return false
+            }
+        })
+
+        return objetoValidacion
+    }
+
+    function ObjetoValidacion()
+    {
+        var banderaValidacion = false
+        var mensaje = ''
+        var linea
+        var indiceDeColumna
+        var campo
+    }
+
+    function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+
+    function eliminaEntrada(e) {
+        e.preventDefault();
+        
+
+        var codigoEntrada;
+        var codigoUsuarioQueElimina;
+        var codigoCaso;
+        var totalDeEntradas;
+
+        codigoEntrada = parseInt($(this).parent("td").parent("tr").find("td:eq(1)").html());
+        codigoUsuarioQueElimina = CodigoUsuarioGlobal;
+        codigoCaso = parseInt($("#hdCodigoCaso").val())
+        totalDeEntradas = parseInt($('#hdCantidadTotalDeEntradas').val().trim())
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({
+                "CodigoEntrada": codigoEntrada
+                , "CodigoUsuario": codigoUsuarioQueElimina
+            }),
+            url: '@Url.Action("EliminaEntrada", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Dato) {
+                Resultado = Dato;
+
+                var total_quitar = parseInt($("#hdCantidadTotalDeEntradas").val());
+                //alert(total_quitar);
+                total_quitar = parseInt(total_quitar) - 1;
+                //alert(total_quitar)
+                $("#hdCantidadTotalDeEntradas").val(total_quitar);
+
+                Concurrent.Thread.create(function () {
+                    mensaje = "Deleted";
+                    error = "Success";
+                    MensajeError(mensaje, error);
+                    // $("#dvLoading").css("display", "none");
+                });
+            }
+        });
+
+        paginaDestino = paginaActual
+        listarEntradasEnPaginaDestino(codigoCaso, totalDeEntradas, paginaDestino)
+    }
+
+    function mostrarAdvertencia(e)
+    {
+        e.currentTarget.parentElement.parentElement.rowIndex
+        if ((e.target.value.trim() != "") && (!(parseFloat(e.target.value) > 0 && parseFloat(e.target.value) < 1))) {
+            mensaje = "Be advised that the value is " + (e.target.value) + " ."
+            error = "Alert"
+            
+            controlActual = new controlDeError()
+            controlActual.indiceDeColumna = e.currentTarget.parentElement.cellIndex
+            controlActual.indiceDeFila = e.currentTarget.parentElement.parentElement.rowIndex
+            controlActual.motivoDeError = 'valorMayorOIgualAUno'
+
+            MensajeError(mensaje, error)
+        }
+    }
+
+    function validaNumeros(e) {
+
+        if (!((e.which >= 48 && e.which <= 57) || (e.which == 40 || e.which == 41) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 46)))//46punto
+        {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    function controlDeError()
+    {
+        var indiceDeColumna // Indice de la columna donde se encuentra el control.
+        var indiceDeFila // Indice de la fila donde se encuentra el control.
+        var motivoDeError // Motivo que ocasiona el error.
+    }
+</script>

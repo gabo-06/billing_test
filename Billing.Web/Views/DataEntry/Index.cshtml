@@ -1,0 +1,898 @@
+﻿<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>DATA ENTRY</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center" style="margin-bottom: 0px;">
+                            <label class="col-sm-4 control-label">Search by Patient's Last Name	</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control ui-autocomplete-input" id="txtBuscaCaso" autocomplete="off">                                
+                            </div>
+                            <div class="col-sm-2">
+                                <a class="btn btn-danger" href="#txtBuscaCaso" onclick="refrescaData();"  data-toggle="tooltipB" data-placement="top"  title="Get updated information from Calendar System"> <i class="fa fa-refresh"></i> &nbsp;&nbsp;Refresh Data</a>
+                                <br>
+                                
+                                
+                            </div>
+                        </div>
+                    </form> 
+                </div>
+              
+                 
+                <div class="ibox-content" id="EnvolturatblCasos">
+                   <!--///////////////////LISTA///////////////////////-->
+                      @Html.Partial("CasosParaBusquedaAvanzada")
+
+                </div> 
+            </div>
+        </div>  
+    </div>
+     
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario" >
+                    <h5></h5>
+                </div>
+                <div class="ibox-content" style="overflow: hidden;" >
+                    <div class="row">
+                        <form role="form" method="get"  class="form-horizontal">
+                            <input type="hidden" id="hdCodigoCaso" value ="0" />
+                            <input type="hidden" id="hdCantidadTotalDeEntradas" value ="0" />
+                            <div class="col-sm-4"  id="seleccionarCaso">
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Claim #:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtClaim" readonly  />                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Insurer:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtAseguradora" readonly />                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">CC:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtContactoUno" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="hdCodigoPaciente" />
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Patient:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtPaciente" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Adjuster:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtAjustador" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">CC:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtContactoDos" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">DOI:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtFechaAccidente" readonly/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Date of Birth:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtFechaNacimiento" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-lg-3 control-label">Supervisor:</label> 
+                                    <div class="col-lg-9">
+                                        <input type="text" class="form-control l-i-de" id="txtSupervisor" readonly />
+                                        <input type="hidden" id="txtUltimaFechaCierre" value="" />
+                                        <input type="hidden" id="txtEnter" value="0" />
+                                        <input type="hidden" id="hdCantidadTotalEntradas" value="0" />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <br /><br /><br /><br /><br />
+                   @*<div id="cargando"><img  src="@Url.Content("~/images/loading2.gif")" /></div>*@
+                    <div class="table-responsive" id="EnvolturatblControlesDataEntry" >
+                    </div>
+
+        </div>
+    </div> 
+</div>
+    </div> 
+</div>
+
+<div class="NotificacionDataEntry" style="background-color: #d9525e;
+                                   color: white;
+                                   border-radius: 0.4em;
+                                   display: none;
+                                   font-size: 1.4em;
+                                   overflow: hidden; 
+                                   padding: 12px; 
+                                   position: fixed; 
+                                   right: 10px;
+                                   top: 8px;
+                                   margin-bottom: 20px;
+                                   /* margin-left: 20px; */
+                                   z-index: 9999; 
+                                   box-shadow: -4px 4px 4px #433e3e;">
+    An entry was added from the calendar!
+</div>
+
+@Html.Partial("footer")
+ 
+<script> 
+
+@*    $().ready(function () {
+        //$("#TablaParaControles").on("click", "#tblEntradas_wrapper > .row:eq(2) > .col-sm-7 > #tblEntradas_paginate > .pagination > .paginate_button > a", function(e)                                                                                                                                     
+
+        $("#TablaParaControles").on("click", "#tblEntradas > tfoot tr > .pagination > a > .page-number", function (e) {
+            alert("33333");
+            var page = parseInt($(this).html());
+            alert(page);
+            $.ajax({
+                url: '@Url.Action("EntradasDeCaso")',
+                data: { "page": page },
+                success: function (data) {
+                    $("#EnvolturatblControlesDataEntry").html(data);
+                }
+            });
+        });
+   });*@
+
+    ////////////////////////////////////////////////////
+    var VecesSelecionaCaso = 0;
+    var VecesSelecionaCasoParaFechaMenor = 0;
+    var BanderaPagino = false; // Para indica que ya paginó una vez después que se presionó en el botón de guardado o que se cambió de página.
+    var botonSelecionaCasoG;
+    var eGlobal;
+    var BanderaElimino = false;
+    var paginaActualOriginal = 0
+    var paginaActual = 0 // almacena la página en donde se está actualmente.
+    var EstadoOcupacion = false; // Indica el estado de ocupación de un caso seleccionado (true: Ocupado, false: Desocupado).
+    var entradasOriginales = new Array() // Arreglo donde se almacenarán las entradas originales que vienen de base.    
+    var indiceQueGeneraActualizacion = -1
+    var paginaQueGeneroActualizacion = 0
+
+    $(Inicio);
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function Hola(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+        type: "POST",
+        async: false,
+        data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+        url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+    // Esta función se encarga e actualizar la data de la fila que ha sido modificada en "Calendar" o "Billing".
+    function refrescarEntradaActualizada(codigosDeEntradas) {
+        var entrada // Donde se obtiene la entrada  que coincide (por su código) con algunas de las entradas que están en la tabla.
+        var i // Indice para recorrer el arreglo "codigosDeEntradas".
+        var tamañoDeArregloCodigosDeEntradas
+
+        tamañoDeArregloCodigosDeEntradas = codigosDeEntradas.length
+
+        // Hace un recorrido de todas las filas para hacer un refresh de los datos.
+        $('#tblEntradas > tbody > tr').each(function (indice, valor) {
+
+            var codigoDeEntradaDeFilaActual
+
+            codigoDeEntradaDeFilaActual = parseInt(valor.children[1].innerText.trim())
+
+            // Hace un recorrido del arreglo de códigos de entradas que viene en la señal
+            // y se van a comparar con cada código de entrada de fila actual.
+            for (i = 0; i < tamañoDeArregloCodigosDeEntradas; i++) {
+                if (codigoDeEntradaDeFilaActual == codigosDeEntradas[i]) {
+                    entrada = leeEntrada(codigoDeEntradaDeFilaActual) // Lee la entrada con el código de entrada que coincide en la fila actual
+
+                    // Setea los valores de la entrada en sus controles correspondientes
+                    // valor.children[3].children["0"].children[1].value = entrada.Dae_date // Con esto también se setea la fecha pero no cambia en el calendario, sólo cambia el valor de la caja de texto
+                    $('.dtpFecha:eq(' + indice + ')').datepicker("setDate", entrada.Dae_date); // Setea fecha, con esto si se actualiza la fecha en el calendario.
+                    valor.children[4].children["0"].value = entrada.Act_code // Setea actividad.
+                    valor.children[5].children["0"].value = (entrada.Dae_hourAct == 0) ? '' : parseFloat(entrada.Dae_hourAct).toFixed(2) // Setea Unit.
+                    valor.children[6].children["0"].value = (entrada.Dae_milesAct == 0) ? '' : parseFloat(entrada.Dae_milesAct).toFixed(2) // Setea Price Unit.
+                    valor.children[8].children["0"].value = (entrada.Dae_comment == null) ? '' : entrada.Dae_comment // Setea comentario.
+                    /*       
+                    setTimeout(function () {
+                        setTimeout(function () { 
+                            valor.style.backgroundColor = '#b42734' 
+                            valor.style.color = 'red'
+                        }, 0)
+                        setTimeout(function () {
+                            if ((indice % 2) == 0) {
+                                valor.style.backgroundColor = '#f9f9f9'                            
+                            } else { 
+                                valor.style.backgroundColor = 'white'                            
+                            }
+                            valor.style.color = 'black'
+                        }, 200)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 400)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 600)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 800)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 1000)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 1200)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 1400)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 1600)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 1800)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 2000)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 2200)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 2400)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 2600)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 2800)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 3000)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 3200)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 3400)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 3600)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 3800)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 4000)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 4200)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 4400)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 4600)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 4800)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 5000)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 5200)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 5400)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 5600)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 5800)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 6000)
+                        setTimeout(function () { ((indice % 2) == 0) ? valor.style.backgroundColor = '#f9f9f9' : valor.style.backgroundColor = 'white' }, 6200)
+                        
+                        setTimeout(function () { valor.style.backgroundColor = '#b42734' }, 6400)
+                    }, 0)
+                    setTimeout(function () {
+                        if ((indice % 2) == 0)
+                            valor.style.backgroundColor = '#f9f9f9'
+                        else
+                            valor.style.backgroundColor = 'white'
+                    }, 6600)
+    
+                    return false
+                    */
+                }
+            }
+        })
+    }
+
+    function actualizarEntradasOriginales(codigosDeEntradas) {
+        $('#tblEntradas > tbody > tr').each(function (indice, valor) { // Recorre las filas de la tabla.
+            var codigoDeEntrada = isNaN(parseInt(valor.children[1].innerText.trim())) ? 0 : parseInt(valor.children[1].innerText.trim())
+
+            if (codigoDeEntrada != 0 && codigosDeEntradas.indexOf(codigoDeEntrada) != -1) { // Para que sólo obtenga los datos de las entradas existentes y no de las filas que están sin valores
+                var fechaDeEntrada = valor.children[3].children[0].children[1].value.trim()
+                var codigoDeActividad = parseInt(valor.children[4].children[0].value.trim())
+                var unit = parseFloat(valor.children[5].children[0].value.trim())
+                var price = isNaN(parseFloat(valor.children[6].children[0].value.trim())) ? 0 : parseFloat(valor.children[6].children[0].value.trim())
+                var descripcion = valor.children[8].children[0].value.trim()
+
+                entradasOriginales[indice].fechaDeEntrada = fechaDeEntrada
+                entradasOriginales[indice].codigoDeActividad = codigoDeActividad
+                entradasOriginales[indice].unit = unit
+                entradasOriginales[indice].price = price
+                entradasOriginales[indice].descripcion = descripcion
+            }
+        })
+    }
+
+    function leeEntrada(codigoDeEntrada)
+    {
+        var entrada
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "codigoDeEntrada": codigoDeEntrada }),
+            url: '@Url.Action("leeEntrada", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (data) {
+                entrada = data
+            }
+        })
+
+        return entrada
+    }
+
+    function muestraNotificacion(tipoDeOperacion, mensaje, codigosDeEntradas)
+    {        
+        // var globo = $('.NotificacionDataEntry').clone()
+        // globo.removeClass('NotificacionDataEntry').addClass('NuevaClase')
+        
+        // if ($('.NuevaClase').length == 0) { // Si no hay notificaciones.                     
+        //     $('.NotificacionDataEntry').after(globo['0'].outerHTML)
+        //     $('.NuevaClase:eq(0)').text(mensaje)
+        // }
+        // else if ($('.NuevaClase').length > 0) { // Si existe una o más notificaciones.                        
+        //     var topDeUltimaNotificacion = parseInt($('.NuevaClase:eq(0)').css('top'))
+        //     var topDeNuevaNotificacion = topDeUltimaNotificacion + 60
+        //     $('.NotificacionDataEntry').after(globo['0'].outerHTML)
+        //     $('.NuevaClase')[0].style.top = topDeNuevaNotificacion.toString() + 'px'
+        //     $('.NuevaClase:eq(0)').text(mensaje)
+        // }
+
+        // if (tipoDeOperacion == 'R') { // Registro
+        //     $('.NuevaClase:eq(0)').css({ 'background-color': '#b42734' })
+        //     $('.NuevaClase:eq(0)').css({ 'color': '#ffffff' })
+        // } else if (tipoDeOperacion == 'A') { // Actualización
+            // $('.NuevaClase:eq(0)').css({ 'background-color': '#b42734' })
+            // $('.NuevaClase:eq(0)').css({ 'color': '#ffffff' })
+        refrescarEntradaActualizada(codigosDeEntradas)
+        actualizarEntradasOriginales(codigosDeEntradas) // Asigna las entradas que vienen de base al arreglo "entradasOriginales" para tenerlas en memoria y después comparar esta data original con la data que incluya los cambios realizados por el usuario.
+
+        // } else if (tipoDeOperacion == 'E') { // Eliminación
+        //     $('.NuevaClase:eq(0)').css({ 'background-color': '#b42734' })
+        //     $('.NuevaClase:eq(0)').css({ 'color': '#ffffff' })
+        // }
+        /*
+        setTimeout(function () {
+            $('.NuevaClase:eq(0)').fadeIn('slow')
+        }, 0)
+        setTimeout(function () {
+            $('.NuevaClase:eq(0)').fadeOut('slow')
+            $('.NuevaClase:eq(0)').remove()
+        }, 6000)    
+        */
+    }
+     
+    var websocket
+
+    function Inicio() {
+        
+        websocket = io.connect(ServidorPuertoNode)
+        
+        websocket.on('manipulaEntradaEnCalendar', function (data) {
+            // Compara si el código del caso seleccionado en el "Billing" 
+            // es igual al código del caso seleccionado en el "Calendar".
+            if (parseInt($("#hdCodigoCaso").val().trim()) == data.codigoDeCasoSeleccionadoEnCalendar) {
+                // si se registó una entrada en el "Calendar"
+                if (data.tipoDeOperacion == 'R') {
+                    muestraNotificacion(data.tipoDeOperacion, "An entry was added from the " + data.aplicacion + " by the user '" + data.nombreDeUsuario + "'") // Muestra un aviso notificando que se ha registrado una entrada en el calendar.
+                }
+
+                // si se actualizó una entrada en el "Calendar"
+                else if (data.tipoDeOperacion == 'A') {                    
+                    muestraNotificacion(data.tipoDeOperacion, "An entry was updated from the " + data.aplicacion + " by the user '" + data.nombreDeUsuario + "'", data.codigosDeEntradas) // Muestra un aviso notificando que se ha actualizado una entrada en el calendar.
+                }
+
+                // si se eliminó una entrada en el "Calendar"
+                else if (data.tipoDeOperacion == 'E') { 
+                    muestraNotificacion(data.tipoDeOperacion, "An entry was removed from the " + data.aplicacion + " by the user '" + data.nombreDeUsuario + "'") // Muestra un aviso notificando que se ha eliminado una entrada en el calendar.
+                }
+            }          
+        })
+
+        websocket.on('manipulaEntradaEnBilling', function (data) {            
+            // Verifica que el código del caso seleccionado en el Billing 
+            // sea igual al código del caso que viene en la señal y que el código
+            // del usuario loguado en el Billing sea distinto al código del usuario 
+            // logueado que generó la señal para que la notificación no se muestre 
+            // en la misma página donde se hizo la manipulación de la entrada.
+            if ((parseInt($("#hdCodigoCaso").val().trim()) == data.codigoDeCasoSeleccionadoEnBilling) &&
+                (CodigoUsuarioGlobal != data.codigoDeUsuarioLogueadoEnBilling)) {
+
+                // si se registó una entrada en el "Billing"
+                if (data.tipoDeOperacion == "R") {
+                    muestraNotificacion(data.tipoDeOperacion, "An entry was added from the " + data.aplicacion + " by the user '" + data.nombreDeUsuario + "'") // Muestra un aviso notificando que se ha registrado una entrada en el calendar.
+                }
+
+                // si se actualizó una entrada en el "Billing"
+                if (data.tipoDeOperacion == "A") {
+                    muestraNotificacion(data.tipoDeOperacion, "An entry was updated from the " + data.aplicacion + " by the user '" + data.nombreDeUsuario + "'", data.codigosDeEntradas) // Muestra un aviso notificando que se ha actualizado una entrada en el calendar.
+                }
+
+                // si se eliminó una entrada en el "Billing"
+                if (data.tipoDeOperacion == "E") {
+                    muestraNotificacion(data.tipoDeOperacion, "An entry was removed from the " + data.aplicacion + " by the user '" + data.nombreDeUsuario + "'") // Muestra un aviso notificando que se ha eliminado una entrada en el calendar.
+                }            
+            }
+        })        
+
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "DataEntry";
+
+        Hola(CodigoUsuarioGlobal);
+        // $(window).on("beforeunload", function ()
+        // {
+        //     console.log("esta seguro que desea abandonar este proceos");
+        //     return false;
+        //     Hola(CodigoUsuarioGlobal);
+        // 
+        // });
+        $('[data-toggle="tooltipB"]').tooltip();
+
+        $("#btnGuardarEntradas").attr("disabled", true); // InHabilita el botón registrar.
+
+        $("#txtBuscaCaso").focus();
+
+        // Cuando se presiona TAB el botón para seleccionar un caso obtiene el foco (Temporal).
+        $("#txtBuscaCaso").on("keydown", function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                return false;
+            }
+
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                $(".SeleccionarCaso").focus();
+            }
+        });
+
+        // ******************************************************************************************************************
+
+        // Cuando se busca un caso, se van mostrando los resultados en la tabla de casos.
+        $("#txtBuscaCaso").on("keyup", BuscaCaso);
+
+        /* Eliminar controles innecesarios de la tabla de controles */
+        $("#tblControlesDataEntry_length").css({ "display": "none" });
+        $("#tblControlesDataEntry_info").css({ "display": "none" });
+        $("#tblControlesDataEntry_filter").css({ "display": "none" });
+
+        $("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", function (e) {
+            
+            e.preventDefault();
+            paginaActual = 0
+            botonSelecionaCasoG = $(this);
+
+            // Muestra el gif de carga            
+            MuestraCarga();
+            
+            // Realiza el proceso de carga de caso y carga de entradas.
+            Concurrent.Thread.create(function () {
+                SeleccionarCaso(botonSelecionaCasoG);
+            });
+        });
+    }
+
+    function OcultaCarga() {
+        console.log("wwwwwwwwwwwwwwww");
+        setTimeout(function () {
+            $("#dvLoading").css("display", "none");
+        }, 100);   
+    }
+
+    function ancla() {
+        $("html,body").stop().animate({ scrollTop: $("#seleccionarCaso").offset().top }, 1000);
+    }
+
+    function SeleccionarCaso(control) {
+        // setTimeout(function () {
+        //     $("#dvLoading").css("display", "none");
+        // }, 1000);        
+        
+        VecesSelecionaCaso = 1; // Para saber que se hizo click en "SeleccionarCaso".
+        VecesSelecionaCasoParaFechaMenor = 1; // Para saber que se hizo click en "SeleccionarCaso, para validar fechas menores".
+
+        var CodigoPaciente;
+        var CodigoCasoSeleccionado;
+        var estadoCaso;
+
+        CodigoPaciente = parseInt(control.parent().parent().find("td:eq(2)").html());
+        CodigoCasoSeleccionado = parseInt(control.parent().parent().find("td:eq(0)").html());
+        estadoCaso = control.parent().parent().find("td:eq(7)").html();
+        cerrado = "n";//indica cuando es un caso cerrado o no
+
+        if (estadoCaso.trim() == "CLOSED") {
+            $("#btnGuardarEntradas").attr("disabled", true); // Deshabilita el botón registrar.
+            error = "Alert!";
+            mensaje = "The selected case is closed but you may enter billing entries.";
+            MensajeError(mensaje, error);
+            $("#dvLoading").fadeOut(2000);
+            cerrado = "s";
+        }
+        
+        var UltimaFechaCierre = ObtenerUltimaFechaDecierre(CodigoCasoSeleccionado);
+        $("#txtUltimaFechaCierre").val("");
+        if (UltimaFechaCierre != "") {            
+            numeros = UltimaFechaCierre.match(/\d+/g);
+            //10 / 02 / 2016
+            
+            // console.log(numeros[0]);
+            // console.log(numeros[1]);
+            // console.log(numeros[2]);
+            UltimaFechaCierre = (numeros[1] + "/" + numeros[2] + "/" + numeros[0]);
+            $("#txtUltimaFechaCierre").val(UltimaFechaCierre);
+        }
+        else
+            $("#txtUltimaFechaCierre").val("");
+           
+        
+        CargarInformacionCaso(CodigoPaciente, CodigoCasoSeleccionado, cerrado);
+        ancla();
+        OcultaCarga();
+        
+    }
+
+    function ObtenerUltimaFechaDecierre(CodigoCasoSeleccionado) {
+        var UltimaFechaCierre;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": CodigoCasoSeleccionado }),
+            url: '@Url.Action("ObtenerUltimaFechaCierre", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Dato) {
+                UltimaFechaCierre = Dato;
+            }
+        });
+
+        return UltimaFechaCierre;
+    }
+
+    function EliminarEntrada(e) {
+        e.preventDefault();
+
+        var CodigoEntrada;
+        var CodigoUsuarioQueElimina;
+        var Resultado;
+
+        CodigoEntrada = 0
+        CodigoUsuarioQueElimina = 0;
+        Resultado = 0;
+
+        CodigoUsuarioQueElimina = CodigoUsuarioGlobal;
+        CodigoEntrada = parseInt(e.currentTarget.parentElement.parentElement.childNodes[1].innerHTML);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoEntrada": CodigoEntrada, "CodigoUsuario": CodigoUsuarioQueElimina }),
+            url: '@Url.Action("EliminaEntrada", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Dato) {
+                console.log("AQUI EDHER ELIMINAR");
+                Resultado = Dato;
+                mensaje = "Deleted";
+                error = "Success";
+                MensajeError(mensaje, error);
+            }
+        }); 
+        
+        CargaEntradas($("#hdCodigoCaso").val());
+    }
+
+    function BuscaCaso(e) {
+        $('#tblCasos').dataTable().fnFilter($("#txtBuscaCaso").val());
+
+        if ($(this).val().trim() == "")//oculta tabla
+        {
+            $("#tblCasos > tbody").css({ "display": "none" });
+            $("#tblCasos_paginate").css({ "display": "none" });
+        }
+        else {
+            $("#tblCasos > tbody").css({ "display": "table-row-group" });
+            $("#tblCasos_paginate").css({ "display": "block" });
+        }
+    }
+
+    function CargarTablaCasos() {
+        //alert("akiiii");
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListaCasosParaBusquedaAvanzada", "DataEntry")',
+            success: function (Data) {
+                
+                console.log(Data);
+                $("#EnvolturatblCasos > .form-group").before(Data); // Coloca la tabla de búsqueda antes del botón "Nuevo".
+            }
+        });
+    }
+
+    function PaginarTablaControles(paginaFinal) {        //mg
+        $('#tblControlesDataEntry').DataTable({ "bSort": false });
+        var table = $('#tblControlesDataEntry').dataTable();
+        table.fnPageChange(paginaFinal - 1, true);
+        $('#tblControlesDataEntry_filter').css("display", "none");
+    }
+
+    function CargarInformacionCaso(CodigoPaciente, CodigoCasoSeleccionado, cerrado) {
+        var Paciente;
+        var Cargo;
+        var CodigoUsuarioQueLee;
+        var CodigoCasoALiberar = 0;
+        var informacionCaso;
+        
+        $("#btnGuardarEntradas").attr("disabled", false); // Habilita el botón registrar.      
+        $("#btnGuardarEntradas").attr("disabled", false); // Habilita el botón registrar.
+        $("#EnvolturatblCasos > #TablaParaBusquedaAvanzadaCasos > #tblCasos_wrapper > #tblCasos_filter > label > input[type='search']").val("");
+
+        // ***************************************************************************
+
+        // Obtiene código del usuario logueado 
+        CodigoUsuarioQueLee = CodigoUsuarioGlobal;
+
+        // ***************************************************************************
+
+        // si hay un caso cargado actualmente obtiene su código para liberarlo y poder cargar el caso selccionado.
+        if ($("#hdCodigoCaso").val() != "")
+            CodigoCasoALiberar = $("#hdCodigoCaso").val();
+
+        // */*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+        // */*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+        // */*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
+        /* (1) */
+        // Obtiene la disponibilidad del caso que será leído.        
+        informacionCaso = VerificarDisponibilidadCaso(CodigoCasoSeleccionado, CodigoUsuarioQueLee)
+
+        // Almacena el total de entradas
+        $('#hdCantidadTotalEntradas').val(informacionCaso.listaCasos["0"].cantidadTotalDeEntradas)
+
+        // Si el caso seleccionado está ocupado, se muestra un mensaje informandolo.
+        // if (EstadoOcupacionCasoQueSeraLeido.Busy == true)
+        if (informacionCaso.ocupacion["0"].busy == true) {
+            $("#dvLoading").css("display", "none");
+
+            //alert("Caso ocupado por " + EstadoOcupacionCasoQueSeraLeido.User);
+            // mensaje = "This case is busy by user " + informacionCaso.ocupacion["0"].user + ".\nYou can not register or update entries, only view them";
+            mensaje = "This case is busy by user " + informacionCaso.ocupacion["0"].user // + ".\nYou can not register or update entries, only view them";
+            error = "Alert!";
+            MensajeError(mensaje, error);
+
+            EstadoOcupacion = true // Sirve para que en la vista de "entradasDeCaso_Nuevo.cshtml" se puedan deshabilitar las funciones de registro y actualización de las entradas.
+        }
+            // Si el caso seleccionado está desocupado. 
+        else {
+            EstadoOcupacion = false // Sirve para que en la vista de "entradasDeCaso_Nuevo.cshtml" se puedan deshabilitar las funciones de registro y actualización de las entradas.
+
+            // Ocupa el caso leído y libera el caso anterior                        
+            // if (!(parseInt(CodigoCasoSeleccionado) == parseInt(CodigoCasoALiberar)))            
+                OcupaLiberaCasos(CodigoCasoSeleccionado, CodigoUsuarioQueLee, CodigoCasoALiberar);
+        }
+
+        /* (1) */ 
+        LimpiarControlesRegistro(); 
+
+        /* (2) */
+        // Obtención y carga de datos de paciente.
+        ///////////// Paciente = ObtenerDatosPaciente(CodigoPaciente);
+        ///////////// CargarPaciente(Paciente); 
+        
+        // **************************************
+        /* (3) */
+        // Obtención y carga de datos de caso.
+        ///////////// Caso = ObtenerDatosCaso(CodigoCasoSeleccionado);
+        ///////////// CargarCaso(Caso); // Carga los datos del caso en los campos que están ubicados debajo de la tabla de casos.
+        var Caso = informacionCaso.listaCasos["0"]
+            
+
+        CargarCaso(Caso); // Carga los datos del caso en los campos que están ubicados debajo de la tabla de casos.
+        // **************************************
+        // console.log("cerrado-open");
+        // muestraLoading();
+
+        // if (cerrado == "s") // si es un caso cerrado oculto
+        // {
+        //     $('#tblEntradas').dataTable().fnClearTable();
+
+        // }
+        // else
+        // {
+        TotalEntradas = Caso.cantidadTotalDeEntradas;
+        UltimaPagina = LeeUltimaPagina(TotalEntradas);
+
+        CargaEntradas(CodigoCasoSeleccionado, TotalEntradas,UltimaPagina);
+    }    
+           
+    function LeeUltimaPagina(TotalEntradas)
+    {
+        PageSize = 10;
+        UltimaPagina = Math.floor(TotalEntradas / PageSize);        
+        Residuo = Math.floor(TotalEntradas % PageSize);
+        //alert(Residuo);
+        //alert(UltimaPagina);
+        if (Residuo >= 0)
+            UltimaPagina = UltimaPagina + 1;
+        //alert(UltimaPagina);
+        return UltimaPagina;
+    }
+
+    function OcupaLiberaCasos(CodigoCasoSeleccionado
+                             , CodigoUsuarioQueLee
+                             , CodigoCasoALiberar) {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({
+                "CodigoCasoLeido": CodigoCasoSeleccionado
+                                 , "CodigoUsuarioQueLee": CodigoUsuarioQueLee
+                                 , "CodigoCasoALiberar": CodigoCasoALiberar
+            }),
+            url: '@Url.Action("OcupaLiberaCasos", "CaseInformation")',
+                contentType: "application/json",
+
+                dataType: 'json',
+                success: function (Usuario) {
+                    UsuarioLogueado = Usuario;
+                }
+            });
+    }
+
+
+    function CargaEntradas(CodigoCasoSeleccionado, TotalEntradas,UltimaPagina)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "codigoCaso": CodigoCasoSeleccionado, "totalDeEntradas": TotalEntradas, "paginaDestino": UltimaPagina }),
+            url: '@Url.Action("EntradasDeCaso", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'html',            //cache: true,
+            success: function (Data) {                
+                $("#EnvolturatblControlesDataEntry").html(Data); // Coloca la tabla de búsqueda antes del botón "Nuevo".
+                // console.log("carga vista parcial");
+            }
+        });
+        
+    }
+    
+    function MuestraCarga() {
+        $("#dvLoading").css("display", "block");
+    }    
+
+    function VerificarDisponibilidadCaso(CodigoCasoSeleccionado, CodigoUsuarioQueLee) {
+        var EstadoOcupacion;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({
+                "CodigoCasoSeleccionado": CodigoCasoSeleccionado
+                                , "CodigoUsuarioQueLee": CodigoUsuarioQueLee
+            }),
+            url: '@Url.Action("VerificarDisponibilidadCaso", "CaseInformation")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Dato)
+                {
+                    EstadoOcupacion = Dato;
+                }
+            });
+
+            return EstadoOcupacion;
+    }
+
+    function LimpiarControlesRegistro() {
+        $("#txtClaim").val("");
+        $("#txtPaciente").val("");
+        $("#txtFechaAccidente").val("");
+            
+        $("#txtAseguradora").val("");
+        $("#txtAjustador").val("");
+        $("#txtFechaNacimiento").val("");
+            
+        $("#txtContactoUno").val("");
+        $("#txtContactoDos").val("");
+        $("#txtSupervisor").val("");
+
+        $('#tblEntradas').dataTable().fnClearTable();        
+    }
+    
+    function ObtenerDatosCaso(CodigoCasoALeer) {
+        var Caso;
+
+        $.ajax({
+        type: "POST",
+        async: false,
+        data: JSON.stringify({ "CodigoCasoALeer": CodigoCasoALeer }),
+        url: '@Url.Action("ObtenerDatosCaso", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json',
+        success: function (DatosCaso) {
+                Caso = DatosCaso;
+            }
+        });
+
+        return Caso;
+    }
+
+    function CargarCaso(Caso) {
+        
+        $("#hdCodigoCaso").val(Caso.CaseCode);
+        $("#hdCantidadTotalDeEntradas").val(Caso.cantidadTotalDeEntradas);
+        
+    
+        $("#hdCodigoPaciente").val(Caso.PatientCode);
+
+        $("#txtClaim").val(Caso.CaseCaseCode);
+        $("#txtPaciente").val(Caso.Patient);
+
+    if (Caso.CaseAccidentDate == null || Caso.CaseAccidentDate == "" || Caso.CaseAccidentDate == "01/01/1900" || Caso.CaseAccidentDate == "1/1/1900" || Caso.CaseAccidentDate == "01/01/0001") {
+            $("#txtFechaAccidente").val();
+        }
+        else
+            $("#txtFechaAccidente").val(Caso.CaseAccidentDate);
+        
+        $("#txtAseguradora").val(Caso.Insurer);
+        $("#txtAjustador").val(Caso.Adjuster);
+
+        // Fecha de cumpleaños del paciente.
+        if (Caso.Birthday == null || Caso.Birthday == "" || Caso.Birthday == "01/01/1900" || Caso.Birthday == "1/1/1900" || Caso.Birthday == "01/01/0001")
+            $("#txtFechaNacimiento").val();
+        else
+            $("#txtFechaNacimiento").val(Caso.Birthday);        
+            
+        $("#txtContactoUno").val(Caso.CaseContact1);
+        $("#txtContactoDos").val(Caso.CaseContact2);
+        $("#txtSupervisor").val(Caso.CaseSupervisor);
+    //-------------------------------------------
+        
+        //console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        //$("#txtUltimaFechaCierre").val("10/02/2016");
+    }
+
+function ObtenerDatosPaciente(CodigoPaciente) {
+        var Paciente;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoPaciente) }),
+            url: '@Url.Action("Buscar", "Patient")',
+                contentType: "application/json",
+                dataType: 'json',
+            success: function (DatosPaciente) {
+                    Paciente = DatosPaciente;
+                }
+        });
+
+        return Paciente;
+    }
+
+    function CargarPaciente(Paciente) {
+        if (Paciente.Pat_birthday == null || Paciente.Pat_birthday == "" || Paciente.Pat_birthday == "01/01/1900" || Paciente.Pat_birthday == "1/1/1900" || Paciente.Pat_birthday == "01/01/0001") {
+            $("#txtFechaNacimiento").val();
+        }
+        else {
+            $("#txtFechaNacimiento").val(Paciente.Pat_birthday);
+        }
+    }
+
+    function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+</script>

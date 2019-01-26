@@ -1,0 +1,4 @@
+E:\Proyectos 2017\Billing Omnimed 2017\Billing.Utils\bin\Debug\Billing.Utils.dll
+E:\Proyectos 2017\Billing Omnimed 2017\Billing.Utils\bin\Debug\Billing.Utils.pdb
+E:\Proyectos 2017\Billing Omnimed 2017\Billing.Utils\obj\Debug\Billing.Utils.dll
+E:\Proyectos 2017\Billing Omnimed 2017\Billing.Utils\obj\Debug\Billing.Utils.pdb

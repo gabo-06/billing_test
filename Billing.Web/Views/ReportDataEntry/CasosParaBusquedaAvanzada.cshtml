@@ -1,0 +1,169 @@
+﻿<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos" style="width:100%;">
+        <thead class="th_tabla">    
+            <tr>
+                <th class="hidden">
+                    CODE
+                </th> 
+                <th >         
+                    NAME
+                </th>
+                <th > 
+                    LASTNAME
+                </th>
+                <th>
+                    SSNUMBER
+                </th>
+                <th>
+                    DOI
+                </th>
+                <th> 
+                    CLOSING DATE
+                </th>
+                <th> 
+                    STATUS
+                </th>
+                <th>
+                    VIEW
+                </th>
+                <th>
+                    DETAIL
+                </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">     
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="hidden">
+                    CODE
+                </th> 
+                <th >         
+                    NAME
+                </th>
+                <th > 
+                    LASTNAME
+                </th>
+                <th>
+                    SSNUMBER
+                </th>
+                <th>
+                    DOI
+                </th>
+                <th> 
+                    CLOSING DATE
+                </th>
+                <th> 
+                    STATUS
+                </th>
+                <th>
+                    VIEW
+                </th>
+                <th>
+                    DETAIL
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(Inicio);
+
+    var NombrePaciente;
+
+      $('#tblCasos > tbody').on('click', 'tr > td > .SeleccionarDetalleCaso', function (e) // para llenar texto en modal
+        {
+            e.preventDefault();
+          
+            var control = $(this);
+
+            codigoPaciente = control.parent().parent().find("td:eq(0)").html();
+            nombrePaciente = control.parent().parent().find("td:eq(1)").html();
+            apellidoPaciente = control.parent().parent().find("td:eq(2)").html();
+
+            NombrePaciente = nombrePaciente + ' ' + apellidoPaciente;
+
+            $("#txtPatientModal").val(NombrePaciente);
+            $("#txtPatientCodigoModal").val(codigoPaciente);
+            
+            BuscaCasoModal();//busca y muestra en el modal
+
+
+      });
+
+    function Inicio()
+    {
+        PaginarTabla();
+        OcultarControlesDecorativosDataTable();
+
+        // $(".SeleccionarDetalleCaso").on("click", MostrarDetalleFacturas);//mg
+
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblCasos_filter > label > .form-control", MostrarOcultarCoincidencias);
+        //$("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso); => movido a index
+    }
+
+
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblCasos').DataTable({
+            //"pageLength": 5,
+            "columnDefs": [{ "width": "15%", "targets": [0] }, { className: "hidden", "targets": [0] }, { className: "text-center", "targets": [7,8] }],
+            "language":
+                 { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>" },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": '@Url.Action("GetData", "ReportDataEntry")',
+                 "type": "POST",
+                 "dataType": "JSON"
+             },
+            "columns": [
+                       { "data": "Cis_code" },
+                       { "data": "Pat_firstName" },
+                       { "data": "Pat_lastName" },
+                       { "data": "Pat_socialSecurityNumber" },
+                       { "data": "Cis_accidentDate" },
+                       /*{
+                           "data": "closingDate", "render": function (value) {
+                               if (value == null) return "";
+                               var pattern = /Date\(([^)]+)\)/;
+                               var results = pattern.exec(value);
+                               var dt = new Date(parseFloat(results[1]));
+                               return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                           }
+                       },*/
+                       { "data": "closingDate" },
+                       { "data": "Status" },
+                       { "render": function (data, type, full, meta) { return '<a href="#detalleCase" class="btn SeleccionarCaso btn-danger btn-bitbucket" >View</a>' } },
+                       { "render": function (data, type, full, meta) { return '<a href="#" id="btnDetalle"  class="btn btn-primary SeleccionarDetalleCaso" data-toggle="modal" data-target="#myModalDetalle"  data-placement="top" title="Register a new patient" tabindex ="2">Detail</a>' } }
+            ]
+        });
+    }
+
+
+
+    function OcultarControlesDecorativosDataTable()
+    {
+        $("#tblCasos_filter").css("display", "none");
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+
+    function MostrarOcultarCoincidencias(e)
+    {
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+</script>

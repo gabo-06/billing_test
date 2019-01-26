@@ -1,0 +1,234 @@
+﻿<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>CLOSING REPORTS</h5>
+                </div> 
+                <div class="ibox-content">
+
+
+
+
+                     <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group">
+                            <div class="col-sm-12" style="margin-bottom:20px;text-align: center;">
+                                <div class="radio radio-danger radio-inline">
+                                            <input type="radio" checked="" name="radioInline" value="option1" id="opcion1">
+                                            <label for="inlineRadio1"> Other Insurer List </label>
+                                </div>
+                                <div class="radio radio-danger radio-inline">
+                                            <input type="radio" name="radioInline" value="option2" id="opcion2">
+                                            <label for="inlineRadio2"> Insurer - Amtrust C/O Carlisle & Assoc </label>
+                                </div>                      
+                            </div>
+                        </div>
+                        <label class=" col-sm-2 control-label">Closing Date </label>
+                            <div class="form-group text-center col-sm-3" id="FechaInicio_div">                            
+                            <div class=" input-group date">
+                                <span class="input-group-addon" id="addon_inicio"><i class="fa fa-calendar"></i></span>
+                                <input class="form-control ui-autocomplete-input dtpFecha" id="txtDateInput1" autocomplete="off" maxlength="10" data-mask="99/99/9999" type="text">
+                            </div>
+                            </div>
+
+                            @*<label class="col-sm-1 control-label" style="width:80px;">Toxx</label>*@                     
+                            
+                            <label class=" col-sm-2 control-label" id="closingDate2" style="width:130px;margin-left: 140px;display:none;">Closing Date 2</label>
+                            <div class="form-group text-center col-sm-3" id="FechaFin_div" style="display:none;">                            
+                            <div class="input-group date">
+                                <span class="input-group-addon" id="addon_fin"><i class="fa fa-calendar"></i></span>
+                                <input class="form-control ui-autocomplete-input dtpFecha" id="txtDateInput2" autocomplete="off" maxlength="10" data-mask="99/99/9999" type="text">
+                            </div>
+                            </div>
+
+                        <div class="form-group text-center" id="botones">
+                            <div class="col-sm-12">                                
+                                    <button type="button" class="btn btn-primary" id="btnBusca">Search</button>
+                                    <input class="btn btn-primary" id="codigo_supervisor" value="0" type="hidden">
+                                    <a style="display:none;" target="_blank" class="btn btn-primary" data-url="/Billing/DownloadPDF" id="linkPdf" href="#"><i class="fa fa-file"></i>&nbsp;Generate link</a>
+@*                                    <input type="hidden" value=""id="fechaInicioTemp">
+                                    <input type="hidden" value=""id="fechaFinTemp">*@
+                            </div> 
+                        </div>
+
+                    </form>
+                </div> 
+                              
+
+            </div>
+        </div>  
+    </div>
+
+    <div class="row">        
+        <div class="col-lg-12" id="divResultado">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>RESULTS</h5>
+                </div> 
+                <div class="ibox-content" id="div_reporte" style="border-style: none; border-width: 0;">
+                    <div class="form-group">
+                     @using (Html.BeginForm("ExportToWordClosing", "ReportClosing", FormMethod.Post))
+                    {
+                      <button id="btnGeneraWord" class="btn btn-primary" type="submit" data-toggle="tooltipB"  data-placement="top" title="" data-original-title="Create a New case">
+                         <i class="fa fa-save"></i>&nbsp; Export to Word</button>
+                        <input type="hidden" value="0" id="fechaInicial" name="fechaInicial">
+                        <input type="hidden" value="0" id="fechaFin" name="fechaFin">
+                         <input type="hidden" value="1" id="tipo" name="tipo">
+                    }
+                         <div id ="resultadoReporte">
+                         </div> 
+                    </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+
+
+</div>
+
+@Html.Partial("footer")
+
+
+<script> 
+    $(Inicio);
+    function Inicio() {
+        ProcesoActual = "Reports";
+        $("#btnBusca").on("click", cargaLista);
+
+
+
+
+
+        $(".dtpFecha").parent(".input-group").find(".input-group-addon").on("click", function () {
+            // console.log($(this).parent(".input-group").find(".dtpFecha"));
+            $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+            $(this).parent(".input-group").find(".dtpFecha").focus();
+        });
+
+        $('.dtpFecha').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+
+        ////////////////$('#txtDateInput1').datepicker({
+        ////////////////    todayBtn: "linked",
+        ////////////////    keyboardNavigation: false,
+        ////////////////    forceParse: false,
+        ////////////////    calendarWeeks: true,
+        ////////////////    autoclose: true
+        ////////////////});
+        ////////////////$('#txtDateInput2').datepicker({
+        ////////////////    todayBtn: "linked",
+        ////////////////    keyboardNavigation: false,
+        ////////////////    forceParse: false,
+        ////////////////    calendarWeeks: true,
+        ////////////////    autoclose: true
+        ////////////////});
+
+        
+        // Asigna datepicker al campo "Fecha Fin"
+        $("#txtDateInput1").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+            
+            fecha = $("#txtDateInput1").val();
+            $("#fechaInicial").val(fecha);
+            $("#fechaFin").val(fecha);
+            console.log("fechiat");
+            var fecha = $.datepicker.formatDate("mm/dd/yy", $(this).datepicker('getDate'));
+            console.log(fecha);
+            $("#fechaInicial").val(fecha);
+        });
+
+        // Asigna datepicker al campo "Fecha Fin"
+        $("#txtDateInput2").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+            fecha = $("#txtDateInput2").val();
+            $("#fechaFin").val(fecha);
+            console.log("holaaaa");
+            //var fecha = $.datepicker.formatDate("mm/dd/yy", $(this).datepicker('getDate'));
+            //console.log(fecha);
+            //$("#fechaInicioTemp").val(fecha);
+        });
+
+
+
+    }
+
+
+
+    /////////////////////////////////////////////////////
+    $("#opcion1").on("click", function (e) {
+        $("#tipo").val(1);
+        $("#FechaFin_div").css("display", "none");
+        $("#closingDate2").css("display", "none");
+    })
+
+    $("#opcion2").on("click", function (e) {
+        //$("#txtDateInput2").val("");
+        $("#tipo").val(2);
+        $("#FechaFin_div").css("display", "block");
+        $("#closingDate2").css("display", "block");
+
+    })
+
+
+    function cargaLista() {
+            txtDateInput1 = $("#txtDateInput1").val();
+            txtDateInput2 = $("#txtDateInput2").val();
+            tipo = $("#tipo").val();//1= primera opcion //2 = segunda opcion
+
+
+
+
+            if (tipo == 1) {
+                if (txtDateInput1 == "") {
+                    error = "Error";
+                    mensaje = "Please enter date";
+                    MensajeError(mensaje, error);
+                    return false;
+                }
+            }
+            else {
+                if (txtDateInput1 == "" && txtDateInput2 == "") {
+                    error = "Error";
+                    mensaje = "Please enter dates";
+                    MensajeError(mensaje, error);
+                    return false;
+                }
+                if (txtDateInput1 == "" || txtDateInput2 == "") {
+                    error = "Error";
+                    mensaje = "Please enter dates";
+                    MensajeError(mensaje, error);
+                    return false;
+                }
+            }
+
+            $("#fechaInicial").val(txtDateInput1);
+            $("#fechaFin").val(txtDateInput2);
+
+
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("listaClosing", "ReportClosing")',
+                data: { fechaInicial: txtDateInput1, fechaFin: txtDateInput2, tipo: tipo },
+                contentType: 'application/html;charset=utf-8',
+                dataType: 'html',
+                success: function (Data) {
+                    $("#resultadoReporte").html(Data);
+                }
+            });
+
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+</script>

@@ -1,0 +1,1273 @@
+﻿<style>
+    #CapaPrincipal 
+    {
+        background: rgba(0, 0, 0, 0.7);
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 9999 !important;
+        display: none;
+    }
+</style>
+
+@{
+    var fechaHoy = DateTime.Today.ToShortDateString(); 
+}
+
+<div class="wrapper wrapper-content animated fadeInRight" id="popopo">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>GENERATE MONTHLY CLOSING</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="form_closing">
+                        <div class="form-group text-center">
+                            <div class="radio radio-inline">
+                                <input type="radio" id="rdbOtraAseguradora" class="TipoAseguradora" value="OA" name="tipoInsurer" checked style="cursor: pointer;">
+                                <label for="rdbOtraAseguradora">Other Insurer List</label>
+                            </div>
+                            <div class="radio radio-inline">
+                                <input type="radio" id="rdbAmtrustCarlisleAssoc"  class="TipoAseguradora" value="AA" name="tipoInsurer"  style="cursor: pointer;">
+                                <label for="rdbAmtrustCarlisleAssoc">Insurer - Amtrust C/O Carlisle & Assoc</label>
+                            </div>
+                        </div> 
+@*                        <div class="form-group text-center"  id="FechaClosing">
+                            <label class="col-sm-4 control-label">Closing Date: </label>
+                            <div class="col-sm-4 input-group date">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                <input type="text" class="form-control ui-autocomplete-input" id="txtClosingDate" autocomplete="off" maxlength="10" data-mask="99/99/9999">
+                            </div>
+                        </div>*@
+
+<div class="form-group text-center" id="FechaClosing">
+<label class="col-sm-4 control-label">Closing Date: </label>
+<div class="input-group date col-sm-4" >
+    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+    <input class="form-control dtpFecha" type="text" id="txtClosingDate" autocomplete="off" style="background: #ffffff; width: 100%;" maxlength="10" data-mask="99/99/9999" value="@fechaHoy" tabindex="03">
+                        </div>
+</div>
+
+
+                        <div class="form-group text-center">
+                              <button id="btnGenerate" class="btn btn-primary" type="button">Generate Invoice(s)</button>
+                              <a href="#"  id="btnUndo" class="btn btn-danger">Undo Invoice</a>
+                              <!--<a href="#"  id="btnHelp" class="btn btn-danger">Help</a>-->
+                              <!--<a href="#"  id="btnListaResultadoInvoice" class="btn btn-danger">Test</a>-->
+                              <button type="button" class="btn btn-primary"  id="btnModalUndo" data-toggle="modal" data-target="#ModalUndo" style="display:none;"></button>
+                              <button type="button" class="btn btn-primary"  id="btnModalListaInvoice" data-toggle="modal" data-target="#ModalListaInvoice" style="display:none;"></button>
+                        </div>
+                        <div id ="cargando" style="text-align: center;display:none;" ><img alt="image" class="img" src="@Url.Content("~/images/loading.gif")" /></div>
+                        <div class="form-group text-center" id="TiposCierre" style="display: none; text-align: right;">
+                            <div class="radio radio-inline">
+                                <input type="radio" id="rdbCierraPorHora" class="TipoCierre" value="CPH" name="TipoCierre"  style="cursor: pointer;">
+                                <label for="rdbCierraPorHora">Closing Per Hours</label>
+                            </div>
+                            <div class="radio radio-inline">
+                                <input type="radio" id="rdbCierraPorFecha" class="TipoCierre" value="CPF" name="TipoCierre" checked style="cursor: pointer;">
+                                <label for="rdbCierraPorFecha">Closing Per Date</label>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <!--<div class="ibox-content" id="frmBusquedaCliente">
+                    <div class="form-group" >
+                    </div>
+                </div>-->
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content" id="EnvolturatblCasos">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--//////////////////////////////////////////////////MODAL UNDO/////////////////////////////////////////////////-->
+
+  <div class="modal inmodal" id="ModalUndo" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header header_formulario" style="padding: 8px 15px;">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;opacity:1;color: white;"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title"> <i class="fa fa-rotate-left"></i> Undo Invoice</h3>                                            
+                                            <!--<small class="font-bold">Below are the last month closures shown</small>-->
+                                        </div>
+
+                                        <div id="cargando_modal_general" style="text-align: center;display:none;"><img alt="image" class="img" src="@Url.Content("~/images/loading.gif")" /></div>
+                                        @* ************************************************ Capa para mostrar la primera tabla ***************************************************************************************** *@                                        
+                                        <div class="modal-body" id="tblUltimasFechasDecierre" style="padding-bottom:0px;padding-top: 15px;">
+                                              @*Aqui primera tabla*@
+                                            <div id="cargando_TablaUltimasFechaCierre" style="text-align: center;display:none;"><img alt="image" class="img" src="@Url.Content("~/images/loading.gif")" /></div>
+                                        </div>
+                                        @* ***************************************************************************************************************************************************************************** *@
+
+                                        @* ************************************************ Capa para mostrar la segunda tabla ***************************************************************************************** *@                                        
+                                        <div class="modal-body" id="tblCasosParaCerrar">
+                                             @*Aqui segunda tabla*@
+                                            <div id ="cargando_TablaFacturasParaCerrar" style="text-align: center;display:none;" ><img alt="image" class="img" src="@Url.Content("~/images/loading.gif")" /></div>
+                                        </div>
+                                        @* ***************************************************************************************************************************************************************************** *@
+
+                                        <div class="modal-footer">
+                                            <button id="btnCancelarUndoModal"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>
+<!--                                            <button  id="btnRegistrarUndoModal" type="button" class="btn btn-primary" >Continue</button>-->
+                                            <input  id="accion" type="hidden" value="registra" />
+                                            <input  id="seleccionado" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccion" type="hidden" value="0" />     
+                                            <input  id="fecha_reversion" type="hidden" value="" />     
+            </div>
+        </div>
+    </div>
+</div>
+<!--/////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+
+
+<!--///////////////////////////////////////////////MODAL LISTA RESULTADO INVOICE//////////////////////////////////////////////-->
+
+  <div class="modal inmodal" id="ModalListaInvoice" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header header_formulario" style="padding: 8px 15px;">                                            
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;opacity:1;color: white;"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>                                            
+                                            <h3 class="modal-title"> <i class="fa fa-warning"></i> Undo Invoice</h3>                                                                               
+                                            <!--<small class="font-bold">Validation Results</small>-->
+                                        </div>
+                           <div class="modal-body">
+                            <table class="table table-bordered" id="tblModalResultadoInvoice" style="margin-top: 50px;">
+                                <thead >
+                                <tr>
+                                    <th class="th_tabla">Code Case</th>
+                                    <th class="th_tabla">Case Price</th>
+                                    <th class="th_tabla">Patient</th>
+                                    <th class="th_tabla">Fac Num</th>
+                                    <th class="th_tabla">Total of Data Entries </th>
+                                    <th class="th_tabla"># Closed Data Entries </th>
+                                    <th class="th_tabla">Comments</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                  
+                                </tbody>
+                            </table>                       
+                            </div>
+                                        <div class="modal-footer">
+                                            <button id="btnCancelarListaModal"  type="button" class="btn btn-white" data-dismiss="modal" >Ok</button>
+                                            <!--<button  id="btnRegistrarListaModal" type="button" class="btn btn-primary" >Continue</button>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div id="CapaPrincipal">
+    
+</div>*@
+
+
+<!--/////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+
+
+
+
+@Html.Partial("footer")
+
+
+@*<script src="@Url.Content("~/scripts/js/plugins/dataTables/datatables.min.js")" async="async"></script>*@
+<script src="@Url.Content("~/scripts/js/plugins/iCheck/icheck.min.js")" async="async"></script>
+
+<script>
+    var i = 0;
+    var ArregloCasosSeleccionados = new Array();
+    var IndiceArregloCasos = 0;
+
+    // ArregloCasosSeleccionados[0] = Array();
+    // ArregloCasosSeleccionados[0]["CodigoCasoSeleccionado"] = "0001";
+    // ArregloCasosSeleccionados[1] = Array();
+    // ArregloCasosSeleccionados[1]["CodigoCasoSeleccionado"] = "0002";
+    // ArregloCasosSeleccionados[2] = Array();
+    // ArregloCasosSeleccionados[2]["CodigoCasoSeleccionado"] = "659";
+    // ArregloCasosSeleccionados[3] = Array();
+    // ArregloCasosSeleccionados[3]["CodigoCasoSeleccionado"] = "0004";
+    // ArregloCasosSeleccionados[4] = Array();
+    // ArregloCasosSeleccionados[4]["CodigoCasoSeleccionado"] = "0005";
+    // ArregloCasosSeleccionados[5] = Array();
+    // ArregloCasosSeleccionados[5]["CodigoCasoSeleccionado"] = "0006";
+
+    $(Inicio);
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function Hola(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+    var ListaCorrelativosSeleccionados = "";
+    var CantidadCorrelativosSeleccionados = 0;
+    var TipoCierre = 1 // Variable que indica el tipo de cierre (1: normal, 2: por hora, 3: por fecha)
+    var FechaDeCierre = "";
+
+    // Se encarga de limpiar 
+    function LimpiarArreglos()
+    {
+        ArregloCasosSeleccionados = [];
+        ArregloCasosSeleccionados = new Array();
+
+        IndiceArregloCasos = 0;
+    }
+
+    function Inicio()
+    {
+        //console.clear();
+
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "MonthlyClosing";
+        // console.log(ProcesoActual);
+
+        Hola(CodigoUsuarioGlobal);
+
+        ////////////$(".input-group-addon").on("click", function () {
+        ////////////    $(this).datepicker("hide");
+        ////////////    $("#txtClosingDate").trigger("click");
+
+        ////////////});
+
+        ////////////$('#FechaClosing .input-group.date').datepicker({
+        ////////////    todayBtn: "linked",
+        ////////////    keyboardNavigation: false,
+        ////////////    forceParse: false,
+        ////////////    calendarWeeks: true,
+        ////////////    autoclose: true
+        ////////////});
+
+        //////////////console.log(Date.now());        
+        ////////////fechaActual = $.datepicker.formatDate("mm/dd/yy", new Date());
+        ////////////console.log(fechaActual);                 
+        ////////////$("#txtClosingDate").datepicker("setDate", fechaActual);
+
+                
+
+
+        ////////////// Asigna datepicker al campo "Closing Date"
+        ////////////$("#txtClosingDate").datepicker().on("changeDate", function (e) {
+        ////////////    $(this).datepicker("hide");
+        ////////////});
+
+      /*  $("#txtClosingDate").parent(".input-group").find(".input-group-addon").on("click", function () {
+            // console.log($(this).parent(".input-group").find(".dtpFecha"));
+            $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+            $(this).parent(".input-group").find(".dtpFecha").focus();
+        });
+
+
+        $('#txtClosingDate').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });*/
+
+
+        $(".dtpFecha").parent(".input-group").find(".input-group-addon").on("click", function () {
+            // console.log($(this).parent(".input-group").find(".dtpFecha"));
+            $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+            $(this).parent(".input-group").find(".dtpFecha").focus();
+        });
+
+
+
+        $('.dtpFecha').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+
+
+
+        $("#txtClosingDate").keypress(function (e) {            
+            if (e.keyCode == 13) {
+                console.log("enter");
+                btnGenerate_click(e);
+            }
+        });
+
+   
+
+
+        // Asigna datepicker al campo "Modal"
+        ////////////$("#txtClosingDateModal").datepicker().on("changeDate", function (e) {
+        ////////////    $(this).datepicker("hide");
+        ////////////});
+
+        //$(".input-group-addon").on("click", function () {
+        //    console.log("xxxxx");
+        //    //$("#FechaNacimiento").trigger("click");
+
+        //});
+
+
+        // Controla que cuando se haga click en el ícono de la fecha de cierre se muestre el calendario como si se hiciera click en la caja de texto.
+        //$(".input-group-addon").on("click", function () {
+        //    $(this).parent(".input-group").find("#txtClosingDate").focus();
+        //});
+
+
+
+
+
+        // Controla el cambio de checking de los radios de tipos de aseguradora.
+        $(".TipoAseguradora").on("change", TipoAseguradora_change);
+        // Controla el cambio de checking de los radios de tipos de cierre.
+        $(".TipoCierre").on("change", TipoCierre_change);
+
+        // Carga la tabla de casos según la aseguradora y el tipo de cierre que se elija.
+        CargarCasosSegunaAseguradoraSeleccionada();
+
+        // Controla el evento click del botón "Generate Invoice".
+        $("#btnGenerate").on("click", btnGenerate_click); // Controla evento click del botón "btnGenerate".
+        $("#btnUndo").on("click", btnUndo_click); // Controla evento click del botón "btnGenerate".
+        $("#btnSearchModal").on("click", btnSearchModal_click); // Controla evento click del botón "btnUndo".
+        $("#btnUndoModal").on("click", btnUndoModal_click); // Controla evento click del botón "btnUndo".
+
+        $("#btnHelp").on("click", MensajeHelp);
+        $("#btnCancelarUndoModal").on("click", btnCancelarUndoModal_click);
+        
+
+        //$("#btnListaResultadoInvoice").on("click", ModalListaResultadoInvoice);
+        //$("#txtClosingDate").val("10/10/2016");
+    }    
+
+    $("#form_closing").on("submit", function (e) {
+        e.preventDefault();
+
+    });
+
+    function btnUndo_click(e)
+    {
+        e.preventDefault();
+        //console.log("btnUndo_click");
+
+        fecha = $("#txtClosingDate").val();
+
+        if (fecha.trim() == "")
+        {
+            mensaje = "Enter Closing Date please";
+            error = "Error";
+            MensajeError(mensaje, error);            
+        }
+        else
+        {   
+            $("#btnModalUndo").trigger("click");
+            $("#tblUltimasFechasDecierre").css("display", "block");
+            $("#tblCasosParaCerrar").css("display", "none");
+            $("#cargando_modal_general").css("display", "block");            
+            ListarUltimasFechasDeCierre();
+        }
+    }
+     
+    // Manejador de evento    
+    function btnGenerate_click(e)
+    {
+     
+        // Validaciones de fecha y obligatoriedad de selección de casos.
+        if ($("#txtClosingDate").val().trim() == "") {
+            e.stopPropagation();
+            $(".sa-error-container").hide();
+            mensaje = "Enter Closing Date please";
+            error = "Error";
+            MensajeError(mensaje, error);
+            return false;
+        }
+
+        if (ArregloCasosSeleccionados.length == 0) {
+            $(".sa-error-container").hide();
+            mensaje = "You have not selected any cases. Please select any case.";
+            error = "Error";
+            MensajeError(mensaje, error);
+            return false;
+        }
+
+
+        swal({
+            title: "Alert",
+            text: "Do you want to perform the monthly closing for the selected case(s)?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+        function (isConfirm)
+        {
+            ///alert("sssss");
+            
+            //////////////////////////////////////////////////////////////
+            if (isConfirm)
+            {                
+                $("div.sa-error-container > .icon_carga").html('<img alt="image" class="img" src="@Url.Content("~/images/loading.gif")" />');
+                $("div.sa-error-container").css("display","block");
+                GenerarFactura(e);
+                // swal("Process!", "", "success");//edher
+                console.log("sxxxxxx");
+                          
+            }
+
+            else {
+                console.log("opcion no");
+                return 0;
+            }
+            //////////////////////////////////////////////////////////////
+        });
+
+        
+    }
+
+    /////////////////////MODAL UNDO/////////////////////////////////////
+    // Manejador de evento    
+    function btnSearchModal_click()
+    {
+        
+        if ($("#txtClosingDateModal").val() != "") 
+        {
+            
+            var FacturaParaRevertir = ListarBillingPorFechaDeCierre($("#txtClosingDateModal").val().trim());
+            
+            if (FacturaParaRevertir.length != 0)
+            {
+                 
+            }
+        }
+        else
+        {
+            
+            error = "Error";
+            mensaje = "Put date"; 
+            MensajeError(mensaje, error);
+
+            return false;
+        }
+    }
+
+    function  ListarUltimasFechasDeCierre()
+    {
+        
+        
+        $.ajax({
+            type: "POST",
+            async: false,
+            // data: JSON.stringify({ "FechaDeCierre": FechaDeCierre }),
+            url: '@Url.Action("ObtenerUltimasFechaCierreReversion", "MonthlyClosing")',
+            contentType: "application/json",
+            // dataType: 'json',
+            success: function (Data)
+            {
+                $("#tblUltimasFechasDecierre").html(Data);
+                
+            }
+        });
+    }
+
+    // Manejador de evento    
+    function btnUndoModal_click() {
+        error = "Error";
+        mensaje = "Please select a row";
+        MensajeError(mensaje, error);
+    }
+    /////////////////////FIN MODAL UNDO/////////////////////////////////////
+
+    /////////////////////////////MODAL RESULTADO INVOICE///////////////////
+    function llenaModalResultadoInvoice(Data, accion)
+    {
+        $("#seleccionado").val(0);
+        ///////////////////////////////////////////////////////////////        
+        $("#tblModalAdjuster").DataTable().clear();
+        $.each(Data.Resultado, function (i, val) {
+            if (val.Adj_firstName != null || val.Adj_lastName != null) {
+                if (val.Adj_status == true)
+                    status = "Active";
+                else
+                    status = "Inactive";
+
+                $('#tblModalAdjuster').dataTable().fnAddData([
+                    val.Adj_code, val.Adj_firstName, val.Adj_lastName, val.Adj_phone, val.Adj_phoneExt, status]);
+            }
+        });
+
+        var otable = $("#tblModalAdjuster").dataTable().fnDestroy();
+        otable = $('#tblModalAdjuster').DataTable({
+            columnDefs: [{ className: "hidden", "targets": [0] }]
+        });
+
+        $("#btnModal").trigger("click");
+
+    }
+    ////////////////////////////////FIN MODAL RESULTADO INVOICE////////////////////////////////////////
+
+    // Manejador de evento
+    function TipoAseguradora_change(e)
+    {
+        SeleccionaTipoAseguradora(e);
+    }
+
+    // Manejador de evento
+    function TipoCierre_change(e)
+    {
+        SeleccionaTipoCierre(e);
+    }
+    function cargandoDiv()
+    {
+        console.log("cargandoDiv");
+        $("#cargando").fadeOut("2000");
+    }
+
+    function PruebaCierreMes()
+    {
+        // var EntradasVerificadasEnCaso;
+        console.clear();
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({
+                "FechaDeCierre": FechaDeCierre
+                , "ListaCorrelativosSeleccionados": ListaCorrelativosSeleccionados
+                , "TipoCierre": TipoCierre
+                , "CodigoUsuario": CodigoUsuarioGlobal
+            }),
+            // data: JSON.stringify({ "ListaCorrelativosSeleccionados": ListaCorrelativosSeleccionados }),
+            url: '@Url.Action("PruebaCierreMes", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {                
+                console.log(Data);
+                console.log("genero");//brenher
+                $("#cargando").css("display", "none");
+                $("div.sa-error-container").css("display", "none");
+                
+                
+                llenaTablaResultado(Data);
+            }
+        });
+
+        // return EntradasVerificadasEnCaso;
+    }
+
+   
+
+
+    function llenaTablaResultado(Data)
+    {
+       $("#tblModalResultadoInvoice").DataTable().clear();
+       $.each(Data, function (i, val)
+       {
+                $('#tblModalResultadoInvoice').dataTable().fnAddData([
+                    val.CodigoCaso, val.PrecioCaso, val.Paciente, val.FacNum, val.CantidadTotalEntradasCaso, val.CantidadEntradasCasoCerrar, val.Comentario]);
+       });
+
+        var otable = $("#tblModalResultadoInvoice").dataTable().fnDestroy();
+        otable = $('#tblModalResultadoInvoice').DataTable({
+            columnDefs: [{ className: "hidden", "targets": [0,1,3] }]
+        });
+        
+        $("#btnModalListaInvoice").click();
+    }
+
+
+
+
+
+    function GenerarFactura(e)
+    {
+        e.preventDefault();
+        
+        var exito = 0;
+        FechaDeCierre = $("#txtClosingDate").val().trim();
+        var Generar = true; // Bandera que indica si el caso que se ha seleccionado tiene entradas (toma valor "true") o no tiene entradas (toma valor "false")
+        var permanecen = "";
+        var cont = 0;
+        var cont2 = 0;
+        var missing = false;
+        var notfoundde = false;
+        var proceso = false;
+
+        //if (FechaDeCierre == "")
+        //{
+        //    e.stopPropagation();
+        //    $(".sa-error-container").hide();
+        //    mensaje = "Enter Closing Date please";            
+        //    error = "Error";
+        //    MensajeError(mensaje, error);
+        //    return false;
+        //}
+
+        //if (ArregloCasosSeleccionados.length == 0)
+        //{
+        //    $(".sa-error-container").hide();
+        //    mensaje = "You have not selected any cases. Please select any case.";
+        //    error = "Error";
+        //    MensajeError(mensaje, error);
+        //    return false;
+        //}
+
+        // *************************************************************************************************
+        // *************************************************************************************************
+        // *************************************************************************************************
+
+        $("#cargando").css("display", "block");
+        
+        ListaCorrelativosSeleccionados = "";
+        CantidadCorrelativosSeleccionados = 0;
+
+        $.each(ArregloCasosSeleccionados, function (i, val)
+        {
+            var CodigoCS = val.CodigoCS;
+            var FacNumCS = val.FacNumCS;
+            var Correlativo = val.CorrelativoCS;
+
+            // console.log(Correlativo);
+        
+            if (CantidadCorrelativosSeleccionados == 0)
+            {
+                ListaCorrelativosSeleccionados = Correlativo.toString();
+            }
+            else
+            {
+                ListaCorrelativosSeleccionados += "," + Correlativo.toString();
+            }
+
+            CantidadCorrelativosSeleccionados += 1;
+        });
+
+        PruebaCierreMes();
+
+        $("#cargando").fadeOut(4000);
+        CargarCasosSegunaAseguradoraSeleccionada();
+        LimpiarArreglos();
+
+        return false;
+
+        // *************************************************************************************************
+        // *************************************************************************************************
+        // *************************************************************************************************
+
+        setTimeout(function () { console.log("despues de 10 segundo"); $(".sa-error-container").hide(); }, "5000");
+        console.log("cargandoooo");
+        //return false;
+        // Recorre el arreglo de los casos seleccionados.
+        $.each(ArregloCasosSeleccionados, function (i, val)
+        {             
+            // console.log("entra al for");
+            // return false;
+
+            // El prefijo CS que se usa al final del nombre de las variables es de "Caso Seleccionado".
+            var CodigoCS = val.CodigoCS;
+            var ClaimCS = val.ClaimCS;
+            var PacienteCS = val.PacienteCS;
+            var FacNumCS = val.FacNumCS;
+            var IndicadorDeCasoSinPrecio = 0; // Variable que obtiene una respuesta de si el caso tiene o no precio, Campo: "Cis_price" (1: El caso tiene precio "0.00", 0: El caso tiene precio diferente de "0.00")
+            var EntradasDeCasoSeleccionado;            
+
+            IndicadorDeCasoSinPrecio = VerificaPrecioCaso(CodigoCS);
+             
+            if (IndicadorDeCasoSinPrecio == 1) // Si el caso tiene Price = 0.00
+            {
+                missing = true;
+
+                console.log("Este caso tiene precio 0.00");
+                error = "Error";
+                mensaje = "This case have price 0.00";
+                MensajeError(mensaje, error);
+                return false;
+                Generar = false;
+            }
+            //else
+            //{
+            //    console.log("Este caso tiene precio diferente a 0.00");
+            //}
+
+            // Se obtienen las entradas para saber la cantidad que tiene cada caso.
+            EntradasDeCasoSeleccionado = ListaEntradasParaConvertirEnFactura(CodigoCS, FechaDeCierre, FacNumCS);
+            console.log("primera");
+            console.log(EntradasDeCasoSeleccionado);
+
+            // Verifica si se encontraron Entradas
+            if (EntradasDeCasoSeleccionado.length == 0) // Si NO se encontraron entradas para el caso actual
+            {
+                Generar = false; // Se establece esta bandera en false para indicar que el caso seleccionado no tiene entradas.
+                notfoundde = true;
+            }
+            
+            // Si la variable generar se mantiene en TRUE es por que SI se han encontrado entradas para el caso seleccionado.
+            if (Generar) 
+            {
+                var CodigoCaso = CodigoCS;
+                var CodigoParametro = 1;
+                var CodigoUsuario = CodigoUsuarioGlobal;
+                var NumFac = FacNumCS;
+                var CodigoFacturaGenerada = 0;
+
+                proceso = true; // significa que por lo menos se generó un invoice.
+
+                // Genera código para Billing Head.   
+                CodigoFacturaGenerada = RegistraCabeceraFactura(CodigoCaso
+                                                              , CodigoParametro
+                                                              , CodigoUsuario 
+                                                              , FechaDeCierre
+                                                              , NumFac);
+
+                exito = exito + 1; 
+
+                // Si el registro de la cabecera de factura se realizó correctamente, retorna un código válido de factura.
+                if (CodigoFacturaGenerada != 0)
+                {
+                    EntradasDeCasoSeleccionado = ListaEntradasParaConvertirEnFactura(CodigoCaso, FechaDeCierre, NumFac); // Se obtienen las entradas para convertirlas en detalle de factura.
+                    console.log("segunda");
+                    console.log(EntradasDeCasoSeleccionado);
+
+                    $.each(EntradasDeCasoSeleccionado, function (i, val)
+                    {
+                        var CodigoEntrada = val.Dae_code;
+                        var Unidad = val.Dae_hourAct;
+                        var Precio = val.Dae_milesAct;
+                        var FechaEntrada = val.Dae_date;
+                        var CodigoActividad = val.Act_code;
+                        var TipoActividad = val.Aty_price;
+
+                        // console.log(val);
+                        // 
+                        // return false; 
+
+                        console.log("registrando cuerpo de factura");
+
+                        RegistraDetalleCuerpoFactura(CodigoFacturaGenerada
+                                                    ,FechaEntrada
+                                                    ,"MMC"
+                                                    ,CodigoActividad
+                                                    ,Unidad
+                                                    ,Precio
+                                                    ,CodigoCaso
+                                                    ,TipoActividad
+                                                    ,0
+                                                    ,CodigoUsuario
+                                                    ,CodigoEntrada);
+                    });
+
+                    TotalizarFactura(CodigoFacturaGenerada);
+
+                    // Actualiza registros de entry para ser billings
+                    var ActulizaEntradas = GeneraInvoice(CodigoCaso, FechaDeCierre, NumFac);
+
+                    //Verifica si un caso tiene entradas para que permanezca en la lista y no desaparezca
+                    var EntradasVerificadasEnCaso = VerificaEntradasEnCaso(CodigoCaso);
+
+
+                    if (EntradasVerificadasEnCaso.length != 0)
+                    {
+                        permanecen = permanecen + PacienteCS + ", ";
+                        cont2 += 1;
+                    }
+
+                    // console.clear();
+                    console.log(EntradasVerificadasEnCaso);
+                }
+                else // Si el registro de la cabecera de factura no se realizó correctamente, por algún motivo.
+                {
+                    console.log("Failed in " + PacienteCS);
+                    $("#cargando").css("display", "none");
+                    error = "Error";
+                    mensaje ="Failed in " + PacienteCS;
+                    MensajeError
+                }
+            }
+        });
+
+        console.log(ArregloCasosSeleccionados);
+
+        if (ArregloCasosSeleccionados.length == 0)
+        {
+            //$("#cargando").css("display", "none");
+            mensaje = "You have not selected any cases. Please select any case.";
+            error = "Error";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else
+        {
+            if (cont2 != 0)
+            {
+                // Mensaje de los que permanecen.
+
+                if (missing == false && notfoundde == false)
+                {
+                    // console.clear();
+                    // console.log("entra mensaje");
+
+                    //alert("Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list");
+                    error = "Success";
+                    mensaje = "Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list";
+                    MensajeError(mensaje, error);
+                }
+
+                if (missing == true && notfoundde == false)
+                {
+                      //alert("Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list");
+                    error = "Success";
+                    mensaje = "Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list";
+                    MensajeError(mensaje, error);
+                }
+
+                if (missing == false && notfoundde == true)
+                {
+                    //alert("Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list");
+                    error = "Success";
+                    mensaje = "Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list";
+                    MensajeError(mensaje, error);
+                }
+
+                if (missing == true && notfoundde == true)
+                {
+                    //alert("Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list");
+                    error = "Success";
+                    mensaje = "Monthly closing has been generated successfully. " + permanecen + " still has pending data entrys on the list";
+                    MensajeError(mensaje, error);
+                }
+
+                // Deseleecionar todos los checks para limpiar (Brenher).
+                //$("#cargando").css("display", "none");
+
+            }
+            else
+                if (cont2 = 0 && proceso == true)
+                {
+                    if (missing == false && notfoundde == false)
+                    {
+                        //alert(exito.ToString + " Invoices have been generated successfully");
+                        error = "Success";
+                        mensaje = exito.ToString + " Invoices have been generated successfully";
+                        MensajeError(mensaje, error);
+                    }
+
+                    if (missing == true && notfoundde == false)
+                    {
+                        //alert(exito.ToString + " Invoices have been generated successfully");
+                        error = "Success";
+                        mensaje = exito.ToString + " Invoices have been generated successfully";
+                        MensajeError(mensaje, error);
+                    }
+
+                    if (missing == false && notfoundde == true)
+                    {
+                        //alert(exito.ToString + " Invoices have been generated successfully");
+                        error = "Success";
+                        mensaje = exito.ToString + " Invoices have been generated successfully";
+                        MensajeError(mensaje, error);
+                    }
+
+                    if (missing == true && notfoundde == true)
+                    {
+                        //alert(exito.ToString + " Invoices have been generated successfully");
+                        error = "Success";
+                        mensaje = exito.ToString + " Invoices have been generated successfully";
+                        MensajeError(mensaje, error);
+                    }
+                    //$("#cargando").css("display", "none");
+                }
+
+                    // Deseleecionar todos los checks para limpiar (Brenher).            
+            else 
+            {
+                if (cont2 == 0 && proceso == false) 
+                {
+                    //alert('Not Process');
+                    error = "Error";
+                    mensaje = "Not Process";
+                    MensajeError(mensaje, error);
+                    //$("#cargando").css("display", "none");
+                }
+            }
+        }
+
+    }
+
+    function VerificaEntradasEnCaso(CodigoCaso)
+    {
+        var EntradasVerificadasEnCaso;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": CodigoCaso }),
+            url: '@Url.Action("VerificaEntradasEnCaso", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                EntradasVerificadasEnCaso = Data;
+                // console.log(Data);
+            }
+        });
+
+        return EntradasVerificadasEnCaso;
+    }
+
+    function RegistraDetalleCuerpoFactura(CodigoFacturaGenerada
+                                         ,FechaEntrada
+                                         ,CodigoMMC
+                                         ,CodigoActividad
+                                         ,Unidad
+                                         ,Precio
+                                         ,CodigoCaso
+                                         ,TipoActividad
+                                         ,AmoReim
+                                         ,CodigoUsuario
+                                         ,CodigoEntrada)
+    {
+        var Parametros = { "CodigoCabeceraFactura": parseInt(CodigoFacturaGenerada)
+                         , "FechaEntrada": FechaEntrada
+                         , "CodigoMMC": CodigoMMC
+                         , "CodigoActividad": parseInt(CodigoActividad)
+                         , "Unidad": parseFloat(Unidad)
+                         , "Precio": parseFloat(Precio)
+                         , "CodigoCaso": parseInt(CodigoCaso)
+                         , "TipoActividad": TipoActividad
+                         , "AmoReim": parseFloat(AmoReim)
+                         , "CodigoUsuario": parseInt(CodigoUsuario)
+                         , "CodigoEntrada": parseInt(CodigoEntrada)
+        };
+
+        // console.clear();
+        console.log("inicio");
+        // console.log(Parametros);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Parametros),
+            url: '@Url.Action("RegistraDetalleCuerpoFactura", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+            }
+        });
+
+        console.log("fin");
+        // return false;
+    }
+
+    function TotalizarFactura(CodigoFacturaGenerada)
+    {
+        console.log(CodigoFacturaGenerada);
+
+        var MontosTotales;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoFacturaGenerada": CodigoFacturaGenerada }),
+            url: '@Url.Action("TotalFactura", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {                
+                if (Data.response == 0) // Si no recibe totales, no hace nada.
+                {
+                    console.log("No hace nada por que no recibe montos totales");
+                }
+                else // si recibe totales
+                {
+                    MontosTotales = Data.response;
+                    console.log(MontosTotales);
+                    
+                    ActualizaTotalFactura(CodigoFacturaGenerada, MontosTotales.Total); // Aquí me quede.
+                }
+            }
+        });
+    }
+            
+    function ActualizaTotalFactura(CodigoFacturaGenerada, Total)
+    {
+
+        // console.clear();
+        console.log("aqui 2");
+        console.log("CodigoFacturaGenerada: " + CodigoFacturaGenerada);
+        console.log("Total: " + Total);        
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoFacturaGenerada": CodigoFacturaGenerada, "Total": Total }),
+            url: '@Url.Action("ActualizaTotalFactura", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+
+            }
+        });
+    }
+
+    function RegistraCabeceraFactura(CodigoCaso, CodigoParametro, CodigoUsuario, FechaDeCierre, NumFac)
+    {
+        var Parametros = {
+            "CodigoCaso": CodigoCaso
+                         , "CodigoParametro": CodigoParametro
+                         , "CodigoUsuario": CodigoUsuario
+                         , "FechaDeCierre": FechaDeCierre
+                         , "NumFac": NumFac};
+
+        var CodigoFacturaGenerada;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Parametros),
+            url: '@Url.Action("RegistraCabeceraFactura", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                CodigoFacturaGenerada = Data;
+            }
+        });
+
+        return CodigoFacturaGenerada;
+    }
+
+    function ListaEntradasParaConvertirEnFactura(CodigoCS, FechaDeCierre, FacNumCS)
+    {
+        
+
+        var EntradasDeCasoSeleccionado;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": parseInt(CodigoCS), "FechaDeCierre": FechaDeCierre, "FacNum": FacNumCS }),
+            url: '@Url.Action("ListaEntradasParaConvertirEnFactura", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                EntradasDeCasoSeleccionado = Data;
+            }
+        });
+
+        return EntradasDeCasoSeleccionado;
+    }
+
+    function GeneraInvoice(CodigoCaso, FechaDeCierre, NumFac)
+    {
+        var Resultado;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": parseInt(CodigoCaso), "FechaDeCierre": FechaDeCierre, "NumFac": NumFac }),
+            url: '@Url.Action("GeneraFactura", "MonthlyClosing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Resultado = Data;
+            }
+        });
+
+        return Resultado;
+    }
+
+    function VerificaPrecioCaso(CodigoCaso)
+    {
+        var CantidadCasos;
+        
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": parseInt(CodigoCaso) }),
+            url: '@Url.Action("VerificaPrecio", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                CantidadCasos = Data;
+            }
+        });
+
+        return CantidadCasos;
+    }
+
+    function CargarCasosSegunaAseguradoraSeleccionada()
+    {
+
+        if ($("#rdbOtraAseguradora").prop("checked")) // Si inicialmente el tipo de aseguradora seleccionada es "Other Insurer List".
+        { 
+            $("#TiposCierre").css({ "display": "none" }); // El panel de tipos de cierre se hace invisible.
+            CargarCasos(1); // Carga casos para aseguradoras diferentes de "Insurer - Amtrust C/O Carlisle & Assoc".
+            TipoCierre = 1;
+        }
+        if ($("#rdbAmtrustCarlisleAssoc").prop("checked")) // Si inicialmente está seleccionada la aseguradora "Insurer - Amtrust C/O Carlisle & Assoc".
+        {
+            $("#TiposCierre").css({ "display": "block" }); // El panel de tipos de cierre se hace visible.
+
+            if ($("#rdbCierraPorHora").prop("checked")) // Si inicialmente está seleccionado el tipo de cierre "Por Hora".
+            { 
+                console.log("Aseguradora Carlisle - Por hora");
+                CargarCasos(2);
+                TipoCierre = 2;
+            }
+            if ($("#rdbCierraPorFecha").prop("checked")) // Si inicialmente está seleccionado el tipo de cierre "Por fecha".
+            { 
+                console.log("Aseguradora Carlisle - Por fecha");
+                CargarCasos(3);
+                TipoCierre = 3;
+            }
+        }
+        
+    }
+     
+    function CargaInformacionSegunTipoAseguradora(e)
+    {
+        if (e.currentTarget.value == "OA") // Si se selecciona la opción de aseguradora diferente de "Insurer - Amtrust C/O Carlisle & Assoc".
+        {
+            // console.log("Otra aseguradora");
+
+            $("#TiposCierre").css({ "display": "none" }); // El panel de tipos de cierre se hace invisible.
+            CargarCasos(1); // Carga casos que no tienen a "Insurer - Amtrust C/O Carlisle & Assoc" como aseguradora.
+            TipoCierre = 1;
+        }
+        else // Si se elige la aseguradora "Insurer - Amtrust C/O Carlisle & Assoc".
+        {
+            $("#TiposCierre").css({ "display": "block" }); // El panel de tipos de cierre se hace visible.
+
+            // Verifica el tipo de cierre que se encuentra checkeado.
+            if ($("#rdbCierraPorHora").prop("checked") == true) // Si está seleccionado el tipo de cierre "Por Hora".
+            {
+                console.log("Aseguradora Carlisle - Por hora");
+                CargarCasos(2); // Carga casos que tienen a "Insurer - Amtrust C/O Carlisle & Assoc" como aseguradora (Cierre "Por Hora").
+                TipoCierre = 2;
+            }
+            else // Si está seleccionado el tipo de cierre "Por fecha".
+            {
+                console.log("Aseguradora Carlisle - Por fecha");
+                CargarCasos(3); // Carga casos que tienen a "Insurer - Amtrust C/O Carlisle & Assoc" como aseguradora (Cierre "Por Fecha").
+                TipoCierre = 3;
+            }
+        }
+    }
+
+    // Esta función carga los casos según el tipo de aseguradora ("No Carlisle" ó "Carlisle") así como el tipo de cierre que se seleccione ("Cierre por Hora" o "Cierre por fecha").
+    // Puede recibir tres parámetros 
+    // (1: "No Carlisle"
+    // ,2: "Carlisle por hora"
+    // ,3:"Carlisle por fecha").
+    function CargarCasos(TipoCarga) 
+    {
+        // console.clear();        
+
+        $.ajax({
+            type: "POST",
+            async: true,
+            data: JSON.stringify({ "TipoCarga": parseInt(TipoCarga) }),
+            url: '@Url.Action("ListaCasos", "MonthlyClosing")',
+            contentType: "application/json",
+            success: function (VistaParcialCasos)
+            {
+                $("#EnvolturatblCasos").html(VistaParcialCasos);
+            }
+        });    
+    }
+
+    function SeleccionaTipoAseguradora(e)
+    {
+        // console.clear();
+
+        $("#dvLoading").css("display", "block");
+
+        setTimeout(function ()
+        {
+            LimpiarArreglos();
+            CargaInformacionSegunTipoAseguradora(e);
+        }, 50);
+    }
+
+    function SeleccionaTipoCierre(e)
+    {
+        // console.clear();
+
+        $("#dvLoading").css("display", "block"); 
+
+        setTimeout(function ()
+        {
+            LimpiarArreglos();
+            CargaInformacionSegunTipoCierre(e);
+        }, 50);
+    }
+
+    function CargaInformacionSegunTipoCierre(e)
+    {
+        if (e.currentTarget.value == "CPH") // Si se elige el cierre por horas.
+        {
+            console.log("Cierre por hora");
+            CargarCasos(2); // Carga casos que tienen a "Insurer - Amtrust C/O Carlisle & Assoc" como aseguradora (Cierre "Por Hora").
+            TipoCierre = 2;
+        }
+        else // Si se elige el cierre por fecha.
+        {
+            console.log("Cierre por fecha");
+            CargarCasos(3); // Carga casos que tienen a "Insurer - Amtrust C/O Carlisle & Assoc" como aseguradora (Cierre "Por Fecha").
+            TipoCierre = 3;
+        }
+    }
+
+
+    function MensajeHelp()
+    {
+        error = "Help";
+        mensaje = "<span style='text-align:justify;'>The undo process Monthly Closing, only to restore the bills, the payment is $ 0, meaning that any payment is not recorded by them, for more information check with your service provider!</span>";
+        MensajeError(mensaje, error);
+    }
+
+    function btnCancelarUndoModal_click(e)
+    {
+        $("#tblCasosParaCerrar").css("display", "none");
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje,
+            //imageUrl:"/images/loading.gif",
+            html:true
+        });
+    }
+
+
+</script>
+

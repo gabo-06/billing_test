@@ -1,0 +1,216 @@
+﻿@model IEnumerable<Billing.Web.Models.ReporteCasosSinActividad>
+
+@{
+    ViewBag.Title = "Report Case Activity";
+}
+
+<style>
+.dataTables_filter {
+    display: none; 
+}
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>CASES WITH NO ACTIVITY</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center">                          
+                            <label class="col-sm-3 control-label">Select days </label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" value="0" id="txtDays" name="txtDays">                         
+                            </div> 
+                            <div class="col-sm-1">                                
+                                    <button type="button" class="btn btn-primary" id="btnApply">Search</button>
+                                    <a style="display:none;" target="_blank" class="btn btn-primary" data-url="/Billing/DownloadPDF" id="linkPdf" href="#"><i class="fa fa-file"></i>&nbsp;Generate link</a>
+                            </div> 
+                        </div>
+                    </form> 
+                </div>             
+
+            </div>
+        </div>  
+    </div>
+
+    <div class="row">        
+        <div class="col-lg-12" id="divResultado">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>RESULTS</h5>
+                </div> 
+
+                <div class="ibox-content" id="div_reporte" style="border-style: none; border-width: 0;display:block;">
+                    <div class="form-group">
+                    <div style="float:right;margin-right: 6px;">
+                    @using (Html.BeginForm("ExportToPdfCaseActivity", "ReportCaseActivity", FormMethod.Post))
+                    {
+                        <button id="btnGeneraPdf" class="btn btn-primary " style="display:none;" type="submit" data-toggle="tooltipB"  data-placement="top" title="" data-original-title="Create a New case">
+                         <i class="fa fa-save"></i>&nbsp; Export to Pdf</button>          
+                        <input type="hidden" value="0" id="txtDays_pdf" name="txtDays_pdf">
+                    }              
+                    </div>  
+
+                         <div id ="resultadoReporte" >
+                            <table class="table table-bordered" id="tblReporte">
+                                <thead >
+                                <tr>
+                                    <th class="th_tabla">Patient</th>
+                                    <th class="th_tabla">New Referral</th>
+                                    <th class="th_tabla">DOI</th>
+                                    <th class="th_tabla">Insurer</th>
+                                    <th class="th_tabla" >Date of Referral</th>
+                                    <th class="th_tabla" >Days Since Last Entry</th>
+                                    <th class="th_tabla">Supervisor</th>                                    
+                                </tr>
+                                </thead>
+                                <tbody style="display: none;">
+                                @foreach (var item in Model)
+                                { 
+                                    <tr>
+                                        <td>@item.Paciente</td>
+                                        <td>@item.NewReferral</td>
+                                        <td>@item.fechaDeAccidente</td>
+                                        <td>@item.aseguradora</td>
+                                        <td>@item.fechaReferencial</td>
+                                        <td>@item.diasPasadosDesdeUltimaEntrada  </td>
+                                        <td>@item.supervisor</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>                             
+                         </div> 
+                     </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+</div>
+
+@Html.Partial("footer")
+
+<script> 
+    var VecesSelecionaCaso = 0;    
+
+    $(Inicio);
+
+    // Función de filtrado personalizado que buscará datos en la columna 5 mayores al valor ingresado en el input "txtDays".
+    $.fn.dataTable.ext.search.push(
+        function (settings, data, dataIndex) { 
+            var diasFiltro = parseInt($('#txtDays').val(), 10);
+            // var max = parseInt($('#max').val(), 10);
+            var diasCelda = parseFloat(data[5]) || 0; // use data for the age column
+
+            if ( isNaN(diasFiltro) ||
+                 (diasCelda >= diasFiltro)) {
+                 // (min <= diasCelda && isNaN(max)) ||
+                 // (min <= diasCelda && age <= max)) {
+                return true;
+            }
+            return false;
+        }
+    );
+
+    function Inicio()
+    {
+        ProcesoActual = "Reports";
+        var tabla = $("#tblReporte").DataTable({
+            "columnDefs": [{
+               "targets": [0, 1, 2,3,4,5,6], // column or columns numbers
+               "orderable": false,  // set orderable for selected columns                
+            }],
+            "aaSorting": [],
+            "bLengthChange": false,
+            "bInfo": false
+        })
+        $("#tblReporte_paginate").css("display", "none");
+        // Controla el eventoe "keyup" a la entrada de filtrado para volver a dibujar en la entrada.
+        $('#btnApply').on('click', function () {
+            if ($("#txtDays").val() != "") {
+                $("#txtDays_pdf").val($("#txtDays").val());
+                $("#tblReporte > tbody").css({ display: 'table-row-group' })
+                $("#tblReporte_paginate").css({ display: 'block' })
+                $("#tblReporte_paginate").css('text-align', 'right');
+                $("#btnGeneraPdf").css("display", "block");
+                tabla.draw();
+            }
+            else
+            {
+                MensajeError("Put Days!","Error");
+            }
+
+        })
+        $("#txtDays").on("keydown", function (e) {
+            if (e.keyCode == 13) {
+                $("#btnApply").trigger("click");
+                return false;
+            }
+        });
+        // ObtenerAutocompletarInsurer();
+        // $("#btnApply").on("click", cargaLista);
+
+        $('#txtDays').val('')
+        $('#txtDays').focus()
+    }
+
+    function ancla() {
+        $("html,body").stop().animate({ scrollTop: $("#seleccionarCaso").offset().top }, 1000);
+    }
+
+    function ObtenerAutocompletarInsurer() // mg
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaAutocompletar", "Insurer")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                //console.log(Data);
+                //Aseguradoras = Data.Data.response['insurers']; // Obtiene datos de los aseguradoras para autocompletado     (INSURER)                   
+                Aseguradoras = Data; // Obtiene datos de los aseguradoras para autocompletado     (INSURER)                   
+                CargarAseguradorasEnCombo(Aseguradoras); // Carga las aseguradoras en el combo autocompletable de aseguradoras.
+            }
+        });
+    }
+
+    function CargarAseguradorasEnCombo(Aseguradoras) {
+        var CodigoAseguradora;
+        var NombreAseguradora;
+        $("#cmbAseguradora").empty();
+        $.map(Aseguradoras, function (val, i) {
+            CodigoAseguradora = val.Codigo;
+            NombreAseguradora = val.NombreCompleto;
+
+            $("#cmbAseguradora").append("<option value='" + CodigoAseguradora + "'>" + NombreAseguradora + "</option>");
+        });
+    }
+
+    function cargaLista() {
+        txtDays = $("#txtDays").val();
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("listaCaseActivity", "ReportCaseActivity")',
+            data: { dias: txtDays },
+            contentType: 'application/html;charset=utf-8',
+            dataType: 'html',
+            success: function (Data) {
+                $("#div_reporte").css("display", "block");
+                $("#resultadoReporte").html(Data);
+            }
+        });
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+
+</script>

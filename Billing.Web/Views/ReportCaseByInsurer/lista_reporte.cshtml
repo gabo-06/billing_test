@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_CASE_BY_INSURER_Result>
+@{
+    var i = 0;
+    var fechaActual = DateTime.Now.ToShortDateString();
+    fechaActual = fechaActual.Replace("/", "-");
+    string nombre_archivo = "Case_by_insurer_report-" + fechaActual;
+}
+<div style="overflow: hidden;" class="ibox-content">
+  
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblListaReporte">
+        <thead class="th_tabla">    
+         <tr>
+           <th></th>
+           <th>Date OF Referral </th>
+           <th>Patient's Name</th>           
+           <th>Insurer</th>           
+           <th>Adjuster</th>          
+           <th>Date of Injury</th>                     
+           <th>Close Date</th>            
+           <th>Supervisor</th>            
+           <th>Nurse</th>            
+           <th>Claim Number</th>            
+        </tr>
+       </thead>
+       <tbody>
+        @foreach (var item in Model)
+         {
+            i = i + 1;
+            var Cis_closedDate = "";
+
+            if (item.Cis_closedDate  == null)
+            {
+                Cis_closedDate = "-";
+            }
+            else
+            {
+                Cis_closedDate = item.Cis_closedDate;
+            }
+                
+
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@i</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Cis_referralDate</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.patient</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Ins_name</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Adjuster</td>              
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Cis_accidentDate</td>                                               
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@Cis_closedDate</td>                                               
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Provider</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Provider</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 13px;font-family: sans-serif;">@item.Cis_caseCode</td>
+                                                                    
+                 </tr>
+        }     
+                
+       </tbody>
+        
+    </table>
+</div>
+</div>
+<script>
+    $(Inicio);
+
+    function Inicio() {
+        $("#btnGeneraWord").on("click", generaWord); //edher
+        aseguradoraTexto =  $("#cmbAseguradora option:selected").text();
+        PaginarTabla(aseguradoraTexto);
+    }
+     
+    function generaWord() {
+
+        var invoice = $("#invoice_btn").val();
+        var urlx = $("#linkWord").attr("data-url");
+        urlx = urlx;
+        window.open(urlx);
+    }
+
+
+    function PaginarTabla(aseguradoraTexto) {
+        console.log("PaginarTabla");
+        $('#tblListaReporte').DataTable({
+            dom: 'Bfrtip',
+            buttons: [{
+                    //extend: 'excelHtml5',                    
+                extend: 'excelHtml5',
+                title:'@nombre_archivo',
+                //message: '  \t   \t \t  \t  \t  CASE BY INSURER \t  \t  \t  \n  \t   \t \t  \t  \t '+ aseguradoraTexto,
+                        //customize: function (xlsx) {
+                        //    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        //    $('row c[r^="C"]', sheet).attr('s', '2');
+                //}
+                customize: function (xlsx) {                    
+                    console.log(xlsx);
+                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    var downrows = 3;
+                    var clRow = $('row', sheet);
+
+                    $('row c[r*="1"]', sheet).attr('s', '37');
+
+                    for (x = 2; x < @i +2; x++) {
+                        $('row c[r*=' + x + ']', sheet).attr('s', '25');
+                    }
+
+                    //update Row
+                    clRow.each(function () {
+                        var attr = $(this).attr('r');
+                        var ind = parseInt(attr);
+                        ind = ind + downrows;
+                        $(this).attr("r", ind);
+                    });
+
+                    // Update  row > c
+                    $('row c ', sheet).each(function () {
+                        var attr = $(this).attr('r');
+                        var pre = attr.substring(0, 1);
+                        var ind = parseInt(attr.substring(1, attr.length));
+                        ind = ind + downrows;
+                        $(this).attr("r", pre + ind);
+                    });
+
+                    function Addrow(index, data) {
+                        console.log(index);
+                        console.log(data);
+                        console.log(data.length);
+                        msg = '<row r="' + index + '">'
+                        for (i = 0; i < data.length; i++) {
+                            var key = data[i].k;
+                            var value = data[i].v;
+                            msg += '<c t="inlineStr" r="' + key + index + '" s="2">'; //42
+                            msg += '<is>';
+                            msg += '<t>' + value + '</t>';
+                            msg += '</is>';
+                            msg += '</c>';
+
+                            
+                        }
+                        msg += '</row>';
+
+                        return msg;
+                    }
+
+                    //insert
+                    var r1 = Addrow(1, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: '' }, { k: 'D', v: 'REPORT CASE BY INSURER' }]);
+                    var r2 = Addrow(2, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: '' }, { k: 'D', v: aseguradoraTexto }]);
+                    //var r3 = Addrow(3, [{ k: 'A', v: '' }, { k: 'B', v: '' }, { k: 'C', v: 'ColC' }, { k: 'D', v: '' }]);
+
+                    sheet.childNodes[0].childNodes[1].innerHTML = r1 + r2 + sheet.childNodes[0].childNodes[1].innerHTML;
+                }
+              }],
+          
+            //"scrollY": 100,            
+            "scrollY": 600,
+            "bFilter": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bSort": false
+        });
+    }
+
+
+
+</script>

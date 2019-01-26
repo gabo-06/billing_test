@@ -1,0 +1,105 @@
+﻿@using System.Diagnostics;
+
+@model IEnumerable<Billing.Web.Models.DetalleFactura>
+@{
+    var i = 0;
+    var FechaServicio = DateTime.Now;
+    var HourMile = (decimal)0.0;
+    var PriceAct = (decimal)0.0;
+    var Total = (decimal)0.0;
+}
+
+<style type="text/css">
+    #tblBillingResult {
+        border-collapse: collapse;font-family:Arial;
+    }
+     #tblBillingResult  {border: 0px;}
+     #tblBillingResult th  {border: 1px solid #e7eaec}
+     /*#tblBillingResult > th  {border: 1px solid black;border-spacing:0;}*/
+     #tblBillingResult td {border: 1px solid #e7eaec;border-spacing:0;}
+    .th_tabla {background-color: #b42734;color:white;}
+     
+</style>
+
+
+
+
+<div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblBillingResult" style="width:100%" >
+                     <thead class ="th_tabla">
+                      <tr>
+                        <th>Date</th>
+                        <th>Service</th>      
+                        <th>Time</th>
+                        <!--<th>Charge Fer Unit</th>
+                        <th>Total</th>        
+                        <th>Action</th>-->
+                      </tr>
+                     </thead>
+                    <tbody>
+                  @foreach (var item in Model)
+                   {
+                      i = i + 1;                        
+                      FechaServicio = Convert.ToDateTime(@item.Bib_servDate);
+                      Debug.Write(FechaServicio);
+                      
+                      HourMile = decimal.Parse(item.Bib_hourMile.ToString());                        
+                       <tr>
+                        <td>@FechaServicio.ToString("MM/dd/yyyy")</td>
+                        <td>@item.Act_description  </td>
+                        <td>@HourMile</td>                        
+                       </tr>
+                   }  
+                    </tbody>
+
+                    </table>
+</div>
+
+
+<script>
+
+    $(Inicio);
+
+    function Inicio()
+    {
+        
+    }
+
+    $(document).ready(function () {////////////////////S T
+        $('#tblBillingResult').DataTable({
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                        i : 0;
+                };
+
+                // Total over all pages
+                total = api
+                    .column(3)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                console.log(total);
+                $("#total").html( "$"+ total);
+                // Total over this page
+                pageTotal = api
+                    .column(3, { page: 'current' })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Update footer
+                /*$(api.column(5).footer()).html(
+                    '$' + pageTotal + ' ( $' + total + ' total)'
+                );*/
+            }
+        });
+    });
+</script>

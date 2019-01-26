@@ -1,0 +1,130 @@
+﻿@model IEnumerable<Billing.Web.Models.DATA_ENTRY_PER_USER_Result>
+@{
+    var i = 0;
+    var nombre = "";
+    Int32 total = 0;
+    Int16 sw=0;
+}
+<div style="overflow: hidden;" class="ibox-content">
+
+                    
+<div id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover " id="tblListaReporte">
+        <thead class="th_tabla" style="background-color:#b42734;color:white;">  
+         <tr>
+           <th style="font-size:13px; font-family: Arial;"></th>
+           <th style="font-size:13px; font-family: Arial;">Date Entry </th>
+           <th style="font-size:13px; font-family: Arial;">Activities</th>           
+           <th style="font-size:13px; font-family: Arial;">Time </th>           
+           <th style="font-size:13px; font-family: Arial;">Patient</th>           
+           <th style="font-size:13px; font-family: Arial;">Description</th>           
+           <th style="font-size:13px; font-family: Arial;">User</th>           
+        </tr>
+       </thead>
+       <tbody>
+        @foreach (var item in Model)
+         {
+            i = i + 1;
+            if (i >= 3948)
+            { 
+                var test = "aki";
+            }
+            total = total + 1;
+            if(nombre != item.UserN && i>1)  
+            {
+                if (sw == 0)
+                {
+                    total = total - 1;
+                }
+                 <tr style="font-weight:bold;background-color: #ffe1e1;">
+                      <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>       
+                     <td  style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">TOTAl</td><td>@total  entries</td>
+                 </tr>
+                total = 0;
+                sw = 1;
+            }            
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@i </td>
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@DateTime.Parse( item.Dae_date.ToString()).ToShortDateString()</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@item.Act_description</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@item.Dae_hourAct</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@item.Patient</td>              
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@item.Comentary</td>                                               
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">@item.UserN</td>                                               
+                 </tr>
+            nombre = item.UserN;
+            
+            if( Model.Count() == i)
+            {
+                if (sw == 1)
+                {
+                    total = total + 1;
+                }
+                 <tr style="font-weight:bold;background-color: #ffe1e1;">
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>                          
+                     <td style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;"></td>       
+                     <td  style="border: 1px solid #cccbcb;font-size:12px; font-family: Arial;">TOTAl</td><td style="font-size:12px; font-family: Arial;">@total   entries</td>
+                 </tr>
+                total = 0;
+            }
+         }        
+       </tbody>
+        
+    </table>
+</div>
+</div>
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        $("#btnGeneraWord").on("click", generaWord); //edher
+       /// PaginarTabla();
+        
+    }
+    function generaWord() {
+
+        //var invoice = $("#invoice_btn").val();
+        var urlx = $("#linkWord").attr("data-url");
+        fechaInicio = $("#txtDateInput1").val();
+        fechaFin    = $("#txtDateInput2").val();
+
+
+
+        $("#fechaInicial").val(fechaInicio);
+        $("#fechaFin").val(fechaFin);
+        if (fechaInicio == "" || fechaFin == "") {
+            return false
+        }
+           
+
+    }
+
+  
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblListaReporte').DataTable({
+            //"scrollY": 100,            
+            "scrollY": 600,
+            "bFilter": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bSort": false
+        });
+    }
+
+
+
+
+  
+
+</script>

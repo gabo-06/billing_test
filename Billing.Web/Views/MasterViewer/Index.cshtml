@@ -1,0 +1,645 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="wrapper wrapper-content" id="cargando">
+    <div class="middle-box text-center animated fadeInRightBig">
+        <h3 class="font-bold">WELCOME SYSTEM</h3>
+        <div class="error-desc">
+                Welcome to OmniMed's case management software. 
+            <br>This web based application will help you manage your cases more effectively.
+                        
+            <br/>@*<a href="indexx.cshtml" class="btn btn-primary m-t">Dashboard</a>*@
+        </div>
+    </div>
+</div>
+
+@Html.Partial("footer")
+
+
+<input type="hidden" value="@Url.Content("~/Scripts/ciudades.js")" id="archivoCiudades"> 
+<input type="hidden" value="billing.web" id="subCarpeta"> 
+@section Scripts {
+    
+<script src="@Url.Content("~/scripts/js/plugins/metisMenu/jquery.metisMenu.js")"></script>
+<script src="@Url.Content("~/scripts/js/plugins/slimscroll/jquery.slimscroll.min.js")"></script>
+<script src="@Url.Content("~/scripts/js/inspinia.js")"></script>
+<script src="@Url.Content("~/scripts/js/plugins/pace/pace.min.js")"></script>
+     
+<script>
+    // Variable global que almacena el nombre del proceso donde se está actualmente. 
+    // Cada vez que se ingresa a un proceso (en la función Inicio lo primero que hace 
+    // es actualizar esta variable con el nombre del proceso).
+    var ProcesoActual = "";
+    var ActualizacionDesdeAlerta = false; // Para indicar que la actualización de un proceso se está haciendo si se acepta la advertencia cuando se pasa de un proceso a otro.
+    var BanderaCambioProceso = false;
+    var BanderaErrorValidacion = false;
+     
+    $(document).on("ready", Inicio);
+
+    function ControlarCambiosProcesos()
+    {
+        // Controles del Case
+        // ************************************************************************************************************************************************************************************************************************        
+        // Controla cambio en el combo de pacientes.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(0) > .col-lg-7:eq(0)", function (e)
+        {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de pacientes");
+        });
+
+        // Controla cambio en el combo de ajustadores.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(2) > .col-lg-7:eq(0)", function (e)
+        {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de ajustadores");
+        });
+
+        // Controla cambio en el combo de aseguradoras.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(1) > .form-group:eq(4) > .col-lg-7:eq(0)", function (e)
+        {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de aseguradoras");
+        });
+
+        // Controla cambio en el check de los sexos.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(8) > .col-lg-9:eq(0) > .OpcionSexo", function (e) {
+            BanderaCambioProceso = true;
+            console.log("Check de los sexos");
+        });
+
+        // Controla cambio en el combo de proveedores.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .form-group:eq(2) > .col-lg-7:eq(0)", function (e) {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de proveedores");
+        });
+
+
+        // Controla cambio en el combo de supervisores.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .form-group:eq(3) > .col-lg-9:eq(0)", function (e) {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de supervisores");
+        });
+
+
+        
+        // Controla cambio en el campo "Price per Hour".
+        // $("#MaestroProceso").on("change", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .form-group:eq(0) > .col-lg-9:eq(0) > #txtPrice", function (e)
+        // {
+        //     BanderaCambioProceso = true;
+        // });
+
+        // Controla cambio en el check de Longshore.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .ibox:eq(0) > .ibox-content:eq(0) > .form-group:eq(0) > .col-lg-2:eq(0) > .LongshoreCompanyStatusOther", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check Longshore");
+        });
+        
+        // Controla cambio en el check de State Company.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .ibox:eq(0) > .ibox-content:eq(0) > .form-group:eq(1) > .col-lg-5:eq(0) > .LongshoreCompanyStatusOther", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check Company");
+        });
+
+        // Controla cambio en el check de Other.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .ibox:eq(0) > .ibox-content:eq(0) > .form-group:eq(2) > .col-lg-2:eq(0) > .LongshoreCompanyStatusOther", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check Other");
+        });
+
+        // Controla cambio en el check de Presumption.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .form-group:eq(4) > .col-lg-5:eq(0) > #cbPresuncion", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check Presumption");
+        });
+
+        // Controla cambio en el combo de Acuity.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .form-group:eq(5) > .col-lg-9:eq(0)", function (e) {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de Acuity");
+        });  
+
+        // Controla cambio en el check de Translation (Yes).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(1) > .col-lg-1:eq(0) > #cbTrasladoSi", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'SI' de Translation");
+        });
+
+        // Controla cambio en el check de Translation (No).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(1) > .col-lg-1:eq(1) > #cbTrasladoNo", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'NO' de Translation");
+        });
+
+        // Controla cambio en el check de Transportation (Yes).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(2) > .col-lg-1:eq(0) > #cbTransporteSi", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'SI' de Transportation");
+        });
+
+        // Controla cambio en el check de Transportation (No).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(2) > .col-lg-1:eq(1) > #cbTransporteNo", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'NO' de Transportation");
+        });
+
+        // Controla cambio en el check de Physical therapy (Yes).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(3) > .col-lg-1:eq(0) > #cbTerapiaFisicaSi", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'SI' de Physical therapy");
+        });
+
+        // Controla cambio en el check de Physical therapy (No).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(3) > .col-lg-1:eq(1) > #cbTerapiaFisicaNo", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'NO' de Physical therapy");
+        }); 
+
+        // Controla cambio en el check de Permission to Contact (Yes).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(4) > .col-lg-1:eq(0) > #cbPermisoContactoSi", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'SI' de Permission to Contact");
+        });
+
+        // Controla cambio en el check de Permission to Contact (No).
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(1) > .form-group:eq(4) > .col-lg-1:eq(1) > #cbPermisoContactoNo", function (e) {
+            BanderaCambioProceso = true;
+            console.log("check 'NO' de Permission to Contact");
+        });
+
+        // Controla cambio en el combo de doctores.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > #div_doctor_atorney > .row:eq(0) > .col-lg-12:eq(0) > .tabs-container:eq(0) > .tab-content:eq(0) > #tab-1 > .panel-body:eq(0) > .form-horizontal:eq(0) > .form-group:eq(0) > .col-lg-9:eq(0)", function (e) {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de doctores");
+        });
+
+        // Controla cambio en el combo de abogados.
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > #div_doctor_atorney > .row:eq(0) > .col-lg-12:eq(0) > .tabs-container:eq(0) > .tab-content:eq(0) > #tab-2 > .panel-body:eq(0) > .form-horizontal:eq(0) > .form-group:eq(0) > .col-lg-9:eq(0)", function (e) {
+            BanderaCambioProceso = true;
+            console.log("Cambia el combo de abogados");
+        });
+
+        // $("#MaestroPrceso").on("keypress", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(9) > .col-lg-8:eq(0) > #txtFechaAccidente", function (e)
+        // {
+        //     BanderaCambioProceso = true;
+        //     console.log("teclea fecha accidente");
+        // });
+
+        // Controla el click sobre la fecha de accidente
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(9) > .col-lg-8:eq(0) .input-group-addon", function (e)
+        {
+            BanderaCambioProceso = true;
+            console.log("clickea en el ícono de fecha de accidente");
+        });
+
+        // Controla el click sobre la fecha referencial
+        $("#MaestroProceso").on("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(2) > .col-sm-6:eq(0) > .form-group:eq(1) > .col-lg-9:eq(0) .input-group-addon", function (e) {
+            BanderaCambioProceso = true;
+            console.log("clickea en el ícono de fecha referencial");
+        });
+    }
+
+    function DesactivaEventosControles()
+    {
+        // $("#MaestroProceso").off("click", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(0) > .col-lg-7:eq(0)");
+
+        // $("#MaestroPrceso").off("keypress", ".wrapper:eq(0) > .row:eq(1) > .col-lg-12:eq(0) > .ibox:eq(0) > #detalleCase > .form-horizontal:eq(0) > .row:eq(0) > .col-sm-6:eq(0) > .form-group:eq(9) > .col-lg-8:eq(0) > #txtFechaAccidente");
+    }
+
+    var websocket
+
+    function Inicio()
+    {
+        // $(".dtpFecha").datepicker().off("changeDate");
+
+        // Desactiva los eventos de todos los controles que se van a usar en el pase de un proceso a otro.
+        // DesactivaEventosControles()
+        websocket = io.connect(ServidorPuertoNode)
+
+        // detectarHoraParaCierreDeSesionAutomatico()
+
+        ControlarCambiosProcesos();
+
+        // Variables globales de usuario
+        // ---------------------------------
+        // UsuarioGlobal.Use_code;
+        // UsuarioGlobal.Use_firstName;
+        // UsuarioGlobal.Use_lastName;
+
+        $("#liberarCasos").on("click", function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                // data: JSON.stringify({ 'CodigoUsuarioActual': CodigoUsuarioGlobal }),
+                url: '@Url.Action("LiberaTodosLosCasos", "CaseInformation")',
+                // contentType: "application/json",
+            });
+
+            MensajeError("The cases of this user were released", "Advice");
+        });
+
+        // Cuando el mouse está dentro del enlace que libera los casos del usuario actual.
+        $("#liberarCasos").on("mouseover", function (e) {
+            $("#liberarCasos").css({ "background": "#cacad7" })
+        })
+         
+        // Cuando el mouse está fuera del enlace que libera los casos del usuario actual.
+        $("#liberarCasos").on("mouseleave", function (e) {
+            $("#liberarCasos").css({ "background": "#d8d8e0" })
+        })
+
+        $("#liberarCasos").on("mousedown", function (e) {
+            $("#liberarCasos > span").css({ "font-size": "0.9em" })
+        })
+
+        $("#liberarCasos").on("mouseup", function (e) {
+            $("#liberarCasos > span").css({ "font-size": "1em" })
+        })
+
+        $("#img_exit").on("click", function (e) {            
+            $("#logoutForm").submit();
+        })
+        validaMenu();
+        @*        // ******************************************************************************
+        // Proceso por defecto (hecho por Gabo para no tener que seleccionar el proceso).
+        $.ajax({
+            type: "POST",
+            //async: false,
+            url: '@Url.Action("Index", "DataEntry")',
+            //contentType: "application/json",
+            contentType: "application/html;charset=utf-8", 
+            dataType: 'html',
+            success: function (Data) { 
+                $("#dvLoading").fadeOut(2000);  
+                $("#MaestroProceso").html(Data);
+            }
+        });
+        // *******************************************************************************@
+
+        $(".ElementoMenu").on("click", function (e)
+        {
+
+            // console.log("ElementoMenu");
+            // console.log(BanderaCambioProceso);
+            
+            // console.log(ProcesoActual);
+            
+            e.preventDefault();
+            //var MenuClickeado = $(this)["0"].attributes[0].value.trim();
+            var MenuClickeado = $(this)["0"].attributes["nombre"].value.trim();
+            console.log($(this)["0"].attributes["nombre"].value.trim());
+            // console.log(MenuClickeado);
+            //alert(MenuClickeado);
+            //alert(ProcesoActual);
+
+            // console.clear();
+            // console.log(MenuClickeado);
+            // return false;
+
+            // Si la variable ProcesoActual está llena con el nombre de un proceso, 
+            // es por que ese proceso está siendo utilizado actualmente.
+            if (ProcesoActual != "")
+            {
+                // Primero verifica si el menu en el cual se hizo click es el mismo en el que se está actualmente,
+                // y si es así no hay necesidad de mostrar el aviso.
+                if (MenuClickeado == ProcesoActual)
+                    return false; // Hace que se aborte esta condición y no muestre el aviso.
+                
+                // Para los procesos "CaseInformation" y "Dataentry" verifica  que no haya un caso cargado.
+                // console.log(ProcesoActual);
+
+                // if ((ProcesoActual == "CaseInformation") || (ProcesoActual == "DataEntry"))
+                
+                if (ProcesoActual == "CaseInformation")
+                { 
+                    //     if (($("#hdCodigoCaso").val().trim() == "") || ($("#hdCodigoCaso").val().trim() == "0"))  // Si no hay un caso cargado para los procesos mmencionados anteriormente.
+                    //     {
+                    //         CargaDeMenu(e); // Carga el menú clickeado.
+                    //         return false;
+                    //     }
+                    //     else // Si hay un caso cargado para el proceso anteriormente.
+                    //     {
+                    // console.log(BanderaCambioProceso);
+                    ///console.log($("#hdCodigoCaso").val().trim());
+                    //console.log($("#hdCodigoPaciente").val().trim());
+                    // console.clear();
+
+                    if ((BanderaCambioProceso )) // && ($("#hdCodigoCaso").val().trim() != "0")) ||
+                        // (BanderaCambioProceso && ($("#hdCodigoPaciente").val().trim() != "0")))
+                    {
+                        // mensaje = "There is a loaded case. Are you sure you want to leave " + ProcesoActual + " and save the changes?. If you leave you will lose changes.";
+                        mensaje = "Do you want to save changes?";
+                        // error = "Are you sure?";
+                        error = "";
+                        MensajeConfirmacionMenu(ProcesoActual, mensaje, error, e);
+                    }
+                    else
+                        CargaDeMenu(e); // Carga el menú clickeado.
+                    //     } 
+                }
+
+                if (ProcesoActual == "DataEntry")
+                {
+                    if ((BanderaCambioProceso && ($("#hdCodigoCaso").val().trim() != "0")))
+                    {
+                        // mensaje = "There is a loaded case. Are you sure you want to leave " + ProcesoActual + " and save the changes?. If you leave you will lose changes.";
+                        mensaje = "Do you want to save changes?";
+                        // error = "Are you sure?";
+                        error = "";
+                        MensajeConfirmacionMenu(ProcesoActual, mensaje, error, e);
+                    } 
+                    else
+                        CargaDeMenu(e); // Carga el menú clickeado.
+                }
+                 
+                // Para el proceso "MonthlyClosing" verifica que no haya un caso seleccionado.
+                if (ProcesoActual == "MonthlyClosing")
+                {
+                    if (ArregloCasosSeleccionados.length == 0) // Si no hay por lo menos un caso checkeado para el proceso mmencionado anteriormente.
+                    {
+                        CargaDeMenu(e); // Carga el menú clickeado.
+                        return false;
+                    }
+                else // Si hay por lo menos un caso seleccionado para el proceso mencionado anteriormente.
+                    {
+                        if (BanderaCambioProceso)
+                        {
+                            // mensaje = "There is a loaded case. Are you sure you want to leave " + ProcesoActual + " and save the changes?. If you leave you will lose changes.";
+                            mensaje = "Do you want to save changes?";
+                            // error = "Are you sure?";
+                            error = "";
+                        MensajeConfirmacionMenu(ProcesoActual, mensaje, error, e);
+                    }
+                        else
+                            CargaDeMenu(e); // Carga el menú clickeado.
+                    }
+                }
+                //alert(ProcesoActual);
+                if (ProcesoActual == "Configuracion") {
+                    CargaDeMenu(e); // Carga el menú clickeado.                    
+                }
+                if (ProcesoActual == "Billing") {
+                            CargaDeMenu(e); // Carga el menú clickeado.                    
+                }
+                if (ProcesoActual == "ReportPayment") {                   
+                    CargaDeMenu(e); // Carga el menú clickeado.                    
+                }
+                if (ProcesoActual == "ReceivePayment") {
+                    CargaDeMenu(e); // Carga el menú clickeado.                    
+                }
+                if (ProcesoActual == "Reports") {
+                    CargaDeMenu(e); // Carga el menú clickeado.                    
+                }
+           
+                
+                //if (confirm("Are you sure you want to leave " + ProcesoActual + "?")) // Si está seguro que desea abandonar el proceso actual
+                //{
+                //    CargaDeMenu(e); // Carga el menú clickeado.
+                //    return false; // Aborta la condición.
+                //}
+                //else // Si cancela el aviso.
+                //{
+                //    return false; // Aborta la condición.
+                //}
+            }
+            else // Si la variable ProcesoActual no está llena con el nombre de un proceso, es por que por primera vez se va a seleccionar un proceso y no hay necesidad de mostrar el aviso.
+            {
+                // console.log("p-CargaDeMenu");
+                CargaDeMenu(e); 
+            }            
+
+            $("#CerrarSesion").on("click", CerrarSesion);
+        });
+
+        function CargaDeMenu(e)
+        {
+             console.log("CargaDeMenu");
+            $("#dvLoading").css("display", "block");
+
+            var idElementoMenu = null;
+            idMenu = localStorage.getItem("idElementoMenu");
+       
+            if ((e == null || e == undefined) && idMenu != null && idMenu != "" && idMenu != "undefined")
+                idElementoMenu = idMenu;
+            else 
+                idElementoMenu = e.currentTarget.id;
+
+            var url = "";
+            //alert(idElementoMenu);
+            //idElementoMenu = "";
+            
+            localStorage.setItem("idElementoMenu", idElementoMenu);
+
+            $(".ElementoMenu").removeClass("activeElementoMenu");
+
+            //console.clear();
+            switch (idElementoMenu)
+            {
+                case "MasterViewer":
+                    url = '@Url.Action("Index", "MasterViewer")';
+                    break;
+                case "MenuPatientTest":
+                    url = '@Url.Action("IndexTest", "Patient")';
+                    break;
+                case "MenuPaciente":
+                    url = '@Url.Action("Index", "Patient")';
+                    $(document).prop("title", "Register Patient");
+                    break;
+                case "MenuDoctor":
+                    url = '@Url.Action("Index", "Medical")';
+                    $(document).prop("title", "Register Doctors and Facilities");
+                    break;
+                case "MenuAseguradora":
+                    url = '@Url.Action("Index", "Insurer")';
+                    $(document).prop("title", "Register Insurer");
+                    break;
+                case "MenuAbogado":
+                    url = '@Url.Action("Index", "Attorney")';
+                    $(document).prop("title", "Register Attorney");
+                    break;
+                case "MenuAdjuster":
+                    url = '@Url.Action("Index", "Adjuster")';
+                    $(document).prop("title", "Register Adjuster");
+                    break;
+                case "MenuProveedor":
+                    url = '@Url.Action("Index", "Provider")';
+                    $(document).prop("title", "Register Provider");
+                    break;
+                case "MenuActividad":
+                    url = '@Url.Action("Index", "Activity")';
+                    $(document).prop("title", "Register Activity");
+                    break;
+                case "MenuEspecialidad":
+                    url = '@Url.Action("Index", "Specialty")';
+                    $(document).prop("title", "Register Specialty");
+                    break;
+                case "MenuCaso":
+                    url = '@Url.Action("Index", "CaseInformation")';
+                    $(document).prop("title", "Case Information Sheet");
+                    break;
+                case "MenuData":
+                    url = '@Url.Action("Index", "DataEntry")';
+                    $(document).prop("title", "Data Entry");
+                    break;
+                case "MenuClosing":
+                    url = '@Url.Action("Index", "MonthlyClosing")';
+                    $(document).prop("title", "Monthly Closing");
+                    break;
+                case "MenuBilling":
+                    url = '@Url.Action("Index", "Billing")';
+                    $(document).prop("title", "Billing");
+                    break;
+                case "MenuPayment":
+                    url = '@Url.Action("Index", "Payment")';
+                    $(document).prop("title", "Payment");
+                    break;
+                case "MenuReports":
+                    url = '@Url.Action("Index", "Report")';
+                    $(document).prop("title", "Reports");
+                    break;
+                case "MenuConfiguracion":
+                    url = '@Url.Action("Index", "Configuration")';
+                    $(document).prop("title", "Configuration");
+                    break;
+                case "MenuDataAudit":
+                    url = '@Url.Action("Index", "DataAudit")';
+                    $(document).prop("title", "Data Audit");
+                    break;
+                case "MenuPaymentReceived":
+                    url = '@Url.Action("Index", "PaymentReceived")';
+                    $(document).prop("title", "Report Payment");
+                    break;
+                case "MenuCaseActivity":
+                    url = '@Url.Action("Index", "ReportCaseActivity")';
+                    $(document).prop("title", "Report Case With No Activity");
+                    break;
+            }
+
+            $.ajax({
+                type: "POST",
+                //async: false,
+                url: url,
+                //contentType: "application/json",
+                contentType: "application/html;charset=utf-8",
+                dataType: 'html',
+                success: function (Data) {
+                    $("#dvLoading").fadeOut(10);
+                    $("#MaestroProceso").html(Data);
+                }
+            });
+            
+            $("#" + idElementoMenu).addClass("activeElementoMenu");
+        }
+
+        function CerrarSesion(e)
+        {
+            e.preventDefault();
+             
+            $.ajax({
+                type: "POST",
+
+                url: '@Url.Action("LogOff", "Account")',
+                data: JSON.stringify({ "__RequestVerificationToken": '2mSKKOQdnmHqSEyO578MblXCzlgRlySHADaEh4BZgzWcydmluDXBoLRTlu48c62GchEOVcG0QLF_BLqIVHH-I8NwCrTb7jOcJkJuFNoXzyvsNfACCOY5Q0P3_fhJJY6D0' }),
+                //contentType: "application/json",
+                    contentType: "application/html;charset=utf-8",
+                dataType: 'html',
+                success: function (Data) {
+                    $("#dvLoading").fadeOut(2000);
+                    $("#MaestroProceso").html(Data);
+                }
+            });
+        }
+
+        function muestraLoading()
+        {
+            $("#dvLoading").css("display", "block");
+            //  $("#dvLoading").fadeOut(2000);
+        } 
+
+        function MensajeError(mensaje, error)
+        {
+            // console.log("mensajeError");
+            swal({
+                title: error,
+                text: mensaje,
+                html: true
+            });
+        }
+
+        function MensajeConfirmacionMenu(ProcesoActual, mensaje, error, e)
+        {
+            swal({
+                title: error,
+                text: mensaje, 
+                type: "warning",
+                showCancelButton: true, 
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes", 
+                cancelButtonText: "No",
+                closeOnConfirm: false,
+                closeOnCancel: true 
+            },
+            function (isConfirm)
+            {
+                if (isConfirm)
+                {
+                    if (ProcesoActual == "CaseInformation")
+                    {
+                        ActualizacionDesdeAlerta = true;
+                        $("#btnRegistrar").trigger("click");                        
+                    }
+                    else if (ProcesoActual == "DataEntry")
+                    {
+                        ActualizacionDesdeAlerta = true;
+                        $("#btnGuardarEntradas").trigger("click");
+                    }
+                    else if (ProcesoActual == "MonthlyClosing")
+                    {
+
+                    }
+
+                    if (!BanderaErrorValidacion)
+                    { 
+                        CargaDeMenu(e); // Carga el menú clickeado.
+                        return false; // Aborta la condición.
+                    }
+                }
+                else
+                {
+                    BanderaCambioProceso = false;
+                    CargaDeMenu(e); // Carga el menú clickeado.
+                    return false;
+                }
+            });
+        }
+
+        function validaMenu(e)
+        {
+            idMenu = localStorage.getItem("idElementoMenu");
+            // console.log("ideM - " + idMenu);
+            if (idMenu != "" && idMenu != null && idMenu != "undefined")
+               CargaDeMenu(e);
+        }
+    }
+
+    function detectarHoraParaCierreDeSesionAutomatico() {
+        websocket.on('HoraDeServidorDeSQLDesdeNode', function (data) {
+            try {
+                console.log('Hora: ' + data["0"].Hora)
+                console.log('Minuto: ' + data["0"].Minuto)
+                console.log('Segundo: ' + data["0"].Segundo)
+                console.log('----------------')
+                if (data['0'].Hora == 11
+                 && data['0'].Minuto == 48
+                 && data['0'].Segundo == 0) {
+                    $('#logoutForm').submit();
+                }
+            } catch (e) {
+                console.log(e.message);
+            }
+        })
+    }
+</script>    
+}

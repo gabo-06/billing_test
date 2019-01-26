@@ -1,0 +1,115 @@
+﻿     <div class="col-lg-12">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-content" style="padding: 15px 15px 15px 15px;">
+                               <nav class="navbar navbar-static-top" style="margin-bottom: 0px;z-index: 5;" role="navigation">
+                                <div class="navbar-collapse collapse" id="navbarX">
+                                    <ul class="nav navbar-nav mn_h">
+                <li>
+                    <a nombre="CaseInformation" href="#" class="ElementoMenu mntop" style="text-align:center;display:none;" id="MenuCaso" >
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/imagen6.jpg")" />
+                        </span>    <br> <span class="nav-label">Case Information Sheet</span>
+                    </a>
+                </li> 
+
+                <li>
+                    <a nombre="DataEntry" href="#" id="MenuData" class="ElementoMenu mntop" style="text-align:center;display:none;" >
+                        <span>
+                            <img alt="image" class="img"  src="@Url.Content("~/images/data_entry.jpg")" />
+                        </span>    <br> <span class="nav-label">Data Entry <br /> &nbsp; </span>
+                    </a>
+                </li>
+                                      
+                <li>
+                    <a nombre="MonthlyClosing" href="#" id="MenuClosing" class="ElementoMenu mntop" style="text-align:center;display:none;" >
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/monthly_closing.jpg")" />
+                        </span>    <br> <span class="nav-label">Monthly Closing  <br /> &nbsp;</span>
+                    </a>
+                </li>
+                 
+                <li>
+                    <a nombre="MenuBilling" href="#" id="MenuBilling" class="ElementoMenu mntop"  style="text-align:center;display:none;">
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/billing.jpg")" />
+                        </span>    <br> <span class="nav-label">Billing <br /> &nbsp;</span>
+                    </a>
+                </li>
+                <li>
+                    <a nombre="MenuPayment" href="#" id="MenuPayment" class="ElementoMenu mntop"  style="text-align:center;display:none;">
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/payment.jpg")" />   
+                        </span>    <br> <span class="nav-label">Receive Payment <br /> &nbsp;</span>
+                    </a>
+                </li>
+                <li>
+                    <a nombre="MenuPaymentReceived" href="#" style="text-align:center;display:block;" class="ElementoMenu" id="MenuPaymentReceived">
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/configuracion.jpg")" width="50" height="47" />
+                        </span>    <br> <span class="nav-label">Payment Report<br /> &nbsp;</span>
+                    </a>
+                </li>               
+                <li>
+                    <a nombre="MenuReports" href="#" id="MenuReports"  class="ElementoMenu mntop"  style="text-align:center;display:none;">
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/reports.jpg")" />
+                        </span>    <br> <span class="nav-label">Reports <br /> &nbsp;</span>
+                    </a>
+                </li>
+
+                <!--<li>
+                    <a href="#" style="text-align:center;display:none;" class="ElementoMenu" id="MenuConfiguracion">
+                        <span>
+                            <img alt="image" class="img" src="@Url.Content("~/images/configuracion.jpg")" width="50" height="47" />
+                        </span>    <br> <span class="nav-label">Configuration <br /> &nbsp;</span>
+                    </a>
+                </li>-->
+                <li>
+                    @*<span id="MenuDataAudit"></span>*@
+                    <a nombre="MenuDataAudit" href="#" style="text-align:center;display:block;" class="ElementoMenu" id="MenuDataAudit">
+                        <span>
+                            <img alt="image" class="img" src="images/imagen4.jpg" />
+                        </span>    <br> <span class="nav-label">Data Audit</span>
+                    </a>
+                </li>   
+                <li>
+                    <a nombre="MenuCaseActivity" href="#" style="text-align:center;display:block;" class="ElementoMenu" id="MenuCaseActivity">
+                        <span><img alt="image" class="img" src="images/imagen4.jpg" />
+                        </span>    <br> <span class="nav-label">Data with no Activity</span>
+                    </a>
+                </li>                                                                            
+                <!--
+                    <li>
+                    <a href="layouts.html" style="text-align:center;">
+                        <span>
+                            <img alt="image" class="img" src="images/imagen4.jpg" />
+                        </span>    <br> <span class="nav-label">Data Backup</span>
+                    </a>
+                </li>
+                -->
+               <li>
+                        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
+                        @Html.AntiForgeryToken()
+                        <span style="display: block;margin-top: 5px;text-align: center">
+                            <img alt="image" class="img" src="images/imagen3.jpg" style="display: block;margin: 0 auto;cursor: pointer;" id="img_exit"/>                            
+                            <input type="submit" value="Exit" style="border: 0; background: transparent; color:#000; font-size: 1em;" />                
+                        </span>  
+                        }
+                </li>
+                                    </ul>
+                                </div>
+                               </nav>
+                            </div>
+
+                        </div>
+                    </div> 
+
+<style>
+    .nav > li > a:focus, .nav > li > a:hover 
+    {
+    text-decoration: none;
+    color: white;
+    background-color: #b42734;
+    }
+   
+</style>

@@ -1,0 +1,422 @@
+﻿  <div class="ibox-title header_formulario">
+                    <h5>BILLING</h5>
+                    </div>
+                    <div class="ibox-content" id="detalleCase" style="padding-bottom: 5px;">
+                      <form role="form" method="get" class="form-horizontal" id="form_billing">
+                        <div class="row">                            
+                           <div class="col-sm-3 b-r">
+
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">Filter</label>
+                            <div class="col-lg-9">                                                                
+                                <select class="form-control" id="cmbFilter">
+                                    <option value="1">Paid</option><option value="2" selected>UnPaid</option>
+                                </select>
+                           </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">Claim#</label>
+                            <div class="col-lg-9">     
+                                 <input type="text" class="form-control inputBusca" id="txtclaim" >
+                                <input type="hidden" id="hdCodigoCasoSeleccionado" />
+                                <input type="hidden" id="hdCodigoFacturaSeleccionada" />
+                                <input type="hidden" id="hdNumeroFacturaSeleccionada" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">Patient</label>
+                            <div class="col-lg-9">     
+                                 <input type="text" class="form-control inputBusca " id="txtPatient" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label">Insurer</label>
+                            <div class="col-lg-9">    
+                                  
+                                @*<input type="text" class="form-control" id="txtAseguradora" />*@                                        
+                                <select class="form-control" id="cmbAseguradora" tabindex="22">
+                                    <option selected value="0"></option>
+                                </select>
+                            </div>
+                        </div>    
+
+@*                        <div class="form-group text-center">                            
+                            <div class="col-lg-12">     
+                                 <a class="btn btn-danger" id="btnSearch" href="#">Search</a>
+                                 <input type="hidden" id="hdCodigoAseguradora" value="0" />
+                            </div>
+                        </div>   *@
+                      </div>
+
+                        
+
+                           <div class="col-sm-9">
+                                                   <div class="table-responsive">
+                     <table class="table table-striped table-bordered table-hover dataTables-example" id="tblBillingSearch" >
+                     <thead class ="th_tabla">
+                      <tr>
+                        <th class="hidden"></th> <!-- Código del caso -->
+                        <th class="hidden"></th> <!-- Código de la factura (INT) -->
+                        <th class="hidden"></th> <!-- Código de cliente (INT) -->
+                        <th class="hidden"></th> <!-- apelllido paciente-->
+                        <th class="hidden"></th> <!-- nombre paciente -->
+		                <th>Claim #</th>      
+		                <th>Patient</th>
+                        <th>Insurer</th>
+		                <th>Invoice #</th>		                
+		                <th>DOI</th>
+		                <th>Closing</th>
+		                <th>Select</th>
+                          
+                      </tr>
+                    </thead>
+                    <tbody>                     
+                    </tbody>
+                    </table>
+                      <div id="loadingBuscar" class="loadingBuscarPrincipal loading-tb2016" style="display: none;text-align: center;"><img src="@Url.Content("~/images/loading.gif")" /></div>
+                                                       <input type="hidden" id="hdInvoice">
+                  </div>
+                            </div>                        
+                        </div> <!--// fin row-->
+                      </form>
+                    </div>
+<input type="hidden" id="hdInvoiceText" />
+<input type="hidden" id="hdPatientText" />
+<input type="hidden" id="hdDOIText" />
+
+<script>
+
+    $(Inicio);
+
+    // Controla el evento click del botón "select" en la última columna de la tabla de facturas "tblBillingSearch".
+     //$("#tblBillingSearch > tbody").on("click", "tr > td:eq(10) > .SeleccionarFactura", SeleccionaFactura);
+    
+    //$(".inputBusca").keypress(function (e) {
+
+    //    if (e.which == 13)
+    //        $("#btnSearch").trigger("click");
+    //});
+    function SeleccionaFactura(e)
+    {
+        e.preventDefault()
+        paginaActual = 0
+
+        $("#dvLoading").css("display", "block");
+
+        VecesSelecionaCaso = 1; // Para saber que se hizo click en "SeleccionarCaso".
+        
+        // Verifica si hay una factura cargada.
+        if ($("#hdInvoice").val().trim() != "")
+        {
+            // Desocupa billing
+        }
+        // if (/* ... */) // Si el Billing está desocupado.
+        // {
+
+        $("#accion").val("0");
+        // Obtiene el código del caso seleccionado en un control oculto.
+        $("#hdCodigoCasoSeleccionado").val(parseInt(e.currentTarget.parentElement.parentElement.children["0"].innerHTML.trim()));
+        $("#hdCodigoFacturaSeleccionada").val(parseInt(e.currentTarget.parentElement.parentElement.children["1"].innerHTML.trim()));
+        $("#hdNumeroFacturaSeleccionada").val(e.currentTarget.parentElement.parentElement.children["8"].innerHTML.trim());        
+                
+        NumeroFactura = e.currentTarget.parentElement.parentElement.children["8"].innerHTML.trim();
+        $("#invoice_btn").val(NumeroFactura);
+
+        // console.log(NumeroFactura);
+
+        paciente = e.currentTarget.parentElement.parentElement.children["6"].innerHTML.trim();
+        $("#paciente_btn").val(paciente);
+
+        codigo_caso = e.currentTarget.parentElement.parentElement.children["0"].innerHTML.trim();
+        $("#cod_case_btn").val(codigo_caso);
+
+        doi = e.currentTarget.parentElement.parentElement.children["9"].innerHTML.trim();
+        if (doi == "" || doi == null || doi =="undefined")
+            $("#doi_btn").val("--");
+        else
+            $("#doi_btn").val(doi);
+
+        codigo_paciente = e.currentTarget.parentElement.parentElement.children["2"].innerHTML.trim();
+        $("#cod_paciente_btn").val(codigo_paciente);
+          
+        codigo_factura = e.currentTarget.parentElement.parentElement.children["1"].innerHTML.trim();
+        $("#cod_factura_btn").val(codigo_factura);
+
+        closing = e.currentTarget.parentElement.parentElement.children["10"].innerHTML.trim();
+        $("#closing_btn").val(closing);
+
+        ///AKI TOTAL DE ENTRADAS        
+        totalDeDetalles = obtenerCantidadDeDetallesDeFactura(NumeroFactura);
+        console.log("TOTAL ENTRADAS : " + totalDeDetalles);
+        UltimaPagina = LeeUltimaPagina(totalDeDetalles);
+        console.log("TOTAL UltimaPagina : " + UltimaPagina);
+        CargaDetalleFactura(NumeroFactura, totalDeDetalles, UltimaPagina);
+        // ListaDetalleFactura(NumeroFactura); // Trae el detalle de factura en json.
+        ancla();
+    };
+    
+    function obtenerCantidadDeDetallesDeFactura(numeroDeFactura)
+    {        
+        var cantidadDeDetallesDeFactura = 0;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "numeroDeFactura": numeroDeFactura }),
+            url: '@Url.Action("obtenerCantidadDeDetallesDeFactura", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) { 
+                cantidadDeDetallesDeFactura = Data
+            }
+        });
+
+        return cantidadDeDetallesDeFactura
+    }
+
+    function LeeUltimaPagina(totalDeDetalles) {
+        PageSize = 20;
+        UltimaPagina = Math.floor(totalDeDetalles / PageSize);
+        Residuo = Math.floor(totalDeDetalles % PageSize);
+        //alert(Residuo);
+        //alert(UltimaPagina);
+        if (Residuo >= 0)
+            UltimaPagina = UltimaPagina + 1;
+        //alert(UltimaPagina);
+        return UltimaPagina;
+    }
+
+    function ListaDetalleFactura(NumeroFactura)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "NumeroFactura": NumeroFactura }),
+            url: '@Url.Action("ListaDetalleFactura", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+                
+            }
+        });
+    } 
+
+    function CargaDetalleFactura(NumeroFactura, totalDeDetalles, UltimaPagina)
+    {
+        
+       // $("#loadingBuscar").css("display", "block");
+    
+        //$cargando = $("#tabla").html("<p><img src='/images/loading.gif'></p>")
+        // $("#tabla").html("");
+
+        // var otable = $("#tblDetalleFactura").dataTable().fnDestroy();
+
+        // otable = $("#tblDetalleFactura").DataTable({});
+
+        //CARGA INPUT DE FILAS PARA PDF
+        $("#hdCantidadTotalDetalles").val(totalDeDetalles);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "NumeroFactura": NumeroFactura, "totalDeDetalles": totalDeDetalles, "paginaDestino": UltimaPagina }),
+            url: '@Url.Action("CargaDetalleFactura_Nuevo", "Billing")',
+            contentType: "application/json",
+            dataType: 'html',
+            success: function (Data)
+            {
+                
+                    $("#tabla").html(Data);
+                    $("#loadingBuscar").css("display", "none");
+
+                    $("#invoice_text").html(NumeroFactura);
+                    $("#patient_text").html($("#paciente_btn").val());
+                    $("#doi_text").html($("#doi_btn").val());
+
+                    $('#hdInvoiceText').val(NumeroFactura)
+                    $('#hdPatientText').val($("#paciente_btn").val())
+                    $('#hdDOIText').val($("#doi_btn").val())
+
+                    $("#tblDetalleFactura_wrapper").css("padding-bottom", "2px");
+                    
+                //setTimeout(function () {
+                //    $("#loadingBuscar").css("display", "none");
+                //}, 50);
+            }
+        });
+    }
+
+    function DesocupaBilling(NumeroFactura)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "NumeroFactura": NumeroFactura }),
+            url: '@Url.Action("DesocupaFacturacion", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+            }
+        });
+    }
+
+    function Inicio()
+    {
+        //////$("#btnSearch").on("click", buscaBilling); //edher
+
+
+        paginarTabla();
+        $("#tblBillingSearch > tbody").css({ "display": "none" });
+        $("#tblBillingSearch_paginate").css({ "display": "none" });
+        $("#tblBillingSearch_filter").css({ "display": "none" });
+    }
+
+
+    function paginarTabla()
+    {
+        //$('#tblBillingSearch').DataTable({
+        //    "bFilter": false,
+        //    "bLengthChange": false,
+        //    "bInfo": false,
+        //    columnDefs: [{ className: "hidden", "targets": [0, 1, 2] }],
+        //    lengthMenu: [[5], [5]]
+        //});
+
+            console.log("PaginarTabla");
+            $('#tblBillingSearch').DataTable({
+                //"pageLength": 5,
+                //"columnDefs": [{ "width": "15%", "targets": [1] }, { "targets": [0, 1, 2, 4, 5, 6, 7], "searchable": false }, { className: "hidden", "targets": [0, 2, 4] }],
+                "bFilter": true,
+                "bLengthChange": false,
+                "bInfo": false,
+                lengthMenu: [[5], [5]],
+                columnDefs: [{ className: "hidden", "targets": [0, 1, 2, 3, 4] }, { className: "text-center", "targets": [11] }],
+                "language":
+                     { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>" },
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": '@Url.Action("GetData", "Billing")',
+                "type": "POST",
+                "dataType": "JSON"
+            },
+            "columns": [
+                       { "data": "Cis_code" },
+                       { "data": "Bih_code" },
+                       { "data": "Pat_code" },
+                       { "data": "Pat_lastName" },
+                       { "data": "Pat_firstName" },
+                       { "data": "Cis_caseCode" },//claim
+                       { "data": "Patient" },                       
+                       { "data": "Insurer" },
+                       { "data": "Bih_code_old" },
+                       {"data": "AccidentDate"},
+                       /*{
+                           "data": "AccidentDate",                           
+                           "render": function (data) {
+                                  var pattern = /Date\(([^)]+)\)/;
+                                  var results = pattern.exec(data);
+                                  var dt = new Date(parseFloat(results[1]));
+                                  return (dt.getMonth() + 1) + "/" + (dt.getDate() + 1) + "/" + dt.getFullYear();
+                             }
+                       },*/
+                       { "data": "Bih_closingDate"},
+                       /*{ "data": "Bih_closingDate",
+                           "render": function (data)
+                           {
+                               var pattern = /Date\(([^)]+)\)/;
+                               var results = pattern.exec(data);
+                               var dt = new Date(parseFloat(results[1]));
+                               return (dt.getMonth() + 1) + "/" + (dt.getDate() + 1) + "/" + dt.getFullYear();
+                           }
+                       },*/
+                       { "render": function (data, type, full, meta) { return '<a href="#TablaParaControles" class="btn SeleccionarFactura btn-danger text-center btn-bitbucket" >Select</a>' } }
+                       ]
+        });
+
+    }
+
+
+    function buscaBilling(e)
+    {
+        e.preventDefault();
+      
+        var NombreAseguradora;
+        var Claim;
+        var ApellidoPaciente;
+        var CodigoAseguradora;
+        var EstadoPago;
+        var DatosJson;
+        var Facturas;
+
+        NombreAseguradora = $("#cmbAseguradora > option:selected").text().trim();
+        Claim = $("#txtclaim").val().trim();
+        ApellidoPaciente = $("#txtPatient").val().trim();
+        CodigoAseguradora = (NombreAseguradora == "---------------") ? 0 : $("#hdCodigoAseguradora").val();
+        EstadoPago = ($("#cmbFilter").val() == "1") ? "P" : "U";      
+        DatosJson = {"Claim"             : Claim
+                    ,"ApellidoPaciente"  : ApellidoPaciente
+                    ,"CodigoAseguradora" : CodigoAseguradora
+                    ,"EstadoPago"        : EstadoPago};
+
+        // Verifica si hay una factura cargada.
+        if ($("#hdInvoice").val().trim() != "")
+        {
+            
+        }
+
+        Facturas = BuscarFacturasDeCaso(DatosJson);
+
+        // Limpia la tabla antes de volver cargar data.
+        $("#tblBillingSearch > tbody").html("");
+
+        /////////////////////////////////////////////////
+        $("#tblBillingSearch").DataTable().clear();
+
+        $.each(Facturas, function (i, val)
+        {
+            $('#tblBillingSearch').dataTable().fnAddData([
+              val.CodigoCaso, val.CodigoFacturaINT, val.Pat_code, val.Claim, val.Paciente, val.Aseguradora, val.CodigoFacturaSTR, val.FechaAccidente, val.FechaCierre, "<button class='SeleccionarFactura btn btn-primary' type='button'>Select</button>"]);
+
+            $("#tblBillingSearch > tbody").on("click", "tr:eq(" + i + ") > td:eq(9) > .SeleccionarFactura", SeleccionaFactura);
+        });
+
+        var otable = $("#tblBillingSearch").dataTable().fnDestroy();
+        otable = $('#tblBillingSearch').DataTable({
+            "bLengthChange": false,
+            "bInfo": false,
+            lengthMenu: [[5], [5]],
+            columnDefs: [{ className: "hidden", "targets": [0, 1, 2] }],
+            "bFilter": false
+        });
+        $("#tblBillingSearch_wrapper").css("display", "padding-bottom: 0px;");
+        ////////////////////////////////////////////////
+    }
+
+    function BuscarFacturasDeCaso( DatosJson)
+    {
+        var Facturas;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(DatosJson),
+            url: '@Url.Action("BuscarFacturasDeCaso", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {                
+                Facturas = Data;
+            }
+        });
+
+        return Facturas;
+    }
+
+ 
+</script>

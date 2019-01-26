@@ -1,0 +1,90 @@
+﻿@model IEnumerable<Billing.Web.Models.PA_NEW_REFERRAL_BYSUPERVISOR_Result>
+@{
+    var i = 0;
+    var fecha_injury = "";
+    var fecha_referral = "";
+}
+
+<div style="overflow: hidden;" class="ibox-content">
+                    
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblListaReporte">
+        <thead class="th_tabla" style="background-color:#b42734;color:white;">  
+         <tr>
+           <th></th>
+           <th style="font-size: 13px;font-family: Arial;">Date OF Referral </th>
+           <th style="font-size: 13px;font-family: Arial;">Patient's Name</th>           
+           <th style="font-size: 13px;font-family: Arial;">Insurer</th>           
+           <th style="font-size: 13px;font-family: Arial;">Adjuster</th>          
+           <th style="font-size: 13px;font-family: Arial;">Date of Injury</th>                     
+           <th style="font-size: 13px;font-family: Arial;">Injury</th>                   
+        </tr>
+       </thead>
+       <tbody>
+        @foreach (var item in Model)
+         {
+            i = i + 1;
+            fecha_injury = item.Cis_accidentDate;
+            if (fecha_injury == "01/01/1900" || fecha_injury == null)
+            {
+                fecha_injury = "";
+            }
+            
+            fecha_referral = item.Cis_referralDate;
+            if (fecha_referral == "01/01/1900" || fecha_referral == null)
+            {
+                fecha_referral = "";
+            }            
+            
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@i</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;width: 108px;">@fecha_referral</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.patient</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.Ins_name</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.adjuster</td>  
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;width: 108px;">@fecha_injury</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 12px;font-family: Arial;">@item.Cis_Injury</td>                          
+                 </tr>
+        }  
+        </tbody>
+        
+    </table>
+</div>
+</div>
+<script>
+    $(Inicio);
+
+    function Inicio() {
+        $("#btnGeneraWord").on("click", generaWord); //edher
+        PaginarTabla();
+    }
+    function generaWord() {
+      
+        //var invoice = $("#invoice_btn").val();
+        //var urlx = $("#linkWord").attr("data-url");
+        codigoSup = $("#cmbSupervisor option:selected").val();
+        nombreSup = $("#cmbSupervisor option:selected").text();
+        dias = $("#dias").val();
+
+        $("#codigoSupervisor").val(codigoSup);
+        $("#supervisor").val(nombreSup);
+        $("#diasReporte").val(dias);
+    }
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tblListaReporte').DataTable({
+            //"scrollY": 100,            
+            "scrollY": 400,
+            "bFilter": false,
+            "bInfo": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bSort": false
+        });
+    }
+
+
+
+</script>

@@ -1,0 +1,998 @@
+﻿@model IEnumerable<Billing.Web.Models.Adjuster>
+
+@{
+    ViewBag.Title = "Adjuster";
+}
+
+<div>
+       <div class="row"> 
+           <!--///////////////////FORMULARIO///////////////////////--> 
+                <div class="col-lg-12" id="divAdjuster">  
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title  header_formulario">
+                            <h5>REGISTER ADJUSTERS</h5>                           
+                        </div>
+                        
+                        <div class="ibox-content" id="frmRegistroAdjuster" style="display: none;">
+                            <form method="get" class="form-horizontal">
+                                <input type="hidden" id="hdCodigo" />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">First Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre" id="Nombre" autofocus  tabindex="1" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Last Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre" id="Apellido"  tabindex ="2" /> 
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Telephone</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="Telefono" data-mask ="999-999-9999"  tabindex="3" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Ext</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="ExtensionTelefono" maxlength ="5"  tabindex="4"/>
+                                    </div>
+                                </div>
+
+                           
+
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-8 col-sm-offset-2 text-center">
+                                        <button id="btnRegistrar" class="btn btn-primary" type="submit" tabindex="5">Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" tabindex="5" disabled>Update</button>
+                                        <button id="btnCancelar" class="btn btn-danger" type="button" tabindex="6">Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Adjuster")">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+           <!--///////////////////LISTA///////////////////////-->
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger"   id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+                        <button type="button" class="btn btn-primary"  id="btnModal" data-toggle="modal" data-target="#myModal4" style="display:none;"></button>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        @Html.Partial("Adjuster_List")
+                    </div>
+                </div>
+            </div>
+            </div>    
+          
+</div>
+
+<div id="pie">
+@Html.Partial("footer")
+</div>
+
+
+
+<!--/////////////////////MODAL//////////////////-->
+
+  <div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Provider were found with similiar names and surnames!.</strong> If the Provider attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Provider record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalAdjuster">
+                                <thead >
+                                <tr>
+                                    <th class="th_tabla"></th>
+                                    <th class="th_tabla">First Name</th>
+                                    <th class="th_tabla">Last Name</th>
+                                    <th class="th_tabla">Phone</th>
+                                    <th class="th_tabla">Ext Phone</th>
+                                    <th class="th_tabla">Status</th>
+                                    <th class="th_tabla">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button id="btnCancelarModal"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>
+                                            <button  id="btnActualizarCoincidencia" type="button" class="btn btn-primary" >Continue</button>
+                                            <input  id="seleccionado" type="hidden" value="0" />                                                    
+                                            <input  id="accion" type="hidden" value="registra" />
+                                            <input  id="estadoSeleccion" type="hidden" value="0" />                                                    
+                                             
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+
+<!----------------------------------------------->
+
+
+<script>
+
+
+    var websocket = io.connect(ServidorPuertoNode);
+    websocket.on('funcionAdjusterDesdeNode', function (data) {
+        funcionAdjusterDesdeNode_llamada(data);
+    });
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function LiberaCasoDeUsuarioActual(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+    LiberaCasoDeUsuarioActual(CodigoUsuarioGlobal);
+
+    $('input:text').on('keypress', function (e) {
+        console.log("xx");
+
+        if (e.which == 13 || e.which == 9 ) {
+  
+            currentTabIndex = parseInt($(this).attr("tabindex"));
+
+            currentTabIndex = currentTabIndex + 1;
+            $("input[tabindex=" + currentTabIndex + "]").select();
+            e.preventDefault();
+        }
+
+    });
+
+
+
+
+    $('input.letter').on('keypress', function (e) {
+
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    $('input.letterNombre').on('keypress', function (e) {
+
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 45) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    function LimpiarControlesRegistro()
+    {
+        $("#Nombre").val("");
+        $("#Apellido").val("");
+        $("#Telefono").val("");
+        $("#ExtensionTelefono").val("");
+    }
+
+    function VerificarContraccionFormularioRegistro() {
+        if ($("#frmRegistroAdjuster").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    function LlenarAdjuster( Codigo
+                            ,Nombre
+                            ,Apellido
+                            ,Telefono
+                            ,ExtensionTelefono)
+    {
+        var AdjusterJson =
+            {
+            "Adj_code"     : Codigo
+            ,"Adj_firstName": Nombre.toUpperCase()
+            , "Adj_lastName": Apellido.toUpperCase()
+            ,"Adj_phone" : Telefono
+            ,"Adj_phoneExt" : ExtensionTelefono
+            ,"Adj_operatorUser": CodigoUsuarioGlobal
+        }
+        return AdjusterJson;
+    }
+
+    function RegistrarAjustador(e)
+    {
+        e.preventDefault();
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#txtNombreAdjuster").focus();
+            $("#txtNombreAdjuster").addClass("has-error");
+
+          
+
+            error = "Error!";
+            mensaje = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            error = "Error!";
+            mensaje = "Required Last name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else
+        {
+           
+            e.preventDefault();
+            console.log("registrandoAdjuster-a");
+            var Ajustador = LlenarAdjuster(0
+                                          , $("#Nombre").val().trim()
+                                          , $("#Apellido").val().trim()
+                                          , $("#Telefono").val().trim()
+                                          , $("#ExtensionTelefono").val().trim())
+            
+
+
+
+            // Primero verifica que no exista un adjuster homónimo.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Ajustador),
+                url: '@Url.Action("BuscarHomonimos", "Adjuster")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    console.clear();
+                    console.log(Data);
+
+                    if (!Data.Resultado) // Si no se encuentran homónimos
+                    {
+                        // Llamará al código que registrará al Ajustador.
+                        metodoRegistraAdjuster(e);
+                    }
+                    else // Si se encontraron homónimos.
+                    {
+                        // Muestra las coincidencias de hómónimos.
+                        console.log("xxxxx");
+                        llenaModal(Data, 'registra');
+                    }
+
+                }
+            });
+        }
+    }
+
+
+    function llenaModal(Data, accion)
+    {
+
+        $("#seleccionado").val(0);
+        ///////////////////////////////////////////////////////////////        
+
+        $("#tblModalAdjuster").DataTable().clear();
+        $.each(Data.Resultado, function (i, val) {
+            if (val.Adj_firstName != null || val.Adj_lastName != null) {
+                if (val.Adj_status == true)
+                    status = "Active";
+                else
+                    status = "Inactive";
+
+                $('#tblModalAdjuster').dataTable().fnAddData([
+                    val.Adj_code, val.Adj_firstName, val.Adj_lastName, val.Adj_phone, val.Adj_phoneExt , status, "<input type='radio' class='rdbSeleccionaCoincidencia' name='idRadio' value='" + val.Adj_code + "' style='cursor: pointer;' >"]);
+            }
+        });
+
+
+        var otable = $("#tblModalAdjuster").dataTable().fnDestroy();
+        otable = $('#tblModalAdjuster').DataTable({
+            columnDefs: [{ className: "hidden", "targets": [0] }]
+        });
+
+        $("#accion").val(accion);
+        $("#btnModal").trigger("click");
+
+    }
+
+    
+    function EditarAjustador(e)
+    {
+        e.preventDefault();
+
+        var otable = $("#tblAjustador").dataTable();
+
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+
+        /* 
+        La siguiente línea obtiene el código del proveedor seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del proveedor seleccionado. 
+        */
+        var CodigoAjustador = $(this).parent().parent().find("td:eq(0)").html();
+
+        var Adjuster;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoAjustador) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Adjuster")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Adjuster = (Data);
+            }
+        });
+
+        var position = $("#divAdjuster").position();
+        scroll(0, position.top);
+  
+        // myDate = convierteFecha(Proveedor.Pat_birthday);
+        // Proveedor.Pat_birthday = myDate;
+
+        CargarDatosFormulario(Adjuster); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+        $("#divAdjuster").find("#Nombre").focus();
+        $("#apos").val(aPos);
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+    function MensajeError(mensaje,error)
+    {
+            swal({
+                title: error,
+                text: mensaje
+            });
+    }
+
+    function EliminaAjustadorModal(e)
+    {
+        e.preventDefault();
+
+        var codAdj = $(this).parent().parent().find("td:eq(0)").html();
+        var nomAdj = $(this).parent().parent().find("td:eq(1)").html();
+        var apeAdj = $(this).parent().parent().find("td:eq(2)").html();
+
+        dato = nomAdj.trim() + " " + apeAdj.trim();
+
+        //var otable = $("#tblAjustador").dataTable();
+        //var target_row = $(this).closest("tr").get(0);
+        //var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        if (VerificarContraccionFormularioRegistro() != true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroAdjuster").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+        ///
+
+        swal({
+            title: "Do you want to delete this adjuster?",            
+            text: "You will not be able to recover the information from " + dato + "!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                swal("Deleted!", "Your file information has been deleted.", "success");
+                EliminarAjustador(codAdj);
+                //EliminarAjustador(codAdj, aPos, otable);
+
+                // En "EliminaAjustadorModal".
+                actualizaTrazabilidad(codAdj, nomAdj, apeAdj)
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated :)", "error");
+                return 0;
+            }
+        });
+    }
+
+
+    function CancelarRegistro()
+    {
+        $("#frmRegistroAdjuster").css("display", "none");
+        
+
+        LimpiarControlesRegistro();
+        $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+        $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Ajustador)
+    {        
+        
+        $("#frmRegistroAdjuster").css("display", "block");
+
+        $("#hdCodigo").val(Ajustador.Adj_code);
+        $("#Nombre").val(Ajustador.Adj_firstName);
+        $("#Apellido").val(Ajustador.Adj_lastName);
+        $("#Telefono").val(Ajustador.Adj_phone);
+        $("#ExtensionTelefono").val(Ajustador.Adj_phoneExt);
+
+    }
+
+    function ActualizarDatos(e)
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Lastname!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }    
+        else {
+            e.preventDefault();
+
+            var NombreCiudad;
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            aPos = $("#apos").val();
+
+            var Ajustador = LlenarAdjuster( $("#hdCodigo").val()
+                                           ,$("#Nombre").val().trim()
+                                           ,$("#Apellido").val().trim()
+                                           ,$("#Telefono").val().trim()
+                                           ,$("#ExtensionTelefono").val().trim())
+   
+
+
+            // Primero verifica que no exista un adjuster homónimos.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Ajustador),
+                url: '@Url.Action("BuscarHomonimos", "Adjuster")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    console.clear();
+
+                    if (!Data.Resultado) // Si no se encontraron homónimos.
+                    {
+                        // Llamará al código que registrará al paciente.
+                        metodoActualizaAdjuster(e,"activo");
+                    }
+                    else // Si se encontraron homónimos.
+                    {
+                        // console.log(Data); // Muestra las coincidencias de hómónimos.
+                        llenaModal(Data, 'actualiza');
+                    }
+                }
+            });
+
+      
+        }
+    }
+
+
+
+
+                    
+    function EliminarAjustador(CodigoAdjustador)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoAdjustador) }),
+            url: '@Url.Action("Delete", "Adjuster")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+                console.log(Data[0].AdjusterErrorCode);
+                console.log("brenher");
+                if (Data[0].AdjusterErrorCode == 50000) { /// 50000 es el nro de error general 
+                     mensaje = Data[0].ErrorMessage;
+                     MensajeError(mensaje,"Error!");
+                }
+                else
+                {
+                    Ajustador = (Data);
+                    //otable.fnDeleteRow(pos);
+                    dato = "";
+                    recargaInformacionTabla(dato);
+                    controlaTab();
+                    
+
+                    websocket.emit('funcionActualizacionTablaAdjusterNode', 'Mantenedor_Proveedores');
+                    websocket.on('funcionAdjusterDesdeNode', function (data) {
+                        funcionAdjusterDesdeNode_llamada(data);
+                    });
+
+                }
+            }
+        });
+    }
+
+
+
+
+
+    
+
+
+    function AgregaFila(Adjuster) {
+        console.log("registrandoAdjuster-c");
+        //$('#tblPacientes').dataTable().fnSetColumnVis(0, false, false);        
+        //////$('#tblAjustador').dataTable().fnAddData([
+        //////   CodPatNew, Adjuster.Adj_firstName, Adjuster.Adj_lastName, Adjuster.Adj_phone, Adjuster.Adj_phoneExt, '<a class="btn EditarAjustador btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarAjustador  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>']);
+
+        //////var otable = $("#tblAjustador").dataTable().fnDestroy();
+        //////otable = $('.dataTables-example').DataTable({
+        //////    columnDefs: [{ className: "hidden", "targets": [0] }],
+        //////    dom: '<"html5buttons"B>lTfgitp',
+        //////    buttons: [
+        //////        { extend: 'copy' },
+        //////        { extend: 'csv' },
+        //////        { extend: 'excel', title: 'ExampleFile' },
+        //////        { extend: 'pdf', title: 'ExampleFile' },
+
+        //////        {
+        //////            extend: 'print',
+        //////            customize: function (win) {
+        //////                $(win.document.body).addClass('white-bg');
+        //////                $(win.document.body).css('font-size', '10px');
+
+        //////                $(win.document.body).find('table')
+        //////                        .addClass('compact')
+        //////                        .css('font-size', 'inherit');
+        //////            }
+        //////        }
+        //////    ]
+        //////});
+
+        dato = Adjuster.Adj_firstName +" "+ Adjuster.Adj_lastName;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+        ///otable =  $("#tblPacientes").dataTable({ "columnDefs": [{className:"hidden","targets": [0,6,8]}]  });
+
+        websocket.emit('funcionActualizacionTablaAdjusterNode', 'Mantenedor_Adjusters');
+        websocket.on('funcionAdjusterDesdeNode', function (data) {
+            funcionAdjusterDesdeNode_llamada(data);
+        });
+    }
+
+    //function EditaFila(Adjuster, pos, otable) {
+    function EditaFila(Adjuster) {
+        console.log("EDITAFILA");
+        //console.log(Adjuster);
+        //console.log(pos);
+        //otable.fnUpdate([
+        //Adjuster.Adj_code, Adjuster.Adj_firstName, Adjuster.Adj_lastName, Adjuster.Adj_phone, Adjuster.Adj_phoneExt, '<a class="btn EditarAjustador btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarAjustador btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>'], pos, undefined, true);
+
+
+        dato = Adjuster.Adj_firstName +" "+ Adjuster.Adj_lastName;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+
+        websocket.emit('funcionActualizacionTablaAdjusterNode', 'Mantenedor_Adjusters');
+        websocket.on('funcionAdjusterDesdeNode', function (data) {
+            funcionAdjusterDesdeNode_llamada(data);
+        });
+
+    }
+
+    function recargaInformacionTabla(dato_busca) {
+        console.log("recargaInformacionTabla");
+        console.log(dato_busca);
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarAjustadorTabla", "Adjuster")',
+            contentType: false,
+            contentType: false,
+            success: function (Data) {
+                console.log("correcto");
+                $('#tblAjustador').DataTable().ajax.reload();
+                if (dato_busca != "") {
+                    setTimeout(function () { otable = $('#tblAjustador').dataTable().fnFilter(dato_busca) }, "1000");
+                }
+                else {
+                    console.log("limpiaFiltro");
+                    setTimeout(function () { otable = $('#tblAjustador').dataTable().fnFilter("") }, "1000");
+                }
+                    
+            }
+        });
+    }
+////////////////////////////////////////////////////////////////////////////////////
+
+    function ActualizaCoincidenciaAjustador(e)
+    {
+        e.preventDefault(); 
+
+        var NombreCiudad;
+        var Sexo = null;
+        var CodigoAjustadorParaActualizar = null;
+
+        $.each($(".rdbSeleccionaCoincidencia"), function (i, val) 
+        {
+            if ($(val).prop("checked"))
+                CodigoAjustadorParaActualizar = val.value;
+        });
+
+
+        //////////////////////////////////////////////////////////////////
+        accion = $("#accion").val();
+        seleccionado = $("#seleccionado").val();
+        estadoSeleccion = $("#estadoSeleccion").val();
+
+        if (seleccionado > 0)
+           $("#hdCodigo").val(seleccionado);//doy valor al codigo de cliente, codigo tomado desde modal, para que asi se pueda modificar
+
+        if (seleccionado > 0)//si selecciono alguna fila
+        {
+            if (estadoSeleccion == "Inactive") // si el estado de la fila seleccionada es inactivo
+            {
+                
+                ////////////////// Pregunta cuando esta inactivo
+                swal({
+                    title: "Do you want to active adjuster?",
+                    text: "You will not be able to recover the information !",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, activate it!",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                },
+               function (isConfirm) {
+                   if (isConfirm) {
+                       //swal("Ok!", "Your information has been saved.", "success");
+
+                       metodoActualizaAdjuster (e, "inactivo");
+                       $("#btnCancelarModal").trigger("click");
+                       $("#btnCancelar").trigger("click");
+                   }
+                   else {
+                       swal("Cancelled", "The information was not saved !!", "error");
+                       return 0;
+                   }
+               });
+
+            } // cuando el estado de la fila es activo
+            else {
+                metodoActualizaAdjuster(e, "activo");
+                mensaje = "Your information has been saved";
+                error = "Success";
+                MensajeError(mensaje, error);
+                $("#btnCancelarModal").trigger("click");
+                $("#btnCancelar").trigger("click");
+            }
+        }
+        else// cuando no selecciono nada
+        {
+            if (accion == 'registra')
+                metodoRegistraAdjuster(e);
+            else
+                metodoActualizaAdjuster(e, "activo");
+
+            
+
+            $("#btnCancelarModal").trigger("click");
+            $("#btnCancelar").trigger("click");
+        }
+        //////////////////////////////////////////////////////////////////
+
+
+    }
+
+    // Esta función se ejecuta para actualizar el mantenedor de auditoría a través de node.
+    function actualizaTrazabilidad(codigoAjustador, nombreAjustador, apellidoAjustador)
+    {
+        var parametros
+
+        parametros = {
+            'codigoAjustadorActualizado': codigoAjustador
+           , 'nombreAjustadorActualizado': nombreAjustador
+           , 'apellidoAjustadorActualizado': apellidoAjustador
+        }
+
+        websocket.emit('actualizaTrazabilidadAjustador', parametros)
+    }
+
+    function metodoRegistraAdjuster(e) 
+    {
+        e.preventDefault();
+
+        var Ajustador = LlenarAdjuster($("#hdCodigo").val()
+                               , $("#Nombre").val().trim()
+                               , $("#Apellido").val().trim()
+                               , $("#Telefono").val().trim()
+                               , $("#ExtensionTelefono").val().trim())
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Ajustador),
+            url: '@Url.Action("Create", "Adjuster")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                if (Data[0].ErrorMessage == "") {
+                    
+                    //AgregaFila(Ajustador, Data[0].AdjusterErrorCode);
+                    AgregaFila(Ajustador);
+                    error  = "Successful!";
+                    mensaje = "Data saved correctly...";
+                    MensajeError(mensaje, error);
+                    $("#frmRegistroAdjuster").css("display", "none");
+
+                    // En "metodoRegistraAdjuster".
+                    actualizaTrazabilidad(Ajustador.Adj_code, Ajustador.Adj_firstName, Ajustador.Adj_lastName)
+                }
+                else {
+                    if (Data[0].AdjusterErrorCode == 2601) {
+                        //$("#NumeroSeguroSocialD").focus();
+                        //mensaje = "The social security number already exists";
+                    }
+                    else
+                        mensaje = "Error in register!!";
+
+                    error = Data[0].ErrorMessage;
+                    codigo = Data[0].AdjusterErrorCode;
+                    MensajeError(mensaje, Data[0].ErrorMessage);
+                }
+            }
+        })
+
+
+    }
+
+    function metodoActualizaAdjuster(e, activo)
+    {
+        e.preventDefault();
+        aPos = $("#apos").val();
+        console.log("-- metodoActualizaAdjuster --");
+
+        var Adjuster = LlenarAdjuster($("#hdCodigo").val()
+                                   , $("#Nombre").val().trim()
+                                   , $("#Apellido").val().trim()
+                                   , $("#Telefono").val().trim()
+                                   , $("#ExtensionTelefono").val().trim())
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Adjuster),
+            url: '@Url.Action("ActualizarDatos", "Adjuster")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                AdjusterX = Adjuster;
+                Adjuster = (Data);
+                
+                if (Data[0].ErrorMessage == "")
+                {
+                    if (activo == "inactivo")
+                        AgregaFila(AdjusterX);
+                        //AgregaFila(AdjusterX, aPos, otable);
+                    if (activo == "activo")
+                        EditaFila(AdjusterX);
+                        //EditaFila(AdjusterX, aPos, otable);
+
+                    error = "Successful!";
+                     mensaje = "Data saved correctly...";
+                    LimpiarControlesRegistro();
+                    $("#frmRegistroAdjuster").css("display", "none");
+
+                    // En "metodoActualizaAdjuster".
+                    actualizaTrazabilidad(AdjusterX.Adj_code, AdjusterX.Adj_firstName, AdjusterX.Adj_lastName)
+                }
+                else {
+
+                    mensaje = "Error!";
+                    error = Data[0].ErrorMessage + "...";
+                    $("#NumeroSeguroSocialD").focus();//el error solo se muestra en SSD
+                }
+                MensajeError(mensaje, error);
+
+            }
+        });
+
+    }
+
+    var websocket = io.connect(ServidorPuertoNode);
+
+    $(document).ready(function () 
+    {
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "";
+        // console.log(ProcesoActual);        
+
+
+        // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+        $("#EnlaceCrearNuevo").on("click", function (e) {
+
+            e.preventDefault();
+
+            LimpiarControlesRegistro();
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+            console.log(VerificarContraccionFormularioRegistro());
+
+            if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+                $("#frmRegistroAdjuster").css("display", "block");
+
+                
+
+            var position = $("#divAdjuster").position();
+            scroll(0, position.top);
+            $("#divAdjuster").find("#Nombre").focus();
+        });
+
+        $("#btnRegistrar").on("click", RegistrarAjustador); // Dispara la función que registra un Proveedor, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblAjustador > tbody").on("click", "tr > td > .EditarAjustador", EditarAjustador); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblAjustador > tbody").on("click", "tr > td > .EliminarAjustador", EliminaAjustadorModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+        $("#btnActualizarCoincidencia").on("click", ActualizaCoincidenciaAjustador);
+
+        controlaTab();
+
+    });
+
+    function controlaTab() {
+
+        $('.form-control').on('keydown', function (e) {
+            //
+            console.log("control_keydown");
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var tabindex = $(this).attr('tabindex');
+                console.log(tabindex);
+                tabindex++;
+                console.log(tabindex);
+                $("[tabindex='" + tabindex + "']").focus();
+            }
+
+        });
+    }
+
+    $("#tblModalAdjuster tbody").on('click', 'tr', function ()  //selecciona fila de tabla  
+    {
+
+
+        var name;  // pro_firstname
+        var apellido;// pro_lastname
+        var idnumber; // pro_number        
+        var status; // Ins_status
+        var codigo; // Ins_code
+        var seleccionado;
+
+
+        var aPos = $("#tblModalAdjuster").dataTable().fnGetPosition(this);
+        var aData = $("#tblModalAdjuster").dataTable().fnGetData(aPos);
+
+
+        codigo = aData[0];
+        status = aData[5];
+
+
+
+        console.log(status);
+        console.log(codigo);
+
+        var $radios = $("input:radio[name=idRadio]");
+        $radios.filter('[value=' + codigo + ']').prop('checked', true);
+        $("#seleccionado").val(codigo);
+        $("#estadoSeleccion").val(status);
+
+
+    });
+
+
+    function funcionAdjusterDesdeNode_llamada(data) {
+        // debugger;
+        console.log("funcion_n_Adjuster");
+        console.log(data);
+        dato_busca = ""; // este campo se usa para filtro en tabla
+        //var otable = $("#tblActividad").dataTable();
+        recargaInformacionTabla(dato_busca);
+    }
+
+    
+
+  </script>          

@@ -1,0 +1,652 @@
+﻿@model IEnumerable<Billing.Web.Models.Specialty>
+
+@{
+    ViewBag.Title = "Speciality";
+}
+
+<div class="row border-bottom">
+        <nav class="navbar navbar-static-top  " role="navigation" style="margin-bottom: 0">
+         <div class="navbar-header" style="width: 80%;">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <span style="display: block;text-align: center;" ><img alt="image" style="padding-left: 110px;" class="" src="@Url.Content("~/Images/OMNIMED.png")"></span>
+         </div>
+            <ul class="nav navbar-top-links navbar-right">
+                <li>
+                    <span class="m-r-sm text-muted welcome-message">Welcome to OMNIMED</span>
+                </li>
+                <li>                
+                    @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
+                        @Html.AntiForgeryToken()
+                        @*<a href="$('#logoutForm').submit()">Log off</a>*@
+                        <i class="fa fa-sign-out" style="padding: 20px 10px;"></i><input type="submit" value="Log out" style="border: 0; background: transparent; color:#999; font-size: 1em; font-weight: bold;" />                
+                    }
+                </li>
+            </ul>
+        </nav>
+</div>
+<div class="row wrapper border-bottom white-bg page-heading">
+   <div class="col-sm-4">
+        <h2>Speciality</h2>
+   </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight" >
+       <div class="row">
+           <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12" id="divPatient">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>New Speciality Register</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link" >                  @* Este es el parámetro que se le pasa a la función "ExpandirFormularioRegistro" para expandir o contraer el formulario de registro *@
+                                    <i class="fa fa-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                     <div class="ibox-content" id="frmRegistroEspecialidad" style="display: none;">
+                            <form method="get" class="form-horizontal">
+                                <input type="hidden" id="hdCodigo" />
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">SPECIALITY<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control letter" id="description" autofocus />
+                                    </div>
+                                </div>
+                                @*<div class="hr-line-dashed"></div>*@
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">TYPE<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control letter" id="Apellido" />                                     
+                                    </div>
+                                </div>
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button id="btnRegistrar" class="btn btn-primary" type="submit">Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" disabled>Update</button>
+                                        <button id="btnCancelar" class="btn btn-danger" type="button">Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Especiality")">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+           <!--///////////////////LISTA///////////////////////-->
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger"   id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblEspecialidad" >
+                    <thead style="background-color: #ed5565;color: white;">
+                    <tr>
+        <th class="hidden"></th>
+        <th >         
+            SPECIALTY
+        </th>
+        <th>
+            TYPE
+        </th>
+        <th>OPERATIONS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+    @foreach (var item in Model) 
+    {
+        <tr>
+            <td class="hidden">
+                @Html.DisplayFor(modelItem => item.Spe_code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Spe_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Spe_type)
+            </td>
+            <td>
+                <a href="#divPatient" class="btn EditarActividad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; 
+                <a class="btn EliminarActividad btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger" /> </a>
+            </td>
+        </tr>
+    }
+                    </tbody>
+                    <tfoot>
+                    <tr>
+        
+        <th class="hidden"></th>
+        <th >         
+            SPECIALTY
+        </th>
+        <th>
+            TYPE
+        </th>    
+<th></th>
+                    </tr>
+                    </tfoot>
+                    </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            </div>    
+          
+</div>
+
+<div class="footer">
+                <div class="pull-right">
+                    <strong>OMNIMED</strong>
+                </div>
+                <div>
+                    <strong>Copyright</strong> <a href="www.itusaservices.com">ITUSASERVICES</a>  © 2016
+                </div>
+            </div>
+
+
+
+
+
+<script>
+    
+
+    $('input.letter').on('keypress', function (e) {
+
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    function LimpiarControlesRegistro()
+    {
+        $("#description").val("");        
+        $("#tipo").val("");
+    }
+
+    function VerificarContraccionFormularioRegistro() {
+        if ($("#frmRegistroEspecialidad").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    function LlenarEspecialidad(Codigo,
+                            Nombre,
+                            Tipo)
+    {
+        var especialidadJson =
+            {
+            "Spe_code": Codigo,
+            "Spe_name": Nombre,
+            "Spe_type": Tipo
+            
+        }
+        return especialidadJson;
+    }
+
+    function RegistrarEspecialidad(e)
+    {
+        if ($("#Description").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Description").focus();
+            $("#Description").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }        
+        else
+        {
+            e.preventDefault();
+            var especialidad = Llenarespecialidad(null
+                                          , $("#Description").val().trim()
+                                          , $("#Tipo").val().trim())
+            // ************************* Verificaión de homónimos *******************************
+            var CantidadHomonimos = 0;
+
+
+
+            // Primero verifica que no exista un proveedor homónimo.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(proveedor),
+                url: '@Url.Action("BuscarHomonimos", "Especiality")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    CantidadHomonimos = Data;
+                }
+            });
+
+            if (CantidadHomonimos == 1) // Si encontró homónimos aborta el registro
+            {
+                mensaje = "Successful!";
+                error = "Similar data were found,You want to register?";
+                MensajeError(mensaje, error);
+                return false; // Aquí sale fuera de la funcíón sin terminar el registro.
+            }
+            // **************************************************************************************
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(proveedor),
+                url: '@Url.Action("Create", "Especiality")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data[0].ErrorMessage == "") {
+                        AgregaFila(proveedor, Data[0].PatientErrorCode);
+                        mensaje = "Successful!";
+                        error = "Data save correctly...";
+                        MensajeError(mensaje, error);
+                        ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+                    }
+                    else {
+                        if (Data[0].PatientErrorCode == 2601) {
+                            $("#NumeroSeguroSocialD").focus();
+                            mensaje = "The social security number already exists";
+                        }
+                        else
+                            mensaje = "Error in register!!";
+
+                        error = Data[0].ErrorMessage;
+                        codigo = Data[0].PatientErrorCode;
+                        MensajeError(mensaje, Data[0].ErrorMessage);
+                    }
+                }
+            });
+        }
+    }
+
+    function EditarEspecialidad(e)
+    {
+        e.preventDefault();
+
+        var otable = $("#tblEspecialidad").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+
+        /* 
+        La siguiente línea obtiene el código del proveedor seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del proveedor seleccionado. 
+        */
+        var Codigoproveedor = $(this).parent().parent().find("td:eq(0)").html();
+
+        var Proveedor;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoEspecialidad": parseInt(CodigoProveedor) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Especiality")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Proveedor = (Data);
+            }
+        });
+
+        var position = $("#divEspecialidad").position();
+        scroll(0, position.top);
+  
+        myDate = convierteFecha(Proveedor.Pat_birthday);
+        Proveedor.Pat_birthday = myDate;
+
+        CargarDatosFormulario(Proveedor); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+        $("#divEscpecialidad").find("#Nombre").focus();
+        $("#apos").val(aPos);
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+    function MensajeError(mensaje,error)
+    {
+            swal({
+                title: mensaje,
+                text: error
+            });
+    }
+
+    function EliminaEspecialidadModal(e)
+    {
+        e.preventDefault();
+
+        var codPac = $(this).parent().parent().find("td:eq(0)").html();
+        var nomPac = $(this).parent().parent().find("td:eq(1)").html();
+        var apePac = $(this).parent().parent().find("td:eq(2)").html();
+        dato = nomPac.trim() + " " + apePac.trim();
+        var otable = $("#tblEspecialidad").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        if (VerificarContraccionFormularioRegistro() != true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+        ///
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover the information from " + dato +"!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                swal("Deleted!", "Your file information has been deleted.", "success");
+                EliminarProveedor(codPac, aPos, otable);
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated :)", "error");
+                return 0;
+            }
+        });
+    }
+
+
+    function CancelarRegistro()
+    {
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+        else
+            ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+
+        LimpiarControlesRegistro();
+        $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+        $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Actividad)
+    {        
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+
+        $("#hdCodigo").val(Actividad.Pat_code);
+        $("#Nombre").val(Actividad.Pro_firstName);
+        $("#Apellido").val(Actividad.Pro_lastName);
+
+    }
+
+    function ActualizarDatos(e)
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Last name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }    
+        else {
+            e.preventDefault();
+
+            var NombreCiudad;
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            aPos = $("#apos").val();
+
+            var Proveedor = LlenarProveedor($("#hdCodigo").val()
+                                          , $("#Nombre").val().trim()
+                                          , $("#Apellido").val().trim()
+                                          , $("#idNumber").val().trim())
+   
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Proveedor),
+                url: '@Url.Action("ActualizarDatos", "Especialidad")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    ProveedorX = Proveedor;
+                    Proveedor = (Data);
+                    console.log(Data);
+                    if (Data[0].ErrorMessage == "")
+                    {
+                        var otable = $("#tblEspecialidad").dataTable();
+                        EditaFila(ProveedorX, aPos, otable);
+
+                        mensaje = "Successful!";
+                        error = "Data save correctly...";
+                        LimpiarControlesRegistro();
+                        ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+                    }
+                    else
+                    {
+
+                        mensaje = "Error!";
+                        error = Data[0].ErrorMessage + "...";
+                        $("#NumeroSeguroSocialD").focus();//el error solo se muestra en SSD
+                    }
+
+
+                    MensajeError(mensaje, error);
+                    
+                }
+            });
+        }
+    }
+
+
+
+
+                    
+    function EliminarEspecialidad(CodigoProveedor, pos, otable)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoEspecialidad": parseInt(CodigoEspecialidad) }),
+            url: '@Url.Action("Delete", "Especiality")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+
+                if (Data == 50000) { /// 50000 es el nro de error general 
+                    mensaje = "You can not delete patient he has an active case!!!";
+                    MensajeError("Error!", mensaje);
+                }
+                else
+                {
+                    Proveedor = (Data);
+                    otable.fnDeleteRow(pos);
+                }
+            }
+        });
+    }
+
+
+
+
+
+    
+
+
+    function AgregaFila(Especialidad, CodPatNew) {
+        Especialidad.Cit_code = "--";
+        Especialidad.Sta_code = "--";
+        //$('#tblPacientes').dataTable().fnSetColumnVis(0, false, false);        
+        $('#tblEspecialidad').dataTable().fnAddData([
+           CodPatNew, Especialidad.Pat_firstName, Especialidad.Pat_lastName, '<a class="btn EditarEspecialidad btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarEspecialidad  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>']);
+
+        var otable = $("#tblEspecialidad").dataTable().fnDestroy();
+        otable = $('.dataTables-example').DataTable({
+            columnDefs: [{ className: "hidden", "targets": [0, 6, 8] }],
+            dom: '<"html5buttons"B>lTfgitp',
+            buttons: [
+                { extend: 'copy' },
+                { extend: 'csv' },
+                { extend: 'excel', title: 'ExampleFile' },
+                { extend: 'pdf', title: 'ExampleFile' },
+
+                {
+                    extend: 'print',
+                    customize: function (win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+
+                        $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                    }
+                }
+            ]
+        });
+        dato = Especialidad.Pat_firstName;
+        otable = $('.dataTables-example').dataTable().fnFilter(dato);
+
+
+        ///otable =  $("#tblPacientes").dataTable({ "columnDefs": [{className:"hidden","targets": [0,6,8]}]  });
+    }
+
+    function EditaFila(Especialidad, pos, otable) {
+        
+        otable.fnUpdate([
+        Especialidad.Pat_code, Especialidad.Pat_firstName, '<a class="btn EditarProveedor btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarProveedor btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>'], pos, undefined, true);
+
+        console.log(Especialidad.Pat_firstName);
+        console.log(Especialidad.Pat_lastName);
+
+
+        dato = Especialidad.Pat_firstName;
+        otable = $('.dataTables-example').dataTable().fnFilter(dato);
+
+    }
+
+
+    $(document).ready(function () 
+    {
+        
+
+        $('#tblEspecialidad').DataTable({
+            dom: '<"html5buttons"B>lTfgitp',
+            buttons: [
+                { extend: 'copy' },
+                { extend: 'csv' },
+                { extend: 'excel', title: 'ExampleFile' },
+                { extend: 'pdf', title: 'ExampleFile' },
+
+                {
+                    extend: 'print',
+                    customize: function (win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+
+                        $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                    }
+                }
+            ]
+        });
+
+
+
+        // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+        $("#EnlaceCrearNuevo").on("click", function (e) {
+
+            e.preventDefault();
+
+            LimpiarControlesRegistro();
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+            if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+                ExpandirFormularioRegistro($("#frmRegistroEspecialidad").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+
+            var position = $("#divPatient").position();
+            scroll(0, position.top);
+            $("#divPatient").find("#Nombre").focus();
+        });
+
+        $("#btnRegistrar").on("click", RegistrarEspecialidad); // Dispara la función que registra un Proveedor, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblEspecialidad > tbody").on("click", "tr > td > .EditarEspecialidad", EditarEspecialidad); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblEspecialidad > tbody").on("click", "tr > td > .EliminarEspecialidad", EliminaEspecialidadModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+    });
+
+
+
+   
+   
+
+  </script>          

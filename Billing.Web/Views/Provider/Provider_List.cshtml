@@ -1,0 +1,81 @@
+﻿<div class="table-responsive">
+<table class="table table-striped table-bordered table-hover dataTables-example" id="tblProveedor" >
+    <thead class ="th_tabla">
+        <tr>
+            <th class="hidden"></th>
+            <th >         
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Id Number
+            </th>
+            <th>Operations</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="hidden"></th>
+            <th >         
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Id Number
+            </th>
+            <th>Operations</th>
+        </tr>
+    </tfoot>
+</table>
+</div>
+
+<script>
+    $(Inicio);
+
+    function Inicio()
+    {
+        PaginarTabla();
+    }
+
+
+    function PaginarTabla()
+    {
+        console.log("hola");
+
+        $('#tblProveedor').DataTable({
+              order: [[1, "asc"]],
+             "pageLength": 10,
+             "columnDefs": [ { className: "hidden", "targets": [0] }],
+             "language":
+                  { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"},
+             "processing": true,
+             "serverSide": true,
+             "ajax": {
+                    "url": '@Url.Action("GetData", "Provider")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                     },
+             "columns": [
+                        { "data": "Pro_code" },
+                        { "data": "Pro_firstName" },
+                        { "data": "Pro_lastName" },
+                        { "data": "Pro_number" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" title="Edit Provider" class="btn EditarProveedor btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a title="Delete Provider" class="btn EliminarProveedor btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger" /> </a>' } }
+                        ]
+        });
+        ////////////////////////////////////////////////////////////////////////
+    }
+
+
+
+
+ 
+
+
+</script>

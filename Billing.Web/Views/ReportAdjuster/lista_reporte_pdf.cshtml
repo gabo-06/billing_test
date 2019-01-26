@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_REPORTS_VIEW_CASES_FOR_ADJUSTER_Result>
+@{
+    var i = 0;
+    var estado = "";
+}
+
+
+
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example"style="width:100%;">
+        <thead class="th_tabla" >    
+        <tr border="1" bgcolor="#b42734" color="#ffffff">
+           <th style="font-size: 11px;" width="6%"></th>
+           <th style="font-size: 11px;" width="35%">Patient </th>
+           <th style="font-size: 11px;">DOI</th>           
+           <th style="font-size: 11px;">SS#</th>           
+           <th style="font-size: 11px;">Claim#</th>           
+           <th style="font-size: 11px;">Status</th>           
+            
+        </tr>
+       </thead>
+       <tbody>
+
+
+         @foreach (var item in Model)
+         {
+            i = i + 1;
+            if (item.Cis_status == false)
+            {
+                estado = "Close";
+            }
+            else
+            {
+                estado = "Open";
+            }
+                
+                 <tr border="1" >
+                     <td style="font-size: 9px;">@i</td>
+                     <td style="font-size: 9px;" >@item.Patient</td>                          
+                     <td style="font-size: 9px;">@item.AccidentDate </td>                          
+                     <td style="font-size: 9px;">@item.Pat_socialSecurityNumberD</td>                          
+                     <td style="font-size: 9px;">@item.Cis_caseCode </td>              
+                     <td style="font-size: 9px;">@estado</td>                                               
+                 </tr>
+        }
+
+       </tbody>
+    </table>
+                             
+</div>

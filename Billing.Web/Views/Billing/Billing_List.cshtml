@@ -1,0 +1,1620 @@
+﻿@using System.Diagnostics;
+
+@model IEnumerable<Billing.Web.Models.DetalleFactura>
+@{
+    var i = 0;
+    var Acumulado = (decimal)0.0;
+    var FechaServicio = DateTime.Now;
+    var HourMile = (decimal)0.0;
+    var PriceAct = (decimal)0.0;
+    var Total = (decimal)0.0;
+}
+
+<style type="text/css">
+    #tblBillingResult {
+        border-collapse: collapse;font-family:Arial;
+}
+     #tblBillingResult  {border: 0px;}
+     #tblBillingResult th  {border: 1px solid #e7eaec}
+     /*#tblBillingResult > th  {border: 1px solid black;border-spacing:0;}*/
+     #tblBillingResult td {border: 1px solid #e7eaec;border-spacing:0;}
+    .th_tabla {background-color: #b42734;color:white;
+}
+</style>
+
+<table style="width:100%;margin-bottom:20px;margin-left:15px;"> 
+<tr><td style="font-weight:bold;width:100px;">Invoice #</td><td style="width:310px;"><span id="invoice_text"></span></td>
+    <td style="font-weight:bold;width:100px;">Patient</td><td style="width:325px;"><span id="patient_text"></span></td>
+    <td style="font-weight:bold;width:100px;">DOI</td><td><span id="doi_text"></span></td>
+</tr>
+</table>
+
+<div class="table-responsive" id="TablaParaControles">
+    <table class="table table-striped dataTables-example" id="tblDetalleFactura" >
+        <thead class="th_tabla">
+            <tr>
+                <th style="width: 8px;"></th>                           @* Correlativo                          (Indice 0)  *@
+                <th class="hidden"></th>            @* Código de detalle de factura         (Indice 1)  *@
+                <th style="width: 246px;"> Service Date</th>              @* Fecha de servicio                    (Indice 2)  *@
+                <th style="width: 431px;">Activities Description</th>      
+                <th style="width: 113px;">Service Unit</th>
+                <th style="width: 111px;">Charge Per Unit</th>
+                <th style="width: 121px;">Total</th>        
+                <th style="width: 67px;"></th>
+                <th class="hidden">Service Date</th>
+                <th class="hidden">Numero Pagina</th>
+                <th class="hidden">Saldo Por Pagar</th> @* Saldo por pagar *@
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+
+            <tr>
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle; width: 8px;">@i </td>
+                <td style="display: none;" class="CodigoEntrada"> @item.Bib_code </td>
+                <td style="vertical-align: middle; width: 246px;" >
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                        @{
+                            FechaServicio = Convert.ToDateTime(@item.Bib_servDate);
+                            Debug.Write(FechaServicio);
+                        }
+                        <input class="form-control dtpFecha" type="text" style="background: #ffffff; width: 100%;" maxlength="10" data-mask="99/99/9999" value="@FechaServicio.ToString("MM/dd/yyyy")" />
+                        <input type="hidden" value="@FechaServicio.ToString("MM/dd/yyyy")" maxlength="10" data-mask="99/99/9999">
+                    </div>
+                </td>  
+                <td style="vertical-align: middle; width: 431px;" CodigoActividad="@item.Act_code">
+                    <select class="form-control cmbActividades" style="width: 100%;">
+                        <option value=""></option>
+                    </select>
+                    <input type="hidden" class="hdCodigoOriginalActividad" value="@item.Act_code" /> 
+                    <input type="hidden" class="hdNombreOriginalActividad" value=""/> 
+                </td>
+                <td style="vertical-align: middle; width: 113px">
+                    @{
+                        HourMile = decimal.Parse(item.Bib_hourMile.ToString());
+                    }
+                    <input class="form-control numeros txtUnit" type="text" style="width: 100%;" maxlength="5" value="@HourMile" />
+                    <input type="hidden" class="hdServiceUnit" value="@HourMile" /> 
+                </td>
+                <td style="vertical-align: middle; width: 111px">
+                    @{
+                        PriceAct = decimal.Parse(item.Bib_priceAct.ToString()); 
+                    }
+                    <input class="form-control txtPriceUnit" type="text" style="width: 100%;" maxlength="8"  value="@PriceAct" />
+                    <input type="hidden" class="hdChargeUnit" value="@PriceAct" />
+                </td>
+                <td style="vertical-align: middle; width: 121px">
+                    @if (item.Bib_hourMile != 0 && item.Bib_priceAct != 0)
+                    {
+                        Total = decimal.Parse((HourMile * PriceAct).ToString("#0.00"));
+                    }
+                    else if (item.Bib_hourMile == 0 || item.Bib_priceAct == 0)
+                    {
+                        Total = 0;
+                    }                         
+                    <input class="form-control txtTotal" type="text" style="width: 100%;" maxlength="5"  value="@Total.ToString("#0.00")" readonly />
+                    @{
+                        Acumulado += Total;
+                    }
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 67px;">
+                    <a href="#" class="btn btn-danger  btn-bitbucket EliminarDetalle">Delete</a>
+                </td>
+                <td class="hidden">
+                    @FechaServicio
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+                <td class="hidden"> @* Monto por pagar *@
+                    @item.BalanceDue
+                </td>
+            </tr>
+        }   
+
+        @for (var Indice = Model.Count(); Indice < (Model.Count() + 20); Indice++)
+        {
+            i = i + 1;
+            
+            <tr>      
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle;">  @i </td>
+                <td style="display: none;"></td>
+                <td style="vertical-align: middle; width: 6000px;">
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                        
+                        @*
+                        @if (Indice == Model.Count())
+                        {
+                            // FechaServicioDateTime
+                            <input class="form-control dtpFecha" type="text"   style ="background: #ffffff; width: 100%;" data-mask="99/99/9999" maxlength="10" value="@FechaServicio.ToString("MM/dd/yyyy")" />                       
+                        }
+                        else
+                        {
+                        *@
+                            <input class="form-control dtpFecha FechaNoMostrada" type="text" data-mask="99/99/9999" style="background: #ffffff; width: 100%;" maxlength="10" />
+                        @*
+                        }
+                        *@
+                    </div>
+                </td>
+                <td style="vertical-align: middle; width: 12000px;">
+                    <select class="form-control cmbActividades" style="width: 100%;" >
+                        <option value=""></option>
+                    </select>
+                    <input type="hidden" class="hdCodigoOriginalActividad" value="" /> 
+                    <input type="hidden" class="hdNombreOriginalActividad" value=""/> 
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtUnit" type="text" maxlength="5"  style="width: 100%;"   />
+                    <input type="hidden" class="hdServiceUnit" value="@HourMile" /> 
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtPriceUnit" type="text" maxlength="8"  style="width: 100%;"   />
+                   <input type="hidden" class="hdChargeUnit" value="@PriceAct" />
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtTotal" type="text"  style="width: 100%;"  readonly />
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 22px;">
+                   <a href="#" class="btn btn-danger  btn-bitbucket EliminarDetalle" style="display:none;">Delete</a>
+                </td>
+                <td class="hidden">
+                    @FechaServicio
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+                <td class="hidden"> @* Monto por pagar *@
+
+                </td>
+            </tr>                  
+        }
+        @{
+            Int32 Cociente = Convert.ToInt32(Math.Floor(Convert.ToDecimal(Model.Count() / 20)));
+            Int32 CantidadPaginas = Cociente + 1;                
+        }
+        </tbody>
+    </table>
+    <input type="hidden" value="@Acumulado" id="hdTotalAcumulado">
+    <input type="hidden" value="@Model.Count()" id="hdTotalFilas">
+    
+</div>
+
+<script>    
+    var Detalles; // Variable global que almacena los detalles de una factura.
+    
+    var ArregloDetalles = new Array();
+    var ArregloValidacionesPendientes = new Array();
+    var RegExpDecimal = /^\d*(\.\d{1,2})?$/ig; // Expresión regular para forzar el punto decimal.
+    var RegExpFecha = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/ig; // Expresión regular para forzar el formato de fecha americano.
+    var PaginaActualGlobal;
+    var Intervalo;    
+    var BanderaEliminacion = false;
+
+    $(Inicio);    
+
+    function Inicio()
+    {
+        Detalles = "";        
+
+        // ObtenerDetallesDeFacturaNuevamente(NumeroFactura);
+
+        var otable = $("#tblDetalleFactura").dataTable().fnDestroy();
+
+        $('.input-group.date').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+        
+        ObtenerActividades();
+        PaginarTabla();
+
+        // ************************************************************************************
+        $("#btnActualizarDetallesFactura").on("click", ActualizaDetallesDeFactura);
+        // ************************************************************************************
+
+        if (VecesSelecionaCaso == 1) // Después de la primera selección de un caso, la variable "VecesSelecionaCaso" siempre va a ser "0" (Sólo se vuelve "1" cuando se selecciona un nuevo caso).
+        {            
+            ultimaPagina();
+            VecesSelecionaCaso = 0;
+        }
+
+        ultimaPagina();
+
+        // Muestra el total de la factura.
+        $("#Balancetotal").html("$ " + Formato(parseFloat($("#hdTotalAcumulado").val()).toFixed(2)));
+        
+        if ($('#cmbFilter option:selected').text() == 'UnPaid')
+        {
+
+            $("#balance_total_text").html("Total Amount");            
+
+            // Muestra lo que se ha pagado de la factura
+            $('#MontoPagado').parent('div').css({'display':'flex'});            
+            var MontoPagado = parseFloat($("#hdTotalAcumulado").val()) - (isNaN(parseFloat($('#tblDetalleFactura > tbody > tr:eq(0) > td:eq(10)').html().trim())) ? 0 : parseFloat($('#tblDetalleFactura > tbody > tr:eq(0) > td:eq(10)').html().trim()));
+            $('#MontoPagado').html('$ ' + Formato(parseFloat(MontoPagado).toFixed(2)));
+
+            // Muestra el saldo de la factura.
+            $('#SaldoPorPagar').parent('div').css({'display':'flex'});
+            $("#SaldoPorPagar").html("$ " + Formato( isNaN(parseFloat($('#tblDetalleFactura > tbody > tr:eq(0) > td:eq(10)').html().trim())) ? '0.00' : parseFloat($('#tblDetalleFactura > tbody > tr:eq(0) > td:eq(10)').html().trim()).toFixed(2)));
+        }
+        else 
+        {
+            $("#balance_total_text").html("Total Amount");
+            $('#MontoPagado').parent('div').css({'display':'none'});
+            $('#SaldoPorPagar').parent('div').css({'display':'none'});
+        }
+
+        setTimeout(function(){
+            $("#dvLoading").css("display", "none");
+        }, 1000);
+    } 
+    
+    function Formato(Numero)
+    {
+        var n = Numero.toString(), p = n.indexOf('.');
+
+        return n.replace(/\d(?=(?:\d{3})+(?:\.|$))/g, function($0, i){
+            return p<0 || i<p ? ($0+',') : $0;
+        });
+    }
+
+    function ActualizaDetallesDeFactura(e)
+    {
+        e.preventDefault();
+        ///////alert("ActualizaDetallesDeFactura");
+        
+
+            if (!ActualizacionDesdeAlerta) // Si la actualización se genera desde el mismo botón entonces va a pasar por el filtro de si quiere realmente guardar o actualizar este caso.
+            {
+                $("#dvLoading").css("display", "block");
+                
+                // ActualizarDetalles(0);
+
+                Intervalo = setTimeout(function () 
+                {
+                    // LimpiarArreglos();
+                    // CargaInformacionSegunTipoAseguradora(e);
+                
+                    // BanderaTipoActualizacion = "G";
+                    // ActualizarEntradas(0); // El 0 significa que se va a mostrar que se muestra el mensaje que confirma el registro de las entradas.
+
+                    ActualizarDetalles(0); // El 0 significa que se va a mostrar que se muestra el mensaje que confirma el registro de las entradas.                    
+                    // $("#dvLoading").css("display", "none");
+                }, 10 );
+
+            }
+            else // Si la actualización se genera desde la alerta que se genera cuando se pasa de un proceso a otro simplemente actualiza el caso sin preguntar si quiere actualizarlo, por que ya se aceptó la advertencia
+            { 
+
+            }
+    }
+   
+
+    function ValidacionAntesDeGuardar()
+    {
+    
+    }
+
+    function ActualizarDetalles(Tipo)
+    {        
+        //alert("ActualizarDetalles");
+        BanderaErrorValidacion = false;
+        var Banderita = false;
+
+        ///////alert("ActualizarDetalles");
+        if (BanderaValidaciones) // Si hay validaciones pendientes.
+        {
+            $.each(ArregloValidacionesPendientes, function (i, val)
+            {
+                // if (val.ServiceUnit != "" || val.ChargeUnit != "")
+                    // console.log((i + 1) + " ------ " + val.ServiceUnit + " ------ " + val.ChargeUnit);
+
+                // if (val.ServiceUnit != "")
+                // {               
+                //     console.log("Error en ServiceUnit");
+                //     mensaje = val.ServiceUnit;
+                //     error = "Error";
+                //     MensajeError(mensaje, error);
+                //     Banderita = true;
+                //     return false;                        
+                // }
+                // 
+                // if (val.ChargeUnit != "")
+                // {               
+                //     console.log("Error en ChargeUnit");
+                //     mensaje = val.ChargeUnit;
+                //     error = "Error";
+                //     MensajeError(mensaje, error);
+                //     Banderita = true;
+                //     return false;                        
+                // }
+            });
+
+            if (!Banderita) // Si nunca se presentó ningún error
+                BanderaValidaciones = false; // Quiere decir que ya no hay más validaciones pendientes.
+        }
+
+        if (!BanderaValidaciones) // Si ya no hay validaciones pendientes.
+        {
+            var DetallesJsonTexto;
+
+            // Variables que almacenan los valores de la tabla de entradas.
+            // ------------------------------------------------------------
+            var NumeroCorrelativoDetalle = 0;
+            var CodigoDetalle = 0;
+            var FechaServicio = null;
+            var CodigoActividad = 0;
+            var DescripcionActividad = null; 
+            var ServiceUnit = null;
+            var ChargeUnit = null;
+            var CampoDelErrorActividad = ""
+            var CampoDelErrorServiceUnit = ""
+            var CampoDelErrorChargeUnit = ""
+            // ------------------------------------------------------------
+
+            var Bandera1 = false;
+            var Bandera2 = false;
+            var Bandera3 = false;
+            var Bandera4 = false;
+            var Bandera5 = false;
+
+            var DetallesJsonObjeto;
+
+            // Arma el JSON en formato de texto que contendrá los valores de los detalles de factura que serán llevados a la base en forma de XML para actualizar e insertar.
+            DetallesJsonTexto = '{"Detalles" : [';
+            $.each(ArregloDetalles, function (i, val)
+            {
+                NumeroCorrelativoDetalle = val.CorrelativoDetalle; // Correlativo de detalle.
+                CodigoDetalle = (val.CodigoDetalle != 0) ? val.CodigoDetalle : 0;
+                FechaServicio = (val.FechaServicio.trim() != "") ? val.FechaServicio.trim() : null;
+                CodigoActividad = (val.CodigoActividad != "") ? val.CodigoActividad : 0;
+                DescripcionActividad = (val.DescripcionActividad != null) ? val.DescripcionActividad.trim() : null;
+                ServiceUnit = (val.ServiceUnit != null && (!(isNaN(val.ServiceUnit)))) ? val.ServiceUnit : null;
+                ChargeUnit = (val.ChargeUnit != null && (!(isNaN(val.ChargeUnit)))) ? val.ChargeUnit : null;
+
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (0).   
+                // ServiceUnit      (1).
+                // ChargeUnit       (1).
+                if (((FechaServicio != null) && (CodigoActividad == 0) && (ServiceUnit != null) && (ChargeUnit != null)))
+                {                               
+                    CampoDelErrorActividad = "Activity";
+
+                    Bandera1 = false;
+                    Bandera2 = false;
+                    Bandera3 = true;
+                    Bandera4 = false;
+                    Bandera5 = false;
+
+                    return false;
+                }
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (0).
+                // ServiceUnit      (0).
+                // ChargeUnit       (1).
+                if (((FechaServicio != null) && (CodigoActividad == 0) && (ServiceUnit == null) && (ChargeUnit != null)))
+                {
+                    CampoDelErrorActividad = "Activity";
+                    CampoDelErrorServiceUnit = "ServiceUnit";
+
+                    Bandera1 = false;
+                    Bandera2 = false;
+                    Bandera3 = true;
+                    Bandera4 = false;
+                    Bandera5 = false;
+
+                    return false;                
+                }
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (0).
+                // ServiceUnit      (1).
+                // ChargeUnit       (0).
+                if (((FechaServicio != null) && (CodigoActividad == 0) && (ServiceUnit != null) && (ChargeUnit == null)))
+                {
+                    CampoDelErrorActividad = "Activity";
+                    CampoDelErrorChargeUnit = "ChargeUnit";
+
+                    Bandera1 = false;
+                    Bandera2 = false;
+                    Bandera3 = true;
+                    Bandera4 = false;
+                    Bandera5 = false;
+
+                    return false;                
+                }
+                /************************************************************************/
+                  
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (0).
+                // ServiceUnit      (0).
+                // ChargeUnit       (0).
+                /*
+                if (((FechaServicio != null) && (CodigoActividad == 0) && (ServiceUnit == null) && (ChargeUnit == null)))
+                {
+                    // alert("qqqqqqqqqqqqqqq")
+
+                    CampoDelErrorActividad = "Activity";
+                    CampoDelErrorServiceUnit = "ServiceUnit";
+                    CampoDelErrorChargeUnit = "ChargeUnit";
+
+                    Bandera1 = false;
+                    Bandera2 = false;
+                    Bandera3 = true;
+                    Bandera4 = false;
+                    Bandera5 = false;
+
+                    return false;                  
+                }
+                */
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (1).
+                // ServiceUnit      (0).
+                // ChargeUnit       (1).
+                if ((FechaServicio != null) && (CodigoActividad != 0) && (ServiceUnit == null) && (ChargeUnit != null))
+                {           
+                    CampoDelErrorServiceUnit = "ServiceUnit";
+
+                    Bandera1 = true;
+                    Bandera2 = false;
+                    Bandera3 = false;
+                    Bandera4 = false;
+                    Bandera5 = false;
+
+                    return false;
+                }
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (1).
+                // ServiceUnit      (1).
+                // ChargeUnit       (0).
+                if ((FechaServicio != null) && (CodigoActividad != 0) && (ServiceUnit != null) && (ChargeUnit == null))
+                {                    
+                    CampoDelErrorChargeUnit = "ChargeUnit";
+
+                    Bandera1 = false;
+                    Bandera2 = true;
+                    Bandera3 = false;
+                    Bandera4 = false;
+                    Bandera5 = false;
+
+                    return false;
+                }
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).
+                // Actividad        (1).
+                // ServiceUnit      (0).
+                // ChargeUnit       (0).
+                if ((FechaServicio != null) && (CodigoActividad != 0) && (ServiceUnit == null) && (ChargeUnit == null))
+                {
+                    CampoDelErrorServiceUnit = "ServiceUnit";
+                    CampoDelErrorChargeUnit = "ChargeUnit";
+
+                    Bandera1 = false;
+                    Bandera2 = false;
+                    Bandera3 = false;
+                    Bandera4 = true;
+                    Bandera5 = false;
+                
+                    return false;
+                }
+                /************************************************************************/
+                
+                /****************************** VALIDACION ******************************/
+                // FechaServicio    (1).    // Es por que 
+                // Actividad        (1).    // todo
+                // ServiceUnit      (1).    // está
+                // ChargeUnit       (1).    // correcto.
+                if ((FechaServicio != null) && (CodigoActividad != 0) && (ServiceUnit != null) && (ChargeUnit != null))
+                {
+                    Bandera1 = false;
+                    Bandera2 = false;
+                    Bandera3 = false;
+                    Bandera4 = false;
+                    Bandera5 = true;
+
+                    // return false;
+                }
+                /************************************************************************/
+                
+                if (i == 0)
+                {
+                    DetallesJsonTexto += '{' + 
+                                                ' "NumeroCorrelativoDetalle": ' + NumeroCorrelativoDetalle +
+                                                ', "Bib_code": ' + CodigoDetalle + 
+                                                ', "Bih_code": ' + parseInt($("#hdCodigoFacturaSeleccionada").val()) + 
+                                                ', "Bib_servDate": ' + ((FechaServicio != null) ? ('"' + FechaServicio + '"') : (null)) + 
+                                                ', "Bib_code_u": "MMC"' + 
+                                                ', "Act_code": ' + CodigoActividad + 
+                                                ', "Bib_hourMile": ' + ServiceUnit + 
+                                                ', "Bib_priceAct": ' + ChargeUnit + 
+                                                ', "Bib_amoReim": ' + 0.00 + 
+                                                ', "Bib_createdUser": ' + CodigoUsuarioGlobal +
+                                         '}';
+                }
+                else
+                {
+                    DetallesJsonTexto += ', {' + 
+                                                ' "NumeroCorrelativoDetalle": ' + NumeroCorrelativoDetalle +
+                                                ', "Bib_code": ' + CodigoDetalle + 
+                                                ', "Bih_code": ' + parseInt($("#hdCodigoFacturaSeleccionada").val()) + 
+                                                ', "Bib_servDate": ' + ((FechaServicio != null) ? ('"' + FechaServicio + '"') : (null)) + 
+                                                ', "Bib_code_u": "MMC"' + 
+                                                ', "Act_code": ' + CodigoActividad + 
+                                                ', "Bib_hourMile": ' + ServiceUnit + 
+                                                ', "Bib_priceAct": ' + ChargeUnit + 
+                                                ', "Bib_amoReim": ' + 0.00 + 
+                                                ', "Bib_createdUser": ' + CodigoUsuarioGlobal +
+                                           '}';
+                }
+            });
+            DetallesJsonTexto += ']}';
+
+            // Convierte el StringJSON en ObjectJSON.
+            DetallesJsonObjeto = JSON.parse(DetallesJsonTexto);
+
+            // ---------------------------------------------------------------------------------------------------------------------------
+            // FechaServicio    (1).
+            // Actividad        (1).
+            // ServiceUnit      (0).
+            // ChargeUnit       (1).
+            if (Bandera1)
+            {
+                $("#btnActualizarDetallesFactura").off("click"); // Deasctiva el click.                
+                $("#btnActualizarDetallesFactura").on("click", ActualizaDetallesDeFactura);
+                
+                mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", field '" + CampoDelErrorServiceUnit + "'";
+                error = "Error";
+
+                BanderaErrorValidacion = true;
+            }
+            // ---------------------------------------------------------------------------------------------------------------------------
+            // FechaServicio    (1).
+            // Actividad        (1).
+            // ServiceUnit      (1).
+            // ChargeUnit       (0).
+            if (Bandera2)
+            {
+                $("#btnActualizarDetallesFactura").off("click"); // Deasctiva el click.                
+                $("#btnActualizarDetallesFactura").on("click", ActualizaDetallesDeFactura);
+                
+                mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", field '" + CampoDelErrorChargeUnit + "'";
+                error = "Error";
+
+                BanderaErrorValidacion = true;
+            }
+            // ---------------------------------------------------------------------------------------------------------------------------
+            // FechaServicio    (1). |        | FechaServicio    (1). |         | FechaServicio    (1). |        | FechaServicio    (1). |
+            // Actividad        (0). |   OR   | Actividad        (0). |   OR    | Actividad        (0). |   OR   | Actividad        (0). |  
+            // ServiceUnit      (1). |        | ServiceUnit      (0). |         | ServiceUnit      (1). |        | ServiceUnit      (0). |
+            // ChargeUnit       (1). |        | ChargeUnit       (1). |         | ChargeUnit       (0). |        | ChargeUnit       (0). |
+            if (Bandera3)
+            {
+                $("#btnActualizarDetallesFactura").off("click"); // Deasctiva el click.                
+                $("#btnActualizarDetallesFactura").on("click", ActualizaDetallesDeFactura);
+
+                if (CampoDelErrorActividad != "" && CampoDelErrorServiceUnit == "" && CampoDelErrorChargeUnit == "")
+                    mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", field '" + CampoDelErrorActividad + "'";                         
+                else if (CampoDelErrorActividad != "" && CampoDelErrorServiceUnit != "" && CampoDelErrorChargeUnit == "")
+                    mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", fields '" + CampoDelErrorActividad + "', '" + CampoDelErrorServiceUnit + "'";
+                else if (CampoDelErrorActividad != "" && CampoDelErrorServiceUnit == "" && CampoDelErrorChargeUnit != "")
+                    mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", fields '" + CampoDelErrorActividad + "', '" + CampoDelErrorChargeUnit + "'";
+                else if (CampoDelErrorActividad != "" && CampoDelErrorServiceUnit != "" && CampoDelErrorChargeUnit != "")   
+                    mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", fields '" + CampoDelErrorActividad + "', '" + CampoDelErrorServiceUnit + "', '" + CampoDelErrorChargeUnit + "'";
+
+                error = "Error";
+
+                BanderaErrorValidacion = true;
+            }
+            // ---------------------------------------------------------------------------------------------------------------------------
+            // FechaServicio    (1).
+            // Actividad        (1).
+            // ServiceUnit      (0).
+            // ChargeUnit       (0).
+            if (Bandera4) 
+            {                
+                $("#btnActualizarDetallesFactura").off("click"); // Deasctiva el click.                
+                $("#btnActualizarDetallesFactura").on("click", ActualizaDetallesDeFactura);
+
+                mensaje = "Missing data in row " + NumeroCorrelativoDetalle + ", fields '" + CampoDelErrorServiceUnit + "', '" + CampoDelErrorChargeUnit + "'";
+                error = "Error";
+
+                BanderaErrorValidacion = true;
+            }
+            // ---------------------------------------------------------------------------------------------------------------------------
+            if (BanderaErrorValidacion) // Si es que encontró algún errror.
+            {
+                MensajeError(mensaje, error);        
+
+                // PaginaActualGlobal = MantenerPaginaActual();        // Antes de llamar al método "CargaDetalleFactura" obtiene el la página donde se está actualmente en la variable "PaginaActualGlobal".
+                //alert("IrAPaginaEspecifica1");
+                IrAPaginaEspecifica(PaginaActualGlobal);
+            
+                $("#dvLoading").css("display", "none");
+                return;                                         
+            }
+
+            // ---------------------------------------------------------------------------------------------------------------------------
+            // FechaServicio    (1).
+            // Actividad        (1).
+            // ServiceUnit      (1).
+            // ChargeUnit       (1).
+            if (Bandera5 == true)
+            {   
+                if (VecesSelecionaCaso == 0)
+                {
+                    //////////////BRENHER
+                    //alert("REGISTRA");
+                    $("#accion").val("REGISTRA");
+                    ///////////////////////
+                    $.ajax({
+                        type: "POST",
+                        async: false,
+                        data: JSON.stringify(DetallesJsonObjeto),
+                        url: '@Url.Action("RegistraActualizaDetalleFactura", "Billing")',
+                        contentType: "application/json",
+                        dataType: 'json',
+                        success: function (Datos)
+                        {  
+                            // if (Tipo == 0)
+                            // {
+                            //     mensaje = "Your information has been saved";
+                            //     error = "Success";
+                            //     MensajeError(mensaje, error);
+                            // 
+                            //     return false;
+                            // }       
+                        }       
+                    });
+                }
+                                
+                $("#btnActualizarDetallesFactura").off("click");    // Deasctiva el click.     
+                ///////alert("ANTES PaginaActualGlobal : " + PaginaActualGlobal);
+                PaginaActualGlobal = MantenerPaginaActual();        // Antes de llamar al método "CargaDetalleFactura" obtiene el la página donde se está actualmente en la variable "PaginaActualGlobal".
+                ///////alert("DESPUES PaginaActualGlobal : " + PaginaActualGlobal);
+                CargaDetalleFactura(NumeroFactura);
+                // $("#btnActualizarDetallesFactura").on("click", ActualizaDetallesDeFactura);
+                ///alert("IrAPaginaEspecifica2");
+                IrAPaginaEspecifica(PaginaActualGlobal);  
+                // LimpiarArreglos();
+
+                $("#dvLoading").css("display", "none");
+
+                // if (Tipo == 0)
+                // {
+                //     mensaje = "Your information has been saved";
+                //     error = "Success";
+                //     MensajeError(mensaje, error);
+                // 
+                //     return false;
+                // }                           
+            }
+            
+            ObtenerDetallesDeFacturaNuevamente(NumeroFactura);
+            
+            // PaginaActualGlobal = MantenerPaginaActual();
+            // PaginarTabla();            
+            // IrAPaginaEspecifica(PaginaActualGlobal);  
+
+            $("#dvLoading").css("display", "none");
+
+            // if (Bandera9)
+            // {
+            //     // alert("everything is correct");
+            // 
+            //     return false;
+            // }            
+        }
+        
+    }
+
+    function ObtenerDetallesDeFacturaNuevamente(NumeroFactura)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "NumeroFactura": NumeroFactura }),
+            url: '@Url.Action("ListaDetalleFactura", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Detalles = Data;     
+            }
+        });
+    }
+     
+    function PaginarTabla()
+    {
+        var otable = $("#tblDetalleFactura").dataTable().fnDestroy();
+        var IndicePrimeraColumna = 1;
+        var accion = $("#accion").val();
+        otable = $("#tblDetalleFactura").DataTable({
+            // "bSortable" : false
+            "pageLength": 20
+            , "bFilter": false
+            , "bFilter": false
+            ,"bLengthChange": false
+            ,"bInfo": false
+            ,"ordering" : false 
+            //, order: []
+        })
+        .on("draw.dt", function(e)
+        {
+            if(@CantidadPaginas <= 1)
+                 return false;
+            //alert(PaginaActualGlobal);
+            //alert("AKI DRAW");
+
+            PaginaActualGlobal = MantenerPaginaActual();
+
+            // $(this).trigger("page.dt");
+
+            // if(PaginaActualGlobal == 1)
+            // { 
+            //     ActualizarDetalles(1);
+            // } 
+        })
+        .on("page.dt", function(e) 
+        {               
+            
+            
+            var info = otable.page.info();
+
+            ///////alert("page DTxx");
+            ///alert("INFOPAGE : " + info.page);
+            //alert("accion : " + accion );
+            //alert("aki0");            
+            //alert("PaginaActualGlobal"+PaginaActualGlobal);
+            //console.clear()
+            //if(accion != "REGISTRA")
+            //{
+                //////alert("BRENHER");
+                /////////////////////////////////////BERNHER
+               // var info = otable.page.info();
+
+                if ((PaginaActualGlobal != undefined)
+                 && (info.page != undefined)
+                 && (PaginaActualGlobal != (info.page + 1)) && accion == "0" )
+                {
+                    ////////////alert("aki1");
+
+                    ///////alert("(1.1) PaginaActualGlobal: " + PaginaActualGlobal);
+                    ActualizarDetalles(1);                                
+                    ///////alert("(1.2) PaginaActualGlobal: " + PaginaActualGlobal);
+                }
+                else
+                { 
+
+                    ///alert("aki2");
+                    ///alert(accion);
+                    ///alert("PaginaActualGlobal"+PaginaActualGlobal);
+                    //alert(info.page);
+                    
+                    if(accion !="CAMBIO") //si accion es 0
+                    {
+                        ///alert("aki3");
+                        PaginaActualGlobal = info.page + 1;   
+                    }
+
+                    else 
+                    {
+                        ///alert("aki4");
+                        return false;
+                        ///alert("PaginaActualGlobal"+PaginaActualGlobal);
+                        ///PaginaActualGlobal = info.page + 1;                           
+                        ///alert("PaginaActualGlobal"+PaginaActualGlobal);
+                        ///alert("IrAPaginaEspecifica3");
+                        ///IrAPaginaEspecifica(PaginaActualGlobal);
+                    }
+                    // console.log("(2) PaginaActualGlobal: " + PaginaActualGlobal);
+                }
+                ///ProcesarCadaColumna(otable, IndicePrimeraColumna);Brenher MOdificado
+                /////////////////////////////////IrAPaginaEspecifica(PaginaActualGlobal);
+            //}         
+
+            return false;
+        });
+        
+        
+        $(".sorting_asc").removeClass("sorting_asc");
+
+        //ProcesarCadaColumna(otable, IndicePrimeraColumna);//Brenher MOdificado
+
+            ProcesarCadaColumna(otable, IndicePrimeraColumna);//Brenher MOdificado
+       
+
+    }
+
+    function ProcesarCadaColumna(otable, IndicePrimeraColumna)
+    {
+        //////alert("ProcesarCadaColumna");
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Muestra correlativos
+        otable.column(0).nodes().to$().each(function (index)
+        {
+            ArregloDetalles[index] = Array(); // Por cada fila que recorre en la tabla inicializa un nuevo arreglo para la fila correspondiente en la matriz "ArregloDetalles".
+            ArregloValidacionesPendientes[index] = Array(); // Lo mismo que la línea anterior hace para la matriz "ArregloValidacionesPendientes".
+            
+            ArregloDetalles[index]["CorrelativoDetalle"] = IndicePrimeraColumna;
+            ArregloDetalles[index]["CodigoDetalle"] = null;
+            ArregloDetalles[index]["FechaServicio"] = null;
+            ArregloDetalles[index]["CodigoActividad"] = 0;
+            ArregloDetalles[index]["DescripcionActividad"] = null;
+            ArregloDetalles[index]["ServiceUnit"] = null;
+            ArregloDetalles[index]["ChargeUnit"] = null;
+
+            ArregloValidacionesPendientes[index]["CorrelativoDetalle"] = "";
+            ArregloValidacionesPendientes[index]["CodigoDetalle"] = "";
+            ArregloValidacionesPendientes[index]["FechaServicio"] = "";
+            ArregloValidacionesPendientes[index]["CodigoActividad"] = "";
+            ArregloValidacionesPendientes[index]["DescripcionActividad"] = "";
+            ArregloValidacionesPendientes[index]["ServiceUnit"] = "";
+            ArregloValidacionesPendientes[index]["ChargeUnit"] = "";
+
+            $(this)["0"].innerHTML = IndicePrimeraColumna;
+            IndicePrimeraColumna += 1;
+        });
+
+        // Obtiene los códigos de cada detalle de factura para llenarlos en ArregloDetalles.
+        otable.column(1).nodes().to$().each(function (index)
+        {            
+            var CodigoNuevoDetalle = $(this)["0"].innerHTML.trim();
+            
+            ArregloDetalles[index]["CodigoDetalle"] = (CodigoNuevoDetalle == "") ? null : parseInt(CodigoNuevoDetalle);
+
+            // Se comparan los códigos (nuevos) de los detalles, que se traen nuevamente de la base de datos con los códigos.
+            if (index < Detalles.length) // Esta condición permite que se evalúen los controles de la tabla que contienen datos.
+            {
+                // Si la fila de controles en la que se está actualmente tiene código nuevo de detalle, no hace nada.
+                if (Detalles[index]["Bib_code"].toString().trim() == CodigoNuevoDetalle)
+                {
+                    // console.log("primera de primera condicion");
+                    // console.log((index + 1) + " - " + CodigoNuevoEntrada + " - " + "Tiene código");
+                }
+                else
+                {
+                    // Aquí tienen que asignarse los códigos nuevos de los detalles que se insertaron a las columna "Bib_code".
+                    $(this)["0"].innerHTML = Detalles[index]["Bib_code"].toString().trim(); 
+                    ArregloDetalles[index]["CodigoDetalle"] = parseInt(Detalles[index]["Bib_code"].toString().trim());
+
+
+                    var EnlaceEliminar = $(this)["0"].parentElement.children[7].children["0"];
+
+                    $(EnlaceEliminar).css({"display":"block"});
+                }
+            
+            }
+
+        });
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Obtiene las fechas de cada detalle para llenarlas en ArregloDetalles.
+        otable.column(2).nodes().to$().each(function (index)
+        {
+            var ControlFecha = $(this).find(".dtpFecha");
+            var FechaActual = $(this).find(".dtpFecha").val();
+            var IconoControlFecha = $(this).find(".dtpFecha").parent(".input-group").find(".input-group-addon");
+
+            ControlFecha.off("change");
+            ControlFecha.off("focusin");
+            ControlFecha.off("focusout");
+            IconoControlFecha.off("click"); 
+
+            ArregloDetalles[index]["FechaServicio"] = $(this).find(".dtpFecha").val();
+
+            tabindex = index + "3"  ;
+            ControlFecha.attr("tabindex", tabindex);
+
+            ControlFecha.on("focusout", function(e)
+            {                   
+                // Si la fecha está llena y no tiene el formato correcto.
+                if ((e.target.value.trim() != "") && !e.target.value.match(RegExpFecha) && (e.target.value.trim() != "__/__/____")) 
+                {
+                    BanderaValidaciones = true;
+                    
+                    ArregloDetalles[index]["FechaServicio"] = e.target.value.trim();                    
+
+                    mensaje = "The Date in the row " + (index + 1) + " is incorrect.";
+                    error = "Error";
+                    MensajeError(mensaje, error);
+                     
+                    ArregloValidacionesPendientes[index]["FechaServicio"] = "The date in the row " + (index + 1) + " is incorrect.";
+                    return false;        
+                }
+
+                // si la fecha está vacía o tiene el formato correcto.
+                if (e.target.value.trim() == "" || e.target.value.match(RegExpFecha)) 
+                {
+                    ArregloValidacionesPendientes[index]["FechaServicio"] =  "";
+                }
+
+                // Este "if" es para que si se borra una fecha y sale del control automaticamente se vuelva a rellenar con la fecha que tenía.
+                if ($(ControlFecha).val() == "")
+                    $(ControlFecha).val(FechaActual);
+                 
+                ArregloDetalles[index]["FechaServicio"] = e.target.value.trim();     
+                $(this)["0"].parentElement.parentElement.parentElement.children[8].innerHTML = e.target.value;
+
+            });
+
+            ControlFecha.on("change", function (e)
+            { 
+                BanderaCambioProceso = true;
+
+                ArregloDetalles[parseInt(e.target.parentElement.parentElement.parentElement.cells["0"].innerText) - 1]["FechaServicio"] = e.target.value;
+                $(this)["0"].parentElement.parentElement.parentElement.children[8].innerHTML = e.target.value;
+                
+                
+            });
+
+            IconoControlFecha.bind("click", function () 
+            {
+                $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+                $(this).parent(".input-group").find(".dtpFecha").focus();
+            });
+        });
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Llena los combos y establece los valores seleccionados de actividad para cada entrada, obteniéndolos también para llenarlos en ArregloDetalles.
+        otable.column(3).nodes().to$().each(function (index)
+        {
+            var ComboActividades;
+            var CodigoActividad;
+
+            ComboActividades = $(this).find("select");
+
+            ComboActividades.off("focusout");
+            ComboActividades.off("change");            
+
+            tabindex = index + "3"  ;
+            ComboActividades.attr("tabindex", tabindex);
+
+
+            // Si el control oculto "hdCodigoOriginalActividad" tiene un código de actividad.
+            if ($(this)["0"].children[1].value != "") 
+            {   
+                $(this)["0"].attributes[1].value = $(this)["0"].children[1].value; // Asigna el código escondido en el control oculto "hdCodigoOriginalActividad" al atributo "CodigoActividad" de la columna correspondiente.
+                $(this)["0"].children["0"].value = $(this)["0"].children[1].value; // Asigna el código escondido en el control oculto "hdCodigoOriginalActividad" al valor del combo.
+            }
+
+            // Llena cada combo con las actividades y establece la actividad seleccionada cada vez que hace el paginado.
+            $.each(Actividades, function (i, val) 
+            {                
+                // Por esto es importante poner en el control oculto del combo de actividades el valor de una actividad seleccionada, 
+                // por que cada vez que hace el paginado verifica cual es la actividad que tiene la fila en la que está para poder establecerla en el combo.
+                CodigoActividad = parseInt(ComboActividades.parent("td").attr("CodigoActividad"));
+
+                // Al momento que está llenando un combo de actividades verifica código por código si alguno de ellos coincide con el código de actividad almacenado 
+                // en la variable "CodigoActividad" y si coincide lo selecciona en el combo actual para que quede mostrado como la actividad de ese detalle de factura.
+                if (val.Act_code == CodigoActividad) 
+                {
+                    ComboActividades.append("<option selected value=" + val.Act_code + ">" + val.Act_description + "</option>");
+                    
+                    ArregloDetalles[index]["CodigoActividad"] = val.Act_code;
+                    ArregloDetalles[index]["DescripcionActividad"] = val.Act_description;
+                }
+                else 
+                {
+                    ComboActividades.append("<option value=" + val.Act_code + ">" + val.Act_description + "</option>");
+                }
+            });
+
+            ComboActividades.on("focusout", function (e)
+            {                   
+                var FechaFilaActual = $(this).parent("td").parent("tr").find("td:eq(2)").find(".dtpFecha").val(); // Obtiene la fecha de la fila actual.
+                
+                var Indice = $(this)["0"].parentElement.parentElement.rowIndex; // Obtiene el indice de la siguiente fila.
+
+                if (!((Indice % 20) == 0)) // Para que no tome en cuenta la última fila de la tabla al momento de generar la fecha en la fila siguiente del combo donde se selecciona un actividad.
+                {
+                    // Si la fecha de la siguiente fila de donde se está no tiene aún fecha, se le asigna la fecha de la fila donde se está.
+                    if ($(this)["0"].parentElement.parentElement.parentElement.children[Indice].children[2].children["0"].children[1].value.trim() == "") 
+                    {
+
+                        var ControlFechaSiguienteHTML = $(this)["0"].parentElement.parentElement.parentElement.children[Indice].children[2].children["0"].children[1];                        
+                        $(ControlFechaSiguienteHTML).datepicker("setDate", FechaFilaActual);
+                    }
+
+                    // $(".dtpFecha").datepicker(FechaFilaActual);
+                }
+
+                var FechaBruto = new Date();
+                var Mes = (FechaBruto.getMonth() + 1).toString();
+                var Dia = FechaBruto.getDate().toString();
+                var Año = FechaBruto.getFullYear().toString();
+                var FechActual = RellenarCerosIzquierdaNumero(Mes, 2) + '/' + RellenarCerosIzquierdaNumero(Dia, 2) + '/' + Año;                
+                
+                ArregloDetalles[index]["FechaServicio"] = FechaFilaActual;
+
+                if(e.target.value.trim() != "")
+                {                    
+                    $(this)["0"].parentElement.parentElement.children[8].innerHTML = FechaFilaActual;
+                    return false;
+                }
+                else
+                {
+                    $(this)["0"].parentElement.parentElement.children[8].innerHTML = "12/28/2050";
+                    return false;
+                } 
+            });
+
+            // Controla el cambio de opción en un combo de actividades.
+            ComboActividades.on("change", function(e)
+            {
+                BanderaCambioProceso = true;
+
+                CodigoDetalleFactura = $(this)["0"].parentElement.children[1].textContent.trim(); 
+
+                var CodigoCasoSeleccionado = 0;
+                var CodigoActividadSeleccionada = 0;
+                var NombreActividadSeleccionada = 0;
+                var CodigoOriginalActividad = 0;
+                var PrecioObtenidoSegunActividad = 0.0;
+                var PrecioOriginalDeActividad = 0.0;                
+
+                // Obtiene el código de la actividad seleecionada en la variable "CodigoActividadSeleccionada".
+                CodigoActividadSeleccionada = ($(this)["0"].selectedOptions["0"].value.trim() == "") ? 0 : $(this)["0"].selectedOptions["0"].value;
+
+                // Obtiene el nombre de la actividad seleecionada en la variable "NombreActividadSeleccionada".
+                NombreActividadSeleccionada = (e.target.selectedOptions["0"].innerHTML == "") ? null : e.target.selectedOptions["0"].innerHTML;                
+
+                // Almacena en la matriz "ArregloDetalles" el código y nombre de la actividad seleccionada que se obtuvieron previamente
+                // en las variables "CodigoActividadSeleccionada" y "NombreActividadSeleccionada" respectivameente.
+                ArregloDetalles[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1]["CodigoActividad"] = CodigoActividadSeleccionada;
+                ArregloDetalles[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1]["DescripcionActividad"] = NombreActividadSeleccionada;
+
+                // Pone el código de la actividad seleccionada en el atributo "CodigoActividad" de la columna que alberga al combo de actividades.
+                $(this).parent("td").attr("CodigoActividad", CodigoActividadSeleccionada); 
+                
+                if ((!(CodigoDetalleFactura == "")))
+                {
+                    // Cuando se cambia de actividad el código y nombre de la actividad seleccionada los almacena en los controles 
+                    // ocultos de código y actividad respectivamente que se encuentran ubicados debajo de la lista desplegable.
+                    $(this)["0"].parentElement.children[1].value = CodigoActividadSeleccionada; // Cuando se selecciona una actividad el código de dicha actividad lo almacena en el control oculto "hdCodigoOriginalActividad".
+                    $(this)["0"].parentElement.children[2].value = NombreActividadSeleccionada; // Cuando se selecciona una actividad el nombre de dicha actividad lo almacena en el control oculto "hdNombreOriginalActividad".
+                }
+
+                // ***********************************************************************************************************************
+                //                                Obtenciones del código del caso y del código de actividad
+                // Obtiene el código del caso.
+                CodigoCasoSeleccionado = $("#hdCodigoCasoSeleccionado").val();
+
+                // Rescata el código original de la actividad, del control oculto "hdCodigoOriginalActividad".
+                // El código original viene cuando se selecciona un caso.
+                // Nota: la primera vez que el control oculto "hdCodigoOriginalActividad" obtiene un código de actividad es cuando 
+                // se selecciona un caso, después este control se va 
+                CodigoOriginalActividad = parseInt(e.currentTarget.parentElement.children[1].value);
+                // ***********************************************************************************************************************
+
+                // Si se seleccionó una actividad inválida (que es la que aparece como primer elemento con nombre vacío).
+                if (CodigoActividadSeleccionada == 0)
+                {
+                    // Borra el valor del campo "Charge Fer Unit" dejándolo vacío.
+                    e.currentTarget.parentElement.parentElement.children[5].children[0].value = "";                    
+                    ArregloDetalles[index]["ChargeUnit"] = null;
+
+                    // ------------------------------------------------------------------------------------------------------//
+                    // Pone un efecto de parpadeo en el campo "Charge Fer Unit" cuando cambia de valor.                      //
+                    // var Intervalo1;                                                                                          //
+                    //                                                                                                          //
+                    // setTimeout(function()                                                                                    //
+                    // {                                                                                                        //
+                    //     e.target.parentElement.parentElement.children[5].children["0"].style.border = "4px solid red";       //
+                    // }, 0);                                                                                                   //
+                    //                                                                                                          //
+                    // Intervalo1 = setInterval(function()                                                                      //
+                    // {                                                                                                        //
+                    //     if (!(e.target.parentElement.parentElement.children[5].children["0"].style.borderColor == 'red'))    //
+                    //         e.target.parentElement.parentElement.children[5].children["0"].style.border = "4px solid red";   //
+                    //     else                                                                                                 //
+                    //         e.target.parentElement.parentElement.children[5].children["0"].style.border = "2px solid pink";  //
+                    // }, 180);                                                                                                 //
+                    //                                                                                                          //
+                    // setTimeout(function()                                                                                    //
+                    // {                                                                                                        //
+                    //     clearInterval(Intervalo1);                                                                           //
+                    //     e.target.parentElement.parentElement.children[5].children["0"].style.border = "1px solid #b3b4b9";   //
+                    // }, 2500);                                                                                                //
+                    // ------------------------------------------------------------------------------------------------------//
+
+                    return false;
+                }                                
+                
+                // Si el código de la actividad seleccionada es igual al código original de actividad.
+                if (CodigoActividadSeleccionada == CodigoOriginalActividad)
+                {    
+                    // Obtiene el precio original de la actividad.
+                    PrecioOriginalDeActividad = e.currentTarget.parentElement.parentElement.children[5].children[1].value;
+                    
+                    // Establece el precio original de la actividad cuando se vuelva a seleccionar la actividad original.
+                    e.currentTarget.parentElement.parentElement.children[5].children["0"].value = PrecioOriginalDeActividad;
+
+                    // --------------------------------------------------------------------------------------------------------------//
+                    // Pone un efecto de parpadeo en el campo "Charge Fer Unit" cuando cambia de valor.                              //
+                    // var Intervalo1;                                                                                                  //
+                    //                                                                                                                  //
+                    // setTimeout(function()                                                                                            //
+                    // {                                                                                                                //
+                    //     e.target.parentElement.parentElement.children[5].children["0"].style.border = "4px solid darkslategrey";     //
+                    // }, 0);                                                                                                           //
+                    //                                                                                                                  //
+                    // Intervalo1 = setInterval(function()                                                                              //
+                    // {                                                                                                                //
+                    //     if (!(e.target.parentElement.parentElement.children[5].children["0"].style.borderColor == 'darkslategrey'))  //
+                    //         e.target.parentElement.parentElement.children[5].children["0"].style.border = "4px solid darkslategrey"; //
+                    //     else                                                                                                         //
+                    //         e.target.parentElement.parentElement.children[5].children["0"].style.border = "2px solid #bbbbbb";       //
+                    // }, 180);                                                                                                         //
+                    //                                                                                                                  //
+                    // setTimeout(function()                                                                                            //
+                    // {                                                                                                                //
+                    //     clearInterval(Intervalo1);                                                                                   //
+                    //     e.target.parentElement.parentElement.children[5].children["0"].style.border = "1px solid #b3b4b9";           //
+                    // }, 2500);                                                                                                        //
+                    // --------------------------------------------------------------------------------------------------------------//
+                }
+                else // Si el código de la actividad seleccionada es diferente al código original de actividad. 
+                {            
+                    // Obtiene el precio según el caso y la actividad seleccionada.
+                    PrecioObtenidoSegunActividad = ObtenerPrecioSegunActividad(parseInt(CodigoCasoSeleccionado), parseInt(CodigoActividadSeleccionada)); 
+
+                    if (!(PrecioObtenidoSegunActividad == e.currentTarget.parentElement.parentElement.children[5].children["0"].value))
+                    {
+                        // --------------------------------------------------------------------------------------------------------------//
+                        // Pone un efecto de parpadeo en el campo "Charge Fer Unit" cuando cambia de valor.                              //
+                        // var Intervalo1;                                                                                                  //
+                        //                                                                                                                  //
+                        // setTimeout(function()                                                                                            //
+                        // {                                                                                                                //
+                        //     e.target.parentElement.parentElement.children[5].children["0"].style.border = "4px solid darkslategrey";     //
+                        // }, 0);                                                                                                           //
+                        //                                                                                                                  //
+                        // Intervalo1 = setInterval(function()                                                                              //
+                        // {                                                                                                                //
+                        //     if (!(e.target.parentElement.parentElement.children[5].children["0"].style.borderColor == 'darkslategrey'))  //
+                        //         e.target.parentElement.parentElement.children[5].children["0"].style.border = "4px solid darkslategrey"; //
+                        //     else                                                                                                         //
+                        //         e.target.parentElement.parentElement.children[5].children["0"].style.border = "2px solid #bbbbbb";       //
+                        // }, 180);                                                                                                         //
+                        //                                                                                                                  //
+                        // setTimeout(function()                                                                                            //
+                        // {                                                                                                                //
+                        //     clearInterval(Intervalo1);                                                                                   //
+                        //     e.target.parentElement.parentElement.children[5].children["0"].style.border = "1px solid #b3b4b9";           //
+                        // }, 2500);                                                                                                        //
+                        // --------------------------------------------------------------------------------------------------------------//            
+                    }
+
+                    // Establece en el campo "Charge Fer Unit" correspondiente el precio obtenido según la actividad seleccionada.                                    
+                    e.currentTarget.parentElement.parentElement.children[5].children["0"].value = PrecioObtenidoSegunActividad.toFixed(2); 
+
+                    ArregloDetalles[index]["ChargeUnit"] = PrecioObtenidoSegunActividad.toFixed(2);
+                }
+            });
+
+            // Pone en el control oculto "hdNombreOriginalActividad" el nombre original de la actividad del detalle en el que se está.
+            // Esto se hace la primera vez que se carga la página.
+            $(this)["0"].children[2].value = $(this)["0"].children["0"].selectedOptions["0"].text;
+        });
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Valida sólo número para "Service Unit" y obtiene sus valores para llenarlos en ArregloDetalles.
+        otable.column(4).nodes().to$().each(function (index)
+        {
+            var ServiceUnit;
+            var CodigoDetalleFactura;
+
+            var ServiceUnitHTML = $(this).find(".txtUnit");
+
+            tabindex = index + "4";            
+            $(ServiceUnitHTML).attr("tabindex", tabindex);
+
+            // Obtiene el código de detalle de factura, se necesita para saber si la fila de la tabla en la que 
+            // se está obtiene datos o no; y con esto poder asignar valores orignales de los campos.
+            CodigoDetalleFactura = $(this)["0"].parentElement.children[1].textContent.trim(); 
+
+            // Si es una fila de la tabla que tiene detalle y este tiene el ServiceUnit vacío
+            if ((!(CodigoDetalleFactura == "")))
+            {
+                // Hace que cada vez que se pagine se llenen los valores originales del campo "Service Unit". 
+                // Esto se da para que valide que el valor "Service Unit" siempre esté visible por si se haya 
+                // borrado sin darse cuenta y se quiera guardar así.
+                ServiceUnit = parseFloat($(this)["0"].children["1"].value).toFixed(2); 
+            
+                // Asigna el valor original del control oculto a la caja de texto.
+                $(this)["0"].children["0"].value = ServiceUnit;                 
+
+                // Asigna el valor original del control oculto al arreglo "ArregloDetalles".
+                ArregloDetalles[index]["ServiceUnit"] = (ServiceUnit == "") ? null : ServiceUnit;
+                ArregloValidacionesPendientes[index]["ServiceUnit"] = "";
+            }
+
+            $(this).off("keydown");
+            $(this).off("keypress");
+            $(this).off("focusout");
+            $(this).off("change");
+
+            // Controla que guarde el detalle de factura cuando se presiona enter en la caja de texto.
+            $(this).on("keydown", function(e)
+            {
+                if (e.keyCode == 13)
+                {
+                    $("#btnActualizarDetallesFactura").focus();
+                }
+            });
+
+            $(this).on("keypress", validaNumeros);
+            
+            $(this).on("focusout", function (e)
+            {                
+                // Si el "Service Unit" está vacío
+                // if (e.target.children["0"].value.trim() == "")
+                if ($(this)["0"].children["0"].value.trim() == "")
+                {
+                    BanderaValidaciones = true;
+
+                    ArregloValidacionesPendientes[index]["ServiceUnit"] = "Missing data in row " + (index + 1) + ".";
+                    
+                    return false;
+                }
+
+                // Si el "Service Unit" está lleno y no tiene el formato correcto.
+                if (($(this)["0"].children["0"].value.trim() != "") && !$(this)["0"].children["0"].value.match(RegExpDecimal)) 
+                {
+                    BanderaValidaciones = true;
+
+                    mensaje = "'Service Unit' does not have the correct format in the row " + (index + 1) + " .";
+                    error = "Error";
+                    MensajeError(mensaje, error);
+
+                    ArregloValidacionesPendientes[index]["ServiceUnit"] = "'Service Unit' does not have the correct format in the row " + (index + 1) + " .";
+
+                    return false;
+                }
+
+                // si el "Service Unit" está lleno y tiene el formato correcto.
+                if ($(this)["0"].children["0"].value.trim() != "" && $(this)["0"].children["0"].value.match(RegExpDecimal))
+                {
+                    BanderaValidaciones = false;
+
+                    ArregloValidacionesPendientes[index]["ServiceUnit"] = "";
+
+                    // if (e.target.value.match(RegExpDecimal)) // Si el "Service Unit" tiene el formato correcto.
+                    // {
+                        // si el "Service Unit" tiene el formato correcto, al salir de la caja de texto simplemente fija el valor poniendole parte entera y dos decimales.
+                        // Lo mismo se lo hace a su control oculto correspondiente "hdServiceUnit".
+                        $(this)["0"].children["0"].value = ($(this)["0"].children["0"].value.trim() != "") ? parseFloat($(this)["0"].children["0"].value).toFixed(2) : "";
+                        $(this)["0"].children["1"].value = ($(this)["0"].children["0"].value.trim() != "") ? parseFloat($(this)["0"].children["0"].value).toFixed(2) : "";
+                    // }
+                }
+            });                       
+
+            $(this).on("change", function (e) 
+            {
+                BanderaCambioProceso = true;
+
+                ArregloDetalles[parseInt($(this)["0"].parentElement.cells["0"].innerText) - 1]["ServiceUnit"] = ($(this)["0"].children["0"].value == "") ? null : parseFloat($(this)["0"].children["0"].value);
+                $(this)["0"].children["0"].defaultValue = parseFloat($(this)["0"].children["0"].value); // Para que el valor del "Service Unit" quede pegado en el control.                
+            });
+        });
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Valida sólo número para "Charge Fer Unit" y obtiene sus valores para llenarlos en ArregloDetalles.
+        otable.column(5).nodes().to$().each(function (index)
+        {
+            var ChargeUnit;
+            var CodigoDetalleFactura;
+
+            var ChargeUnitHTML = $(this).find(".txtPriceUnit");
+            
+            tabindex = index + "5";            
+            $(ChargeUnitHTML).attr("tabindex", tabindex);
+
+            // Obtiene el código de detalle de factura, se necesita para saber si la fila de la tabla en la que 
+            // se está obtiene datos o no; y con esto poder asignar valores orignales de los campos.
+            CodigoDetalleFactura = $(this)["0"].parentElement.children[1].textContent.trim(); 
+
+            // Se comprueba si al cargar por primera vez la tabla de detalles, existe un código de detalle de factura en cada fila 
+            // (verificando si el código de detalle de factura "CodigoDetalleFactura" es diferente del vacío).
+            if (!(CodigoDetalleFactura == ""))
+            {
+                // Hace que cada vez que se pagine se llenen los valores originales del campo "Charge Fer Unit". 
+                // Esto se da para que valide que el valor "Charge Fer Unit" siempre esté visible por si se haya 
+                // borrado sin darse cuenta y se quiera guardar así.
+                ChargeUnit = parseFloat($(this)["0"].children["1"].value).toFixed(2); 
+
+                // Asigna el valor original del control oculto a la caja de texto.
+                $(this)["0"].children["0"].value = ChargeUnit; 
+
+                // Asigna el valor original del control oculto al arreglo "ArregloDetalles".
+                ArregloDetalles[index]["ChargeUnit"] = (ChargeUnit == "") ? null : ChargeUnit;                
+                ArregloValidacionesPendientes[index]["ChargeUnit"] = "";
+            }
+
+            $(this).off("keydown");
+            $(this).off("keypress");
+            $(this).off("focusout");
+            $(this).off("change");
+
+            // Controla que guarde el detalle de factura cuando se presiona enter en la caja de texto.
+            $(this).on("keydown", function(e)
+            {
+                if (e.keyCode == 13)
+                {
+                    $("#btnActualizarDetallesFactura").focus();
+                }
+            });
+
+            $(this).on("keypress", validaNumeros);
+
+            $(this).on("focusout", function (e)
+            {
+                if ($(this)["0"].children["0"].value.trim() == "")
+                {   
+                    BanderaValidaciones = true;
+
+                    ArregloValidacionesPendientes[index]["ChargeUnit"] = "Missing data in row " + (index + 1) + ".";
+
+                    return false;
+                }
+
+                // Si "Charge Fer Unit" está lleno y no tiene el formato correcto.
+                if (($(this)["0"].children["0"].value.trim() != "") && !$(this)["0"].children["0"].value.match(RegExpDecimal)) 
+                {
+                    BanderaValidaciones = true;
+            
+                    mensaje = "'Charge Fer Unit' does not have the correct format in the row " + (index + 1) + " .";
+                    error = "Error";
+                    MensajeError(mensaje, error);
+            
+                    ArregloValidacionesPendientes[index]["ChargeUnit"] = "'Charge Fer Unit' does not have the correct format in the row " + (index + 1) + " .";
+            
+                    return false;
+                }
+            
+                // si el "Charge Fer Unit" está lleno y tiene el formato correcto.
+                if ($(this)["0"].children["0"].value.trim() != "" && $(this)["0"].children["0"].value.match(RegExpDecimal)) 
+                {
+                    // BanderaValidaciones = false;
+
+                    // ArregloValidacionesPendientes[index]["ChargeUnit"] = "";
+            
+                    // if (e.target.value.match(RegExpDecimal)) // Si el "Charge Fer Unit" tiene el formato correcto.
+                    // {
+                        // si el "Charge Fer Unit" tiene el formato correcto, al salir de la caja de texto simplemente fija el valor con poniendole parte entera y dos decimales.
+                        // Lo mismo se lo hace a su control oculto correspondiente "hdChargeUnit".
+                        $(this)["0"].children["0"].value = ($(this)["0"].children["0"].value.trim() != "") ? parseFloat($(this)["0"].children["0"].value).toFixed(2) : "";
+                        $(this)["0"].children["1"].value = ($(this)["0"].children["0"].value.trim() != "") ? parseFloat($(this)["0"].children["0"].value).toFixed(2) : "";
+                    // }
+                }
+            });
+            
+            $(this).on("change", function (e) 
+            {
+                BanderaCambioProceso = true;
+
+                ArregloDetalles[parseInt($(this)["0"].parentElement.cells["0"].innerText) - 1]["ChargeUnit"] = ($(this)["0"].children["0"].value.trim() == "") ? null : parseFloat($(this)["0"].children["0"].value.trim());
+                $(this)["0"].children["0"].defaultValue = parseFloat($(this)["0"].children["0"].value); // Para que el valor del "Charge Fer Unit" quede pegado en el control.
+            });
+        });
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Columna para almacenar el número de la página.
+        otable.column(7).nodes().to$().each(function (index)
+        {            
+            var BotonEliminarDetalle = $(this).find(".EliminarDetalle");
+
+            BotonEliminarDetalle.on("click", EliminarDetalle);
+        });
+        // *************************************************************************************************************************************************************************************************************************************************
+        // Columna para almacenar el número de la página.
+        otable.column(9).nodes().to$().each(function (index)
+        {
+            var MaximoIndice = $(this)["0"].parentElement.children["0"].innerHTML;
+            var NumeroPagina = Math.floor(parseInt(MaximoIndice) / 20);
+
+            $(this)["0"].innerHTML = NumeroPagina + 1;
+        });
+
+        /////alert("yyyyyyyyyyyyyyyyy");
+       //alert(NumeroPagina);
+    }
+
+    function EliminarDetalle(e)
+    {
+        e.preventDefault();
+
+        var CodigoDetalle;
+        var CodigoUsuarioQueElimina;
+        var Resultado;
+
+        CodigoDetalle = 0
+        CodigoUsuarioQueElimina = 0;
+        Resultado = 0; 
+         
+        CodigoUsuarioQueElimina = CodigoUsuarioGlobal;
+        CodigoDetalle = parseInt($(this).parent("td").parent("tr").find("td:eq(1)").html());
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoDetalle": CodigoDetalle, "CodigoUsuario": CodigoUsuarioQueElimina }),
+            url: '@Url.Action("EliminaDetalle", "Billing")',
+            contentType: "application/json",
+            dataType: 'json', 
+            success: function (Dato) 
+            {
+                // Resultado = Dato;
+                $("#dvLoading").css("display", "block");
+            }
+        });
+        
+        $("#btnActualizarDetallesFactura").off("click");    // Deasctiva el click.
+        PaginaActualGlobal = MantenerPaginaActual();        // Antes de llamar al método "CargaDetalleFactura" obtiene el la página donde se está actualmente en la variable "PaginaActualGlobal".
+        CargaDetalleFactura(NumeroFactura);     
+        ///alert("IrAPaginaEspecifica4");// Vuelve a cargar la vista parcial del detalle de factura
+        IrAPaginaEspecifica(PaginaActualGlobal);  
+
+        $("#dvLoading").css("display", "none");
+
+        // mensaje = "Deleted";
+        // error = "Success";
+        // MensajeError(mensaje, error);
+    }
+
+    function validaNumeros(e) 
+    {
+        if (!((e.which >= 48 && e.which <= 57) || (e.which == 40 || e.which == 41) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 46)))//46punto
+        {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+
+    function IrAPaginaEspecifica(PaginaEspecifica)      
+    {   
+        //alert(info.page);alert("IrAPaginaEspecifica");
+        var otable = $("#tblDetalleFactura").DataTable();
+        var info = otable.page.info();
+        
+        /////alert("ir a pagina especifica : " + PaginaEspecifica);
+
+        var table = $('#tblDetalleFactura').dataTable();
+        table.fnPageChange((PaginaEspecifica - 1)    , true);        // Esta es la huevada que causa el problema de ir siempre a la última página.
+    }
+    
+    function ultimaPagina()
+    {
+        var cantidad = @CantidadPaginas;
+        var table = $('#tblDetalleFactura').dataTable();
+        
+        table.fnPageChange((cantidad - 1), true);
+    }
+
+    function MantenerPaginaActual()/////BRENHER
+    {
+        /////////alert("MantenerPaginaActual");
+        var otable = $("#tblDetalleFactura").DataTable();
+        var PaginaActual;
+        var accion = $("#accion").val();
+        /////////alert("MantenerPaginaActual : ACCION" + accion);
+        /////alert("MantenerPaginaActual : accion " + accion);
+        var info = otable.page.info();
+        if(accion == "REGISTRA")
+        {
+            /////alert("cambia accion a  Cambio ");
+            PaginaActual = info.page;   
+            $("#accion").val("CAMBIO");
+        }
+        else 
+        {
+            /////alert("cambia2 accion a  0 ");
+            PaginaActual = info.page + 1;   
+            $("#accion").val("0");
+        }
+
+        return PaginaActual;
+    }
+
+    function ObtenerPrecioSegunActividad(CodigoCaso, CodigoActividad)
+    {
+        var Precio;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": CodigoCaso, "CodigoActividad": CodigoActividad }),
+            url: '@Url.Action("ObtenerPrecioSegunActividad", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Precio = Data;
+            }
+        });        
+
+        return Precio;
+    }
+
+    function RellenarCerosIzquierdaNumero(n, p, c)
+    {
+        var pad_char = typeof c !== 'undefined' ? c : '0';
+        var pad = new Array(1 + p).join(pad_char);
+        return (pad + n).slice(-pad.length);
+    }
+
+    function LimpiarArreglos()
+    {
+        ArregloDetalles = [];
+        ArregloValidacionesPendientes = [];
+        
+        ArregloDetalles = new Array(); 
+        ArregloValidacionesPendientes = new Array();
+    }
+
+    function controlaTab()
+    {
+        $('.form-control').on('keydown',function (e) 
+        {
+            if (e.keyCode==9)
+            {
+                e.preventDefault();
+                var tabindex = $(this).attr('tabindex');
+
+                if(tabindex == "03" || tabindex == "04" || tabindex == "05"  || tabindex == "06" || tabindex == "08")
+                {
+                    tabindex = parseInt(tabindex) + parseInt(1);
+                    tabindex = "0"+tabindex;
+                }
+                else 
+                    tabindex ++;
+
+                if( $(this).hasClass("txtPriceUnit") ==true)
+                {              
+                    if( tabindex == "07" )//cantidad ya sumada
+                    {
+                        tabindex = parseInt(tabindex) + parseInt(1);
+
+                        tabindex = "0"+tabindex;
+                    }
+                    else 
+                        tabindex ++;
+                }    
+                
+                if( $(this).hasClass("Comentario") ==true)
+                {
+                    tabindex = parseInt(tabindex) +parseInt(4) ;
+                }
+            }
+        });
+    }
+</script>

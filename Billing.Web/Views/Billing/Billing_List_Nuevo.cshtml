@@ -1,0 +1,816 @@
+﻿@using System.Diagnostics;
+
+@model IEnumerable<Billing.Web.Models.DetalleFactura>
+@{
+    var i = 0;
+    var Acumulado = (decimal)0.0;
+    var FechaServicio = DateTime.Now;
+    var HourMile = (decimal)0.0;
+    var PriceAct = (decimal)0.0;
+    var Total = (decimal)0.0;
+}
+
+<style type="text/css">
+/*    #tblBillingResult {
+        border-collapse: collapse;font-family:Arial;
+}
+     #tblBillingResult  {border: 0px;}
+     #tblBillingResult th  {border: 1px solid #e7eaec}     
+     #tblBillingResult td {border: 1px solid #e7eaec;border-spacing:0;}
+    .th_tabla {background-color: #b42734;color:white;
+}*/
+.pagination {
+    display: inline-block;
+}
+
+.pagination a {
+    color: black; 
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+}
+
+.pagination a.active {
+    background-color: #b42734;
+    color: white;
+    border: 1px solid #ed5565;
+}
+
+.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+
+
+
+<table style="width:100%;margin-bottom:20px;margin-left:15px;"> 
+<tr><td style="font-weight:bold;width:100px;">Invoice #</td><td style="width:310px;"><span id="invoice_text"></span></td>
+    <td style="font-weight:bold;width:100px;">Patient</td><td style="width:325px;"><span id="patient_text"></span></td>
+    <td style="font-weight:bold;width:100px;">DOI</td><td><span id="doi_text"></span></td>
+</tr>
+</table>
+
+<div class="table-responsive" id="TablaParaControles">
+    <table class="table table-striped" id="tblDetalleFactura" >
+        <thead class="th_tabla">
+            <tr>
+                <th style="width: 8px;"></th>                           @* Correlativo                          (Indice 0)  *@
+                <th class="hidden"></th>            @* Código de detalle de factura         (Indice 1)  *@
+                <th style="width: 246px;"> Service Date</th>              @* Fecha de servicio                    (Indice 2)  *@
+                <th style="width: 431px;">Activities Description</th>      
+                <th style="width: 113px;">Service Unit</th>
+                <th style="width: 111px;">Charge Per Unit</th>
+                <th style="width: 121px;">Total</th>        
+                <th style="width: 67px;"></th>
+                <th class="hidden">Service Date</th>
+                <th class="hidden">Numero Pagina</th>
+                <th class="hidden">Saldo Por Pagar</th> @* Saldo por pagar *@
+            </tr>
+        </thead>
+        <tbody>
+        @{
+
+            Int32 NroPagina = ViewBag.CurrentPage;
+            Int32 nroFinal = NroPagina * 20;
+            Int32 nroInicial = nroFinal - 19;
+            i = nroInicial;
+            Int32 paginaMostrar = 0;
+        }
+        @foreach (var item in Model)
+        {          
+
+            <tr>
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle; width: 8px;">@i </td>
+                <td style="display: none;" class="CodigoEntrada"> @item.Bib_code </td>
+                <td style="vertical-align: middle; width: 246px;" >
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                        @{
+                            FechaServicio = Convert.ToDateTime(@item.Bib_servDate);
+                            Debug.Write(FechaServicio);
+                        }
+                        <input class="form-control dtpFecha" type="text" style="background: #ffffff; width: 100%;" maxlength="10" data-mask="99/99/9999" value="@FechaServicio.ToString("MM/dd/yyyy")" />
+                        <input type="hidden" value="@FechaServicio.ToString("MM/dd/yyyy")" maxlength="10" data-mask="99/99/9999">
+                    </div>
+                </td>  
+                <td CodigoActividad="@item.Act_code">
+                    <select class="form-control cmbActividades" style="width: 100%;">
+                        <option value=""></option>
+                    </select>
+                    <input type="hidden" class="hdCodigoOriginalActividad" value="@item.Act_code" /> 
+                    <input type="hidden" class="hdNombreOriginalActividad" value=""/> 
+                </td>
+                <td style="vertical-align: middle; width: 113px">
+                    @{
+                        HourMile = decimal.Parse(item.Bib_hourMile.ToString());
+                    }
+                    <input class="form-control numeros txtUnit" type="text" style="width: 100%;" maxlength="5" value="@HourMile" />
+                    <input type="hidden" class="hdServiceUnit" value="@HourMile" /> 
+                </td>
+                <td style="vertical-align: middle; width: 111px">
+                    @{
+                        PriceAct = decimal.Parse(item.Bib_priceAct.ToString()); 
+                    }
+                    <input class="form-control txtPriceUnit" type="text" style="width: 100%;" maxlength="8"  value="@PriceAct" />
+                    <input type="hidden" class="hdChargeUnit" value="@PriceAct" />
+                </td>
+                <td style="vertical-align: middle; width: 121px">
+                    @if (item.Bib_hourMile != 0 && item.Bib_priceAct != 0)
+                    {
+                        Total = decimal.Parse((HourMile * PriceAct).ToString("#0.00"));
+                    }
+                    else if (item.Bib_hourMile == 0 || item.Bib_priceAct == 0)
+                    {
+                        Total = 0;
+                    }                         
+                    <input class="form-control txtTotal" type="text" style="width: 100%;" maxlength="5"  value="@Total.ToString("#0.00")" disabled />
+@*                    @{
+                        Acumulado += Total; // se usaba en forma antigua
+                    }*@
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 67px;">
+                    <a href="#" class="btn btn-danger  btn-bitbucket EliminarDetalle">Delete</a>
+                </td>
+                <td class="hidden">
+                    @FechaServicio
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+                <td class="hidden"> @* Monto por pagar *@
+                    @item.BalanceDue
+                </td>
+            </tr>
+            i = i + 1;
+            paginaMostrar = i;
+        }   
+
+       @for (var Indice = i; Indice <= nroFinal; Indice++)
+        {
+            
+            <tr>      
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle;">  @Indice </td>
+                <td style="display: none;"></td>
+                <td style="vertical-align: middle; width: 6000px;">
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                        
+                        @*
+                        @if (Indice == Model.Count())
+                        {
+                            // FechaServicioDateTime
+                            <input class="form-control dtpFecha" type="text"   style ="background: #ffffff; width: 100%;" data-mask="99/99/9999" maxlength="10" value="@FechaServicio.ToString("MM/dd/yyyy")" />                       
+                        }
+                        else
+                        {
+                        *@
+                            <input class="form-control dtpFecha FechaNoMostrada" type="text" data-mask="99/99/9999" style="background: #ffffff; width: 100%;" maxlength="10" />
+                        @*
+                        }
+                        *@
+                    </div>
+                </td>
+                <td style="vertical-align: middle; width: 12000px;">
+                    <select class="form-control cmbActividades" style="width: 100%;" >
+                        <option value=""></option>
+                    </select>
+                    <input type="hidden" class="hdCodigoOriginalActividad" value="" /> 
+                    <input type="hidden" class="hdNombreOriginalActividad" value=""/> 
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtUnit" type="text" maxlength="5"  style="width: 100%;"   />
+                    <input type="hidden" class="hdServiceUnit" value="@HourMile" /> 
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtPriceUnit" type="text" maxlength="8"  style="width: 100%;"   />
+                   <input type="hidden" class="hdChargeUnit" value="@PriceAct" />
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtTotal" type="text"  style="width: 100%;"  disabled />
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 22px;">
+                   <a href="#" class="btn btn-danger  btn-bitbucket EliminarDetalle" style="display:none;">Delete</a>
+                </td>
+                <td class="hidden">
+                    @FechaServicio
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+                <td class="hidden"> @* Monto por pagar *@
+
+                </td>
+            </tr>                  
+        }
+        </tbody>
+
+       <tfoot>
+        <tr>
+            <td colspan="8" style="text-align: right;">
+               <div class="pagination">
+      
+                @for (int xx = 1; xx <= ViewBag.NumberOfPages; xx++)
+                {
+                    if (xx == ViewBag.CurrentPage)
+                    {
+                    <a class="page-number active" id="page_@xx" >@xx</a>
+                    <input type="hidden" id="PaginaActual"  value="@xx"/>
+                    }
+                    else
+                    {
+                        <a class="page-number"  id="page_@xx" href="#">@xx</a>
+                    }                    
+                }
+                    <input type="hidden" value="@ViewBag.NumberOfPages" id="UltimaPagina" >
+                    
+               </div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <input type="hidden" value="0" id="hdTotalAcumulado">
+@*    <input type="hidden" value="0" id="hdTotalFilas"><!--FALTA MANDAR TOTAL DE FILAS (TOTAL), desde controlador-->*@
+    
+</div>
+
+<script>    
+    var Detalles; // Variable global que almacena los detalles de una factura.
+    
+    var arrDetalles = new Array(); // Arreglo que almacenará objetos de tipo "Detalle" y que será el que se enviará al controlador para serializar como XML.
+    var ArregloValidacionesPendientes = new Array();
+    var RegExpDecimal = /^\d*(\.\d{1,2})?$/ig; // Expresión regular para forzar el punto decimal.
+    var RegExpFecha = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/ig; // Expresión regular para forzar el formato de fecha americano.
+    var PaginaActualGlobal;
+    var Intervalo;    
+    var BanderaEliminacion = false;
+
+    $(Inicio);    
+
+    function Inicio()
+    {
+        // Asignaciones
+        if (paginaActual == 0)
+            paginaActual = LeeUltimaPagina(parseInt($('#hdCantidadTotalDetalles').val())) // La primera vez que se cargan las entradas de un caso el valor de la variable "paginaActual" será 1.        
+
+        Detalles = "";        
+       
+        // Funciones
+        removerGifAlCompletarCarga()
+        crearControlesFecha()
+        cargarActividadesEnCombos()
+        setearFechaEnPrimeraFilaSinDatos()
+        muestraTotales()
+       
+        // Eventos
+        $(".input-group-addon").off("click");
+        $(".input-group-addon").on("click", dibujaControlFecha);
+        $('.page-number').on('click', irAPaginaDestino)
+        $('#btnActualizarDetallesFactura').off('click')
+        $('#btnActualizarDetallesFactura').on('click', btnActualizarDetallesFactura_click)
+        $('.cmbActividades').on('focusout', abandonaFoco)
+        $('.cmbActividades').on('change', obtenerPrecioSegunActividad)
+        $('.EliminarDetalle').on('click', eliminarDetalle)
+        $('.txtUnit').on('keypress', validaNumeros)
+        $('.txtPriceUnit').on('keypress', validaNumeros)
+    } 
+
+    function muestraTotales() 
+    {
+        var numeroDeFactura
+        var montosDeFactura
+        var totalDeFactura
+        var saldoAdeudado
+
+        numeroDeFactura = $("#hdNumeroFacturaSeleccionada").val().trim()
+        // debugger
+
+        montosDeFactura = obtenerMontosDeFactura(numeroDeFactura)
+        if (montosDeFactura == undefined) {
+            totalDeFactura = 0
+            saldoAdeudado = 0
+            
+        } else {
+            totalDeFactura = isNaN(montosDeFactura.TotalAmount) ? 0 : montosDeFactura.TotalAmount
+            saldoAdeudado = isNaN(montosDeFactura.BalanceDue) ? 0 : montosDeFactura.BalanceDue
+        }               
+
+        $("#hdTotalAcumulado").val(saldoAdeudado.toFixed(2));
+
+        // Muestra el total de la factura.
+        $("#Balancetotal").html("$ " + Formato(totalDeFactura.toFixed(2)));
+
+        if ($('#cmbFilter option:selected').text() == 'UnPaid') {
+            $("#balance_total_text").html("Total Amount");
+
+            // Muestra lo que se ha pagado de la factura
+            $('#MontoPagado').parent('div').css({ 'display': 'flex' }); 
+            // $('#MontoPagado').parent('div').css({ 'display': 'none' });
+            $('#MontoPagado').html("$ " + Formato((totalDeFactura - saldoAdeudado).toFixed(2)))
+
+            // Muestra el saldo de la factura.
+            $('#SaldoPorPagar').parent('div').css({ 'display': 'flex' });
+            // $('#SaldoPorPagar').parent('div').css({ 'display': 'none' });
+            $('#SaldoPorPagar').html("$ " + Formato((saldoAdeudado).toFixed(2)))
+        }
+        else {
+            $("#balance_total_text").html("Total Amount");
+            $('#MontoPagado').parent('div').css({ 'display': 'none' });
+            $('#SaldoPorPagar').parent('div').css({ 'display': 'none' });
+        }
+    }
+
+    function obtenerMontosDeFactura(numeroDeFactura)
+    {
+        var montosDeFactura
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "numeroDeFactura": numeroDeFactura }),
+            url: '@Url.Action("obtenerMontosDeFactura", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {     
+                montosDeFactura = Data;
+            }
+        });
+
+        return montosDeFactura
+    }
+
+    function irAPaginaDestino(e) {
+        e.preventDefault();
+
+        var codigoFactura
+        var numeroFactura
+        var objetoValidacion
+        
+        objetoValidacion = validaciones()
+
+        if (objetoValidacion.banderaValidacion) // Si se encontró un error...
+        {
+            MensajeError(objetoValidacion.mensaje, "Error")
+            return false // ... y aborta el proceso.
+        }
+
+        paginaDestino = parseInt(e.currentTarget.innerText.trim())
+        paginaActual = paginaDestino // La variable "paginaActual" cambiará su valor cada vez que se cambie de página y tomará el valor de página destino.
+        codigoFactura = parseInt($("#hdCodigoFacturaSeleccionada").val().trim())
+        numeroFactura = $("#hdNumeroFacturaSeleccionada").val().trim()
+
+        llenarDetallesParaInsertar(codigoFactura) // Llena los detalles en el arreglo "arrDetalles" que se van a insertar en base.
+        registrarActualizarDetalles()
+        detectarRegistroOActualizacion()
+        
+        totalDeDetalles = parseInt($('#hdCantidadTotalDetalles').val().trim())
+        listarDetallesEnPaginaDestino(numeroFactura, totalDeDetalles, paginaDestino)
+        mostrarDatosDeCabecera()
+    }
+
+    function mostrarDatosDeCabecera()
+    {
+        $("#invoice_text").html($('#hdInvoiceText').val())
+        $("#patient_text").html($('#hdPatientText').val())
+        $("#doi_text").html($('#hdDOIText').val())
+    }
+
+    function guardaSinPaginar()
+    {
+        var codigoFactura
+        var numeroFactura
+        var paginaDestino
+        var totalDeDetalles
+        console.log("guardaSinPaginarz");
+        codigoFactura = parseInt($("#hdCodigoFacturaSeleccionada").val())
+        numeroFactura = $("#hdNumeroFacturaSeleccionada").val().trim()
+
+        llenarDetallesParaInsertar(codigoFactura)
+
+        registrarActualizarDetalles()
+
+        paginaDestino = paginaActual
+        tipo = detectarRegistroOActualizacion();
+        totalDeDetalles = parseInt($('#hdCantidadTotalDetalles').val().trim())
+
+        if (tipo == 'registro_paginado') {
+            ////ancla();
+            paginaDestino = paginaDestino + 1;
+            paginaActual = paginaDestino
+        }
+        
+        listarDetallesEnPaginaDestino(numeroFactura, totalDeDetalles, paginaDestino)
+    }
+
+    function obtenerPrecioSegunActividad(e)
+    {
+        var codigoCaso = parseInt($('#hdCodigoCasoSeleccionado').val().trim())
+        var codigoActividad = isNaN(parseInt(e.currentTarget.value)) ? 0 : parseInt(e.currentTarget.value)
+        var Precio;
+
+        if (codigoActividad == 0) // Si no se selecciona ninguna actividad.
+        {             
+            e.currentTarget.parentElement.parentElement.children[5].children[0].value = ''
+            return false
+        }
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": codigoCaso, "CodigoActividad": codigoActividad }),
+            url: '@Url.Action("ObtenerPrecioSegunActividad", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                Precio = Data;
+            }
+        });
+        
+        e.currentTarget.parentElement.parentElement.children[5].children["0"].value = parseFloat(Precio).toFixed(2)
+    }
+
+    function abandonaFoco(e) {
+        var filaActual = parseInt(e.currentTarget.parentElement.parentElement.rowIndex)
+        var indiceDeFilaActual = e.currentTarget.parentElement.parentElement.rowIndex
+        var FechaFilaActual = e.currentTarget.parentElement.parentElement.children[2].children[0].children[1].value
+
+        if (filaActual != 20) // Hace que la fecha posterior cambie para todas las filas excepto cuando se abandona el foco del combo de actividades de la fila (10, 20, 30, etc...) ya que no encontrará nada en la siguiente fila.
+        { 
+            if (e.currentTarget.parentElement.parentElement.parentElement.children[indiceDeFilaActual].children[2].children[0].children[1].value.trim() == '')
+                e.currentTarget.parentElement.parentElement.parentElement.children[indiceDeFilaActual].children[2].children[0].children[1].value = FechaFilaActual
+        }
+    }
+
+    // Esta función se encaraga de setear una fecha en la primera fila de la tabla que carezca de ella,
+    // tomará como referencia la fecha de a fila anterior.
+    function setearFechaEnPrimeraFilaSinDatos() {
+        $('#tblDetalleFactura > tbody > tr').each(function (i, val) {
+
+            if (val.children[2].children[0].children[1].value.trim() == '' && // Valida que sólo se debe setear la fecha en la primera fila en blanco que encuentre, 
+                val.parentElement.children[i - 1] != undefined) // excepto en la primera fila de una tabla ya que en ese caso no existe una fila anterior.
+            {
+                val.children[2].children[0].children[1].value = val.parentElement.children[i - 1].children[2].children[0].children[1].value.trim()
+                return false // Para que aborte el bucle y no continue con las demás fechas, y sólo afecte a la primera fila donde no haya fecha.
+            }
+        })
+    }
+
+    function llenarDetallesParaInsertar(codigoFactura)
+    {
+        arrDetalles = new Array()
+        $('#tblDetalleFactura > tbody > tr').each(function (i, val) {
+
+            // Declaración de variables
+            var objDetalle = new Detalle()
+            var codigoActividad
+            var codigoDetalleNuevo
+            var hourMile
+            var priceAct
+            var fechaDeServicio
+            var numeroCorrelativoDetalle
+
+            // Seteo de variables
+
+            codigoActividad = isNaN(parseInt(val.children[3].children[0].value.trim())) ? 0 : parseInt(val.children[3].children[0].value.trim())
+
+            codigoDetalleNuevo = isNaN(parseInt(val.children[1].innerText.trim())) ? 0 : parseInt(val.children[1].innerText.trim())
+
+            hourMile = isNaN(parseFloat(val.children[4].children["0"].value.trim())) ? 0 : parseFloat(val.children[4].children["0"].value.trim())
+
+            priceAct = isNaN(parseFloat(val.children[5].children["0"].value.trim())) ? 0 : parseFloat(val.children[5].children["0"].value.trim())
+
+            fechaDeServicio = val.children[2].children[0].children[1].value
+            numeroCorrelativoDetalle = parseInt(val.children[0].innerText.trim())
+
+            // Seteo del objeto "objDetalle"
+            objDetalle.Act_code = codigoActividad
+            objDetalle.Bib_code = codigoDetalleNuevo
+            objDetalle.Bih_code = codigoFactura
+            objDetalle.Bib_hourMile = hourMile
+            objDetalle.Bib_priceAct = priceAct
+            objDetalle.Bib_amoReim = 0.00
+            objDetalle.Bib_servDate = fechaDeServicio
+            objDetalle.numeroCorrelativoDetalle = numeroCorrelativoDetalle
+            objDetalle.Bib_createdUser = CodigoUsuarioGlobal            
+
+            arrDetalles.push(objDetalle)
+        })
+    }
+
+    function detectarRegistroOActualizacion()
+    {
+        var banderaRegistro = false
+        var codigoDetalle
+        var codigoActividad
+        var totalDeDetalles
+        var cantidadTotal_temp = $("#hdCantidadTotalDetalles").val();
+
+        $('#tblDetalleFactura > tbody > tr').each(function (i, val) {
+            codigoDetalle = isNaN(parseInt(val.children[1].innerText.trim())) ? 0 : parseInt(val.children[1].innerText.trim())
+            codigoActividad = isNaN(parseInt($('.cmbActividades:eq(' + i + ')').val())) ? 0 : parseInt($('.cmbActividades:eq(' + i + ')').val())
+
+            if (codigoDetalle == 0 && codigoActividad != 0) {
+                banderaRegistro = true
+                cantidadTotal_temp = parseInt(cantidadTotal_temp) + 1;
+                if (i == 9) // indica que se registro en la ultima pagina, por lo tanto ira a la siguiente pagina
+                {
+                    dato = "registro_paginado";
+                }
+                else {                 
+                    dato = "registro";
+                }                
+            }
+            else {
+                dato = "edicion";
+            }
+
+        })
+        $("#hdCantidadTotalDetalles").val(cantidadTotal_temp);
+        totalDeDetalles = cantidadTotal_temp;
+
+        return dato;
+    }
+
+    function validaciones()
+    {
+        var objetoValidacion = new ObjetoValidacion()
+        var codigoDetalle
+        var fechaDetalle
+        var codigoActividad
+        var serviceUnit
+        var chargeUnit
+        var descripcionActividad
+        var RegExpFecha = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/ig // Expresión regular para forzar el formato de fecha americano.
+
+        $('#tblDetalleFactura > tbody > tr').each(function (i, val) {
+            // debugger
+            codigoDetalle = isNaN(parseInt(val.children[1].innerText.trim())) ? 0 : parseInt(val.children[1].innerText.trim())
+            fechaDetalle = val.children[2].children[0].children[1].value.trim();
+            codigoActividad = isNaN(parseInt($('.cmbActividades:eq(' + i + ')').val())) ? 0 : parseInt($('.cmbActividades:eq(' + i + ')').val())
+            descripcionActividad = $('.cmbActividades:eq(' + i + ') > option:selected').text().trim()
+            serviceUnit = isNaN(parseFloat(val.children[4].children[0].value)) ? 0 : parseFloat(val.children[4].children[0].value)
+            chargeUnit = isNaN(parseFloat(val.children[5].children[0].value)) ? 0 : parseFloat(val.children[5].children[0].value)
+
+            // Obliga la fecha
+            if (((fechaDetalle.trim() == '' || (!(fechaDetalle.trim().match(RegExpFecha)))) && codigoActividad != 0 && (serviceUnit != 0 || chargeUnit != 0)) ||
+                ((fechaDetalle.trim() == '' || (!(fechaDetalle.trim().match(RegExpFecha)))) && codigoActividad == 0 && (serviceUnit != 0 || chargeUnit != 0)) ||
+                ((fechaDetalle.trim() == '' || (!(fechaDetalle.trim().match(RegExpFecha)))) && codigoActividad != 0 && (serviceUnit == 0 || chargeUnit != 0))) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'The date in row ' + ((paginaActual * 20) - (20 - (i + 1))) + ' is incorrect'
+                objetoValidacion.linea = i + 1
+                objetoValidacion.campo = 'Service Date'
+
+                return false
+            }
+
+            // Obliga la actividad
+            if (codigoDetalle != 0 && (fechaDetalle != '') && (codigoActividad == 0) && (serviceUnit == 0)
+                || (fechaDetalle != '') && (codigoActividad == 0) && ((serviceUnit != 0) || (chargeUnit != 0))) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'Activity is required for entry in row ' + ((paginaActual * 20) - (20 - (i + 1)))
+                objetoValidacion.linea = i + 1
+                objetoValidacion.campo = 'Activities Description'
+
+                return false
+            }
+
+            // Obliga el "Service Unit"
+            if ((fechaDetalle != '') && (codigoActividad != 0) && (serviceUnit == 0)) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'Missing data in row ' + ((paginaActual * 20) - (20 - (i + 1))) + ', field "Service Unit"'
+                objetoValidacion.linea = i + 1                
+
+                return false
+            }
+
+            // Obliga el "Charge Per Unit"
+            if ((fechaDetalle != '') && (codigoActividad != 0) && (serviceUnit != 0) && (chargeUnit == 0)) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'Missing data in row ' + ((paginaActual * 20) - (20 - (i + 1))) + ', field "Charge Per Unit"'
+                objetoValidacion.linea = i + 1
+
+                return false
+            }
+
+            if ((descripcionActividad == "MILES")
+                && (chargeUnit < 0 || chargeUnit > 1)) {
+                objetoValidacion.banderaValidacion = true
+                objetoValidacion.mensaje = 'If the activity is MILES the unit price must be greater than or equal to zero and less than equal to 1 in the row ' + ((paginaActual * 10) - (10 - (i + 1)))
+                objetoValidacion.linea = i + 1
+                // objetoValidacion.indiceDeColumna = val.children[6].cellIndex
+                objetoValidacion.campo = 'PriceUnit'
+
+                return false
+            }
+        })
+
+        return objetoValidacion
+    }
+
+    function crearControlesFecha() {
+        // var nowDate = new Date();
+        // var today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+
+        // if (RolUsuarioLogueado == 'Administrator')
+        //     today = "1985-01-01";
+        // else {
+        //     today = $("#txtUltimaFechaCierre").val();
+        //     today = new Date(today);
+        //     today = today.setDate(today.getDate() + 1);
+        //     today = new Date(today);
+        // }
+
+        // $('.input-group.date').datepicker({
+        //     todayBtn: "linked",
+        //     keyboardNavigation: false,
+        //     forceParse: false,
+        //     calendarWeeks: true,
+        //     autoclose: true,
+        //     //format: 'yyyy-mm-dd', 
+        //     format: 'mm/dd/yyyy',
+        //     startDate: today
+        // });
+
+        $('.input-group.date').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+    }    
+             
+    function listarDetallesEnPaginaDestino(numeroFactura, totalDeDetalles, paginaDeDestino) {
+        $.ajax({
+            url: '@Url.Action("CargaDetalleFactura_Nuevo")',
+            type: "POST",
+            data: {
+                "numeroFactura": numeroFactura                
+                , "totalDeDetalles": totalDeDetalles
+                , "paginaDestino": paginaDeDestino
+            },
+            success: function (data) {
+                $("#tabla").html(data)
+                $("#invoice_text").html(NumeroFactura);
+                $("#patient_text").html($("#paciente_btn").val());
+                $("#doi_text").html($("#doi_btn").val());
+            }
+        })
+    }
+
+    function cargarActividadesEnCombos()
+    {
+        var comboActividades 
+        var codigoActividadOriginal
+
+        // Llena todos los combos de actividades.
+        Actividades = ObtenerActividades()
+        $.each(Actividades, function (i, val) {
+            $('.cmbActividades').append("<option selected value=" + val.Act_code + ">" + val.Act_description + "</option>")
+        })
+
+        // Setea en cada combo la actividad que le corresponde.
+        $('#tblDetalleFactura > tbody > tr').each(function (i, val) {
+            codigoActividadOriginal = parseInt(val.children[3].attributes[0].value)
+            comboActividades = val.children[3].children[0]
+            comboActividades.value = codigoActividadOriginal
+        })
+    }
+
+    function ObtenerActividades() {
+        var Actividades
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListaActividades", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                Actividades = Data
+            }
+        });
+
+        return Actividades
+    }
+
+    function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+
+    function removerGifAlCompletarCarga()
+    {
+        setTimeout(function()
+        {
+            $("#dvLoading").css("display", "none")
+        },1500);
+    }
+
+    function registrarActualizarDetalles() {
+        var respuesta
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ 'Detalles': arrDetalles }),
+            url: '@Url.Action("RegistraActualizaDetalleFactura", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Datos) {
+                respuesta = Datos
+            }
+        })
+
+        return respuesta
+    }
+
+    function Detalle()
+    {
+        var Act_code
+        var Bib_code
+        var Bih_code
+        var Bib_hourMile
+        var Bib_priceAct
+        var Bib_amoReim
+        var Bib_servDate
+        var Bib_createdUser
+        var numeroCorrelativoDetalle
+    }
+
+    function dibujaControlFecha() {
+        //$(this).datepicker("hide");
+
+        //$(".dtpFecha").trigger("click");
+        //$(this).parent(".input-group").find(".dtpFecha").focus();
+        $(".datepicker").css("display", "hide");
+        $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+        $(this).parent(".input-group").find(".dtpFecha").focus();
+    }
+
+    function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+
+    function ObjetoValidacion() {
+        var banderaValidacion = false
+        var mensaje = ''
+        var linea
+        var campo
+    }
+
+    function validaNumeros(e) {
+        if (!((e.which >= 48 && e.which <= 57) || (e.which == 40 || e.which == 41) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 46))) {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    function eliminarDetalle(e) {
+        e.preventDefault();
+        
+        var codigoDeDetalle
+        var codigoDeUsuario
+        var numeroDeFactura
+        var totalDeDetalles
+        var paginaDeDestino
+
+        codigoDeDetalle = parseInt($(this).parent("td").parent("tr").find("td:eq(1)").html());
+        codigoDeUsuario = CodigoUsuarioGlobal
+        numeroDeFactura = $("#hdNumeroFacturaSeleccionada").val().trim()
+        totalDeEntradas = parseInt($('#hdCantidadTotalDetalles').val().trim())
+        
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({
+                "codigoDeDetalle": codigoDeDetalle
+                , "codigoDeUsuario": codigoDeUsuario
+                , "numeroDeFactura": numeroDeFactura
+            }),
+            url: '@Url.Action("EliminaDetalle", "Billing")',
+            contentType: "application/json",
+            dataType: 'json',
+        });
+        
+        paginaDeDestino = paginaActual
+        listarDetallesEnPaginaDestino(numeroDeFactura, totalDeEntradas, paginaDeDestino)
+    }
+
+    function Formato(Numero) {
+        var n = Numero.toString(), p = n.indexOf('.');
+
+        return n.replace(/\d(?=(?:\d{3})+(?:\.|$))/g, function ($0, i) {
+            return p < 0 || i < p ? ($0 + ',') : $0;
+        });
+    }
+
+</script>

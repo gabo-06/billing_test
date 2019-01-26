@@ -1,0 +1,33 @@
+﻿@using System.Diagnostics;
+@model IEnumerable<Billing.Web.Models.SP_REPORT_VIEW_DATAENTRY_PATIENT_Result>
+@{
+    var i = 0;
+}
+
+
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover dataTables-example" style="width:100%;">
+         <thead class="th_tabla" >  
+         <tr border="0" bgcolor="#b42734" color="#ffffff" cellpadding="1">
+           @*<td width="6%" style="font-size: 10px;text-align:center;"></td>*@
+           <td width="14%" style="font-size: 9px;text-align:left;">Service Dates </td>
+           <td style="font-size: 9px;">Description</td>           
+        </tr>
+       </thead>
+       <tbody>
+        @foreach (var item in Model)
+         {
+                i = i + 1;
+                 <tr border="0" >
+                     @*<td style="font-size: 8px;" >@i</td>*@
+                     <td style="font-size: 8px;" >@item.Dae_date</td>                          
+                     <td style="font-size: 8px;" >@item.Dae_comment.Replace("’","'").Replace("–","-").Replace("—","-").Replace('“','"').Replace('”','"')</td>    
+                 </tr>            
+     
+            
+         }   
+        </tbody>
+        
+    </table>
+</div>

@@ -1,0 +1,197 @@
+﻿<div class="table-responsive">
+<table class="table table-striped table-bordered table-hover dataTables-example" id="tblDoctores">
+<thead class ="th_tabla">
+  <tr>
+        <th class="hidden"></th>
+        <th>
+            First Name
+        </th>
+        <th>
+            Last Name
+        </th>
+        <th>
+            Street
+        </th>
+        <th>
+            City
+        </th>
+        <th>
+            State
+        </th>
+        <th>
+            Zip
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>
+            Phone
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>
+            Alt phone
+        </th>
+        <th>
+            Fax
+        </th>
+    
+        <th>
+            Speciality
+        </th>
+        <th style="width: 300px;">
+            Office
+        </th>
+        <th>
+            Operations
+        </th>
+    </tr>
+</thead>
+ <tbody>
+
+</tbody>
+ <tfoot>
+    <tr>
+        <th style="display: none;">          
+        </th>
+        <th>
+            First Name
+        </th>
+        <th>            
+            Last Name
+        </th>
+        <th>            
+            Street
+        </th>
+        <th>
+            City
+        </th>
+        <th>            
+            State
+        </th>
+        <th>            
+            Zip
+        </th>
+        <th>            
+            Ext
+        </th>
+        <th>            
+            Phone
+        </th>
+        <th>
+            Ext
+        </th>
+        <th>
+            Alt phone
+        </th>
+        <th>
+            Fax
+        </th>
+        <th>
+            Speceality
+        </th>
+        <th style="width: 300px;">
+            Office
+        </th>
+        <th >Operations</th>
+    </tr>
+</tfoot>
+</table>
+     
+</div>
+
+
+
+<script>
+    $(Inicio);
+
+    function Inicio() {
+        //llenaTest();
+        PaginarTabla();
+        //OcultarControlesDecorativosDataTable();
+        //$("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        //$("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+
+        /////$("#tblCasos_filter").css({ "display": "none" });
+        //antes en index
+        //$("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso);=> movido al index
+        //$(".SeleccionarCaso").on("click", SeleccionarCaso);
+        
+    }
+
+
+    function PaginarTabla() {
+        console.log("hola");
+
+        $('#tblDoctores').DataTable({
+              order: [[1, "asc"]],
+             "pageLength": 10,
+             "columnDefs": [{ "width": "3%", "targets": [5,6,7] }, { className: "hidden", "targets": [0] }],
+             "language":
+                  { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"},
+             "processing": true,
+             "serverSide": true,
+             "ajax": {
+                    "url": '@Url.Action("GetData", "Medical")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                     },
+             "columns": [
+                        { "data": "Med_code" },
+                        { "data": "Med_firstName" },
+                        { "data": "Med_lastName" },
+                        { "data": "Med_address" },
+                        { "data": "Med_city" },
+                        { "data": "Med_state" },
+                        { "data": "Med_zipCode" },
+                        { "data": "Med_zipCodeExt" },
+                        { "data": "Med_phone" },
+                        { "data": "Med_phoneExt" },
+                        { "data": "Med_alternatePhone" },
+                        { "data": "Med_fax" },           
+                        { "data": "Specialty.Spe_name" },
+                        { "data": "Med_office" },                        
+                        { "render": function (data, type, full, meta) { return '<a href="#divMedical" class="btn EditarDoctor btn-white btn-bitbucket" title="Edit Doctor"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarDoctor btn-white btn-bitbucket" title="Delete Doctor"><i class="fa fa-trash-o text-danger" /> </a>' } }
+             ]
+        });
+
+
+
+        ////////////////////////////////////////////////////////////////////////
+
+
+        ////var otable = $("#tblDoctores").dataTable().fnDestroy();
+        ////otable = $("#tblDoctores").DataTable({
+        ////    order: [[1, "asc"]],
+        ////    dom: '<"html5buttons"B>lTfgitp',
+        ////    buttons: [
+        ////        { extend: 'copy' },
+        ////        { extend: 'csv' },
+        ////        { extend: 'excel', title: 'ExampleFile' },
+        ////        { extend: 'pdf', title: 'ExampleFile' },
+
+        ////        {
+        ////            extend: 'print',
+        ////            customize: function (win) {
+        ////                $(win.document.body).addClass('white-bg');
+        ////                $(win.document.body).css('font-size', '10px');
+
+        ////                $(win.document.body).find('table')
+        ////                        .addClass('compact')
+        ////                        .css('font-size', 'inherit');
+        ////            }
+        ////        }
+        ////    ]
+        ////});
+
+
+    }
+
+
+
+
+ 
+
+
+</script>

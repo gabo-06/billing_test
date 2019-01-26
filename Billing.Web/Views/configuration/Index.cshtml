@@ -1,0 +1,370 @@
+﻿<style>
+    #EnvolturatblCasos
+    {
+        padding: 1em 22%;
+    }
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>CONFIGURATION</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center">                            
+                            <label class="col-sm-4 control-label">Role </label>
+                                                        
+                            <div class="col-sm-5">
+                                @*<input type="text" class="form-control ui-autocomplete-input" id="txtBuscaCaso" autocomplete="off">*@
+                                <select class="form-control" id="cmbRole">
+                                    
+                                </select>
+                            </div>                            
+                        </div>
+                    </form>                     
+                </div>              
+                
+                
+                <div class="ibox-content" id="EnvolturatblCasos">
+                    <div class="form-group table-responsive">
+                        @* lista de opciones *@
+                        <table class="table table-striped table-bordered table-hover dataTables-example" id="tblModalResultadoInvoice">
+                            <thead class="th_tabla">
+                                <tr>
+                                    <th class="hidden">Código Opción</th>
+                                    <th>Option</th>
+                                    <th>Permission</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                        @*
+                        @Html.Partial("../Configuration/lista")
+                        *@
+                    </div>  
+                </div>                 
+            </div>
+        </div>  
+    </div>
+
+@Html.Partial("footer")
+
+<script> 
+    $('#tblModalResultadoInvoice').find('tbody').on('click', 'tr > td > .AsignarPermiso', ModificarPermiso);
+    
+    $(Inicio);
+
+    var Roles;
+    var Opciones;
+    var codigosOpciones; // Almacena un arreglo de los códigos de todas las opciones.
+
+    function Inicio()
+    {
+        ProcesoActual = "Configuracion";
+        // Métodos
+        ObtenerRoles();
+        CargarRolesEnCombo();
+        ObtenerOpciones();
+        CargarOpcionesEnTabla();
+        $('#cmbRole').select2();
+
+        // Pinta todas las filas de la tabla color rosado.
+        $('#tblModalResultadoInvoice').find('tbody').find('tr').css({ 'background': '#e6bbbb' });
+
+        // Eventos
+        $('#cmbRole').on('change', SeleccionaRol);
+    }
+
+    function ModificarPermiso() 
+    {
+        var CodigoRol;
+        var checkBox;
+        var CodigoOpcionManipulada;
+        var FilaManipulada;
+        var imgCarga = $(this)["0"].parentElement.children[1];
+        var ValorChecked // false o true.
+
+        // Muestra la imagen de carga mientras se está procesando la asignación del permiso.
+        $(imgCarga).css({'display':'inline-block'});
+
+        // Deshabilita todos los checks para que no se puedan manipular mientras que se está procesando la asignación de un permiso.
+        $('.AsignarPermiso').prop('disabled', true);
+
+        // Obtiene el código del rol seleccionado.
+        CodigoRol = $('#cmbRole').val().trim();
+
+        // Obtiene el checkbox que se ha manipulado (seleccionado o deseleccionado).
+        checkBox = $(this);
+
+        // Obtiene la fila en la cual está el checkBox manipuldo.
+        FilaManipulada = $(this).parents('td').parents('tr');
+
+        // Obtiene el valor (true o false de la propiedad checked dek checkbox).
+        ValorChecked = checkBox["0"].checked;
+
+        // Pinta la fila según el valor del checkBox (true o false).
+
+        (ValorChecked == true) 
+
+        // Teniendo como base el checkbox que se ha manipulado, obtiene el código de la opción
+        CodigoOpcionManipulada = parseInt(checkBox["0"].parentElement.parentElement.children["0"].innerHTML);
+
+        ModificaPermiso(CodigoRol, CodigoOpcionManipulada, imgCarga, ValorChecked, FilaManipulada);
+        
+    }
+
+    function ModificaPermiso(CodigoRol, CodigoOpcion, imgCarga, ValorChecked, FilaManipulada)
+    {
+        var Parametros =
+        {
+            'CodigoRol' : CodigoRol
+           , 'CodigoOpcion': CodigoOpcion
+        };
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Parametros),
+            url: '@Url.Action("AsignarPermisoARol", "Role")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function ()
+            {
+                
+            }
+        });
+
+        setTimeout(function ()
+        {
+            // Pinta la fila del checkBox manipulado según se active o desactive el check.
+            (ValorChecked) ? FilaManipulada.css({ 'background': '#6bda98' }) : FilaManipulada.css({ 'background': '#e6bbbb' });
+
+            // Habilita todos los checks para que se puedan volver a manipular cuando ya terminó la asignación de un permiso.
+            $('.AsignarPermiso').prop('disabled', false);
+
+            $(imgCarga).css({ 'display': 'none' });
+        }, 600)
+
+        
+    }
+
+    function SeleccionaRol()
+    {
+        var CodigoRol;        
+        var OpcionesDeRol;
+
+        CodigoRol = $(this).val();        
+
+        $('.AsignarPermiso').prop('checked', false); // Limpia todos los checks activados.
+
+        // debugger;
+        if (CodigoRol != '0') // Si se elije un rol válido.
+        {
+            $('.AsignarPermiso').prop('disabled', false); // Se habilitarán los checkes para asignar permisos
+
+            // Obtiene las opciones asignadas al rol seleccionado.            
+            OpcionesDeRol = ObtenerOpcionesDeRol(CodigoRol);
+
+            // Pinta todas las filas de color que representa a las opciones a las cuales un rol no tiene permiso (color rosado),
+            var filaOpcionSinPermiso = $('#tblModalResultadoInvoice').find('tbody').find('tr');
+            filaOpcionSinPermiso.css({ 'background': '#e6bbbb' });
+
+            $.each(OpcionesDeRol, function (index, item)
+            {                                
+                var filaOpcionConPermiso = $('#tblModalResultadoInvoice').find('tbody').find('tr').eq(item - 1);
+                var checkBox = $('#tblModalResultadoInvoice').find('tbody').find('tr').eq(item - 1).find('td').eq(2).find('.AsignarPermiso');
+                                
+                // Activa el check de la opción en la acual se tiene permiso.
+                checkBox["0"].checked = true;
+
+                // Pinta la fila de la opción en la acual se tiene permiso (color verde claro).
+                filaOpcionConPermiso.css({ 'background': '#6bda98' });
+
+                // Verifica en el arreglo "codigosOpciones" que contiene todos los códigos de las opciones de rol,
+                // si alguno de esos códigos coincide con los código de opción asignados al rol seleccionado
+                // almacenados en el arreglo "OpcionesDeRol".
+                //if (codigosOpciones.indexOf(item) != -1)
+                // console.log(item);
+            });
+        }
+        else // Si no se elije ningún rol.
+        {
+            // Pinta todas las filas de la tabla color rosado.
+            $('#tblModalResultadoInvoice').find('tbody').find('tr').css({ 'background': '#e6bbbb' });
+            
+            $('.AsignarPermiso').prop('disabled', true); // Deshabilita todos los checks.
+        }        
+    }
+
+    function ObtenerOpciones()
+    {
+        // Obtiene un arreglo de objetos de tipo => Object { Opt_code, Opt_name }
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ObtenerOpciones", "Option")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {                
+                Opciones = Data;
+            }
+        });
+
+        // Obtiene un arreglo de los código de todas las opciones, se utilizará para verificar
+        // cual de todas estarán activas cuando se seleccione un role determinado, ya que este 
+        // arreglo "codigosOpciones" se comparará con el arreglo de opciones que el rol seleccionado
+        // tiene asignadas.
+        codigosOpciones = $.map(Opciones, function (value, index) 
+        {
+            return value.Opt_code;
+        });
+    }
+
+    function ObtenerOpcionesDeRol(codigoRol)
+    {
+        var OpcionesDeRol;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ 'CodigoRol' : codigoRol }),
+            url: '@Url.Action("ObtenerPermisosDeRol", "Role")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                OpcionesDeRol = Data;
+            }
+        });
+
+        return OpcionesDeRol
+    }
+
+    function CargarOpcionesEnTabla()
+    {
+        //console.clear();
+        $.each(Opciones, function (indice, elemento)
+        {
+            var codigoOpcion = elemento.Opt_code;
+            var nombreOpcion = elemento.Opt_name;
+            // debugger;
+            // console.log(nombreOpcion);
+
+            var fila = document.createElement('tr');
+
+            var colCodigoOpcion = document.createElement('td');
+            $(colCodigoOpcion).addClass('hidden');
+            var textoCodigoOpcion = document.createTextNode(codigoOpcion);
+            colCodigoOpcion.appendChild(textoCodigoOpcion)
+
+            var colNombreOpcion = document.createElement('td');
+            var textoNombreOpcion = document.createTextNode(nombreOpcion);            
+            $(colNombreOpcion).css({ 'text-align': 'center' });
+            colNombreOpcion.appendChild(textoNombreOpcion)
+                        
+            var colCheckAsignaPermiso = document.createElement('td');
+            var checkBox = document.createElement('input');            
+
+            $(checkBox).prop('type', 'checkbox');
+            $(checkBox).prop('disabled', true);
+            $(checkBox).addClass('AsignarPermiso');
+            $(checkBox).css({ 'cursor': 'pointer', });
+            // $(colCheckAsignaPermiso).css({ 'text-align': 'center' });
+            colCheckAsignaPermiso.appendChild(checkBox);
+
+            // Crea la imagen de carga 
+            var imgCarga = document.createElement('img');
+            $(imgCarga).prop('src', '../../images/load.gif');
+            // $(imgCarga).css({'display':'none'});
+
+            colCheckAsignaPermiso.appendChild(imgCarga);
+
+            fila.appendChild(colCodigoOpcion);
+            fila.appendChild(colNombreOpcion);
+            fila.appendChild(colCheckAsignaPermiso);
+            
+            $('#tblModalResultadoInvoice').find('tbody').append(fila);
+        });
+    }
+
+    function ObtenerRoles()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ObtenerRoles", "Role")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {                
+                Roles = Data;
+                // console.log(Roles);
+            }
+        });
+    }
+
+    function CargarRolesEnCombo()
+    {
+        var CodigoRol;
+        var NombreRol;
+        var primeraOpcionDeCombo; // Primera opción que se agregará al combo, que tiene por texto una cadena vacía.
+        var textoPrimeraOpcionDeCombo;
+        var varComboRoles;
+
+        // Obtiene el combo de roles
+        comboRoles = document.getElementById('cmbRole');
+
+        // Crea la primera opción para agregar al combo de roles.
+        primeraOpcionDeCombo = document.createElement('option');
+
+        // Asigna valor y contenido a la primera opción creada para el combo.
+        primeraOpcionDeCombo.setAttribute('value', '0');
+        textoPrimeraOpcionDeCombo = document.createTextNode('\u00A0');
+        primeraOpcionDeCombo.appendChild(textoPrimeraOpcionDeCombo);
+
+        // Agrega la opción al combo.
+        comboRoles.appendChild(primeraOpcionDeCombo);
+                
+        $.each(Roles, function (Indice, Valor)
+        {
+            var opcionAgregadaACombo;
+            var textoOpcionDeCombo;
+            var otraOpcionDeCombo;
+
+            // Obtiene el código y el nombre del rol que está iterandi.
+            CodigoRol = Valor.RoleId;
+            NombreRol = Valor.RoleName;
+
+            // Crea una opción para agregar al combo de roles.
+            otraOpcionDeCombo = document.createElement('option');
+           
+            // Asigna valor y contenido a la opción creada.
+            otraOpcionDeCombo.setAttribute('value', CodigoRol);
+            textoOpcionDeCombo = document.createTextNode(NombreRol);
+            otraOpcionDeCombo.appendChild(textoOpcionDeCombo);
+
+            // debugger;
+            // console.log(otraOpcionDeCombo);
+
+            // Agrega la opción al combo.
+            comboRoles.appendChild(otraOpcionDeCombo);
+        });
+
+        // debugger;
+        // console.log(comboRoles);
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+</script>

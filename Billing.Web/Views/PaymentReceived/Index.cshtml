@@ -1,0 +1,424 @@
+﻿<style>
+    #PagoAjustadoSegunDistribucion
+    {
+        overflow: hidden;    
+        text-align: right;
+    }
+    #PagoAjustadoSegunDistribucion > span
+    {
+        font-size: 2em;
+    }
+    #PagoAjustadoSegunDistribucion > div
+    {
+        border: 3px outset #e1d7d8;
+        padding: 0.2em 1.2em;
+        font-size: 1.5em;
+        width: 120px;
+        float: right;
+    }
+    #cmbFilterModal
+    {
+        cursor: pointer;
+    }
+</style>
+
+<script src="@Url.Content("~/scripts/js/plugins/dataTables/buttons.html5.min.js")"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>PAYMENT REPORT</h5>
+                </div> 
+                <div class="ibox-content">
+
+                  <form method="get" class="form-horizontal">
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Received From </label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                    <select class="form-control" id="cmbFilter">
+                                    
+                                    </select>
+                                    <input type="hidden" id="hdCodigoAseguradora" value="0"/>
+                                    <input type="hidden" id="hdNombreAseguradora" value="" />
+                                </div>                                   
+                           </div>
+                            <label class="col-sm-1 control-label">Patient</label>
+                             <input type="hidden" id="hdCodigoPaciente" value ="0"/>
+                             <input type="hidden" id="apellidoPaciente" value =""/>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                        @*<input type="text" class="form-control" id="txtPaciente" />*@                                                                                
+                                        <select class="form-control control_tabs" id="cmbPaciente" tabindex ="1">
+                                            <option selected value="0"></option>
+                                        </select>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="form-group text-center">
+                            <label class="col-sm-3 control-label">Check <!--<span style="color: #b9858e; font-size: 0.9em;">(You can mipulate this amount)</span>--> </label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-12">
+                                 <input type="text" class="form-control " id="txtCheck" >
+                                </div>                                   
+                           </div>
+
+<label class="col-sm-1 control-label">Claim </label>
+<div class="col-sm-3" style="padding-left: 29px;">    
+    <input class="form-control" type="text" id="txtClaim" autocomplete="off" style="background: #ffffff; width: 205px" maxlength="25"  tabindex="03">
+</div>
+
+
+
+
+                    </div>
+                    <div class="form-group text-center">                            
+                           <label class="col-sm-3 control-label">Bill number <!--<span style="color: #b9858e; font-size: 0.9em;">(You can select other method)</span>--></label>
+                            <div class="col-sm-3">                                
+                                <div class="col-lg-9">
+                                   <input type="text" class="form-control " id="txtBillumber" >
+                                </div>         
+                                                                
+                           </div>
+
+                    </div>
+
+                    <div class="form-group text-center">
+                       <!--<button id="btnGenerate" class="btn btn-primary" type="button" disabled >Save</button>
+                        <button id="btnHelp" type="button"  title="Delete" data-placement="top" data-target="#myModalElimina" data-toggle="modal" class="btn btn-primary control_tabs" >Delete Payment</button>
+                        <button id="btnReset" type="button"  class="btn btn-primary control_tabs" >Refresh</button>-->
+                        @*<button id="btnPrueba" type="button"  class="btn btn-primary control_tabs" >prueba</button>*@
+                        <button id="btnSearch" class="btn btn-primary" type="button"  >Search</button>
+                       
+
+                            @*<button type="button" id="btnPrueba">Prueba</button>*@
+                    </div>
+                  </form>
+                    <div class="ibox float-e-margins">
+                         
+                        <div class="ibox-content" id="EnvolturatblPagos">
+
+                        </div>
+
+                        <br />
+
+                        <div class="ibox-content" id="EnvolturatblDetallePago">
+
+                        </div>
+
+                    </div>
+                </div>
+
+@*                <div class="ibox-content" id="frmBusquedaCliente">
+                    <div class="form-group" >
+                        
+                    </div>
+                </div>*@
+            </div>
+        </div>
+        <div class="col-lg-12">
+                                   
+        </div>
+    </div>
+</div>
+
+<!--////////////////////////// MODAL METODO DE PAGO//////////////////-->
+
+  <div class="modal inmodal" id="myModalMetodoPago" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog" style="width: 550px;">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                          <p><strong style="float:left;">Type pay: </strong> <input type="text" class="form-control " id="type_pay_modal" style="width: 60%;float:left;margin-left:15px;margin-right:15px;"> 
+                                               <button id="btnRegisterPayModal" type="button" class="btn btn-primary">Register</button></p>
+                                            <br>
+
+                            <table class="table table-bordered dataTables-example" id="tblMetodoPago">
+                                <thead >
+                                <tr>
+                                    <th class="hidden">Codigo</th>
+                                    <th class="th_tabla">Tipe Pay</th>                                                                        
+                                    <th class="th_tabla">Remove</th>           
+                                </tr>
+                                </thead>
+                                <tbody>
+                                      
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <!--<button  id="btnRegistrarModalAdjusterHom" type="button" class="btn btn-primary" >Continue</button>-->
+                                            <button id="btnCancelarModalAdjusterHom"  type="button" class="btn btn-danger" data-dismiss="modal" >Cancel</button>
+                                            
+                                            <input  id="accionAdjusterHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoAdjusterHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionAdjusterHom" type="hidden" value="0" />          
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+@Html.Partial("footer")
+
+@*<script src="@Url.Content("~/scripts/js/plugins/dataTables/datatables.min.js")" async="async"></script>*@
+<script src="@Url.Content("~/scripts/js/plugins/iCheck/icheck.min.js")" async="async"></script>
+
+<script>
+
+    $(Inicio)
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function Hola(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+
+    // Variables globales donde guardo los valores con los que voy a filtrar.
+    var codigoAseguradora = 0;
+    var nombreAseguradora = '';
+    var codigoPaciente = 0;
+    var nombrePaciente = '';
+    var numeroCheque = '';
+    var claim = '';
+    var numeroFactura = '';
+
+    function Inicio()
+    {
+        ProcesoActual = "ReportPayment";
+        Hola(CodigoUsuarioGlobal);
+
+        // Métodos
+        ObtenerAseguradorasParaPago()
+        CargarAseguradorasParaPago()
+        ObtenerPacientesAutocompletar();        
+
+        $("#cmbPaciente").select2();
+        $("#cmbFilter").select2() // Convierte la lista desplegable de aseguradoras en lista desplegable autocompletable.
+
+        // Eventos
+        $("#cmbFilter").on("change", CargarInformacionDeFacturas);
+        ObtenerPacientesAutocompletar();
+
+        $("#btnSearch").on("click", function () {
+            buscaFiltro();
+            //buscaFiltro(cargaBusquedaFiltro)
+        });
+    }
+
+    // función que carga la información obtenida del filtro
+    function buscaFiltro()
+    {       
+        
+        nombreAseguradora = $('#cmbFilter option:selected').text().trim()
+        codigoAseguradora = (nombreAseguradora.indexOf("---------") != -1) ? 0 : $('#cmbFilter').val();
+        nombrePaciente = $('#cmbPaciente option:selected').text().trim()
+        codigoPaciente = (nombrePaciente.indexOf("---------") != -1) ? 0 : $('#cmbPaciente').val();        
+        numeroCheque = $('#txtCheck').val().trim();
+        claim = $('#txtClaim').val().trim();
+        numeroFactura = $('#txtBillumber').val().trim();
+                
+        console.clear();
+        console.log('codigoAseguradora: ' + codigoAseguradora);
+        console.log('codigoPaciente: ' + codigoPaciente);
+        console.log('numeroCheque: ' + numeroCheque);
+        console.log('claim: ' + claim);
+        console.log('numeroFactura: ' + numeroFactura);
+
+        sw=0;
+        if (codigoAseguradora != 0 || numeroCheque != "" || numeroFactura != "" || claim != "" || codigoPaciente != 0)
+        {
+            console.log("hay data");
+            //ajax
+
+            // $('#BillNumber').val(bill_number);
+            // $('#BillNumber').trigger("change");
+            // 
+            // $('#Claim').val(claim);
+            // $('#Claim').trigger("change");
+            // 
+            // $('#Patient').val(paciente);
+            // $('#Patient').trigger("change");
+            // 
+            // $('#Insurer').val(insurer);
+            // $('#Insurer').trigger("change");
+            // 
+            // 
+            // $('#CheckNumber').val(CheckNumber);
+            // $('#CheckNumber').trigger("change");
+            sw = 1;
+        }                   
+
+        if (sw == 0) {
+            error = "Error!";
+            mensaje = "Enter information to search";
+            MensajeError(mensaje, error);
+        }
+        else {
+            // Si se ha validado que al menos se ingrese un filtra obtiene los pagos
+            var parametrosFiltro = {
+                'CodigoAseguradora': codigoAseguradora
+                , 'CodigoPaciente': codigoPaciente
+                , 'NumeroCheque': numeroCheque
+                , 'Claim': claim
+                , 'NumeroFactura': numeroFactura
+            }
+
+            // Carga los pagos
+            cargarPagos(parametrosFiltro)
+
+            // Limpia el contenedor de detalle del pago
+            $("#EnvolturatblDetallePago").empty()
+        }
+    }
+
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error,
+            text: mensaje,
+            html: true
+        });
+    }
+
+
+    $("#cmbPaciente").on("change", function (e) {
+        var CodigoPacienteSeleccionado;
+        var Paciente;
+
+        CodigoPacienteSeleccionado = $(this).val();
+        console.log(CodigoPacienteSeleccionado);
+        console.log($("#select2-cmbPaciente-container").attr("title"));
+
+        $("#hdCodigoPaciente").val(CodigoPacienteSeleccionado);
+        $("#apellidoPaciente").val($("#select2-cmbPaciente-container").attr("title"));
+
+    });
+
+    function CargarPacientesEnCombo(Pacientes) {
+        var CodigoPaciente;
+        var NombrePaciente;
+        $("#cmbPaciente").empty();
+
+        $("#cmbPaciente").append("<option value='0'>---------------------</option>");
+
+        $.map(Pacientes, function (val, i) {
+            CodigoPaciente = val.Codigo;
+            NombrePaciente = val.NombreCompleto;
+
+            $("#cmbPaciente").append("<option value='" + CodigoPaciente + "'>" + NombrePaciente + "</option>");
+        });
+    }
+
+    function ObtenerPacientesAutocompletar() {
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaAutocompletar", "Patient")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                //console.log(Data);
+
+                Pacientes = Data; // obtiene datos de los Pacientes para autocompletado
+                CargarPacientesEnCombo(Pacientes); // Carga los pacientes en el combo autocompletable de pacientes.
+            }
+        });
+    }
+
+
+    function CargarInformacionDeFacturas(e) 
+    {
+        codigoAseguradora = parseInt(e.currentTarget.value);
+        Aseguradora = e.currentTarget.text;
+
+        $("#hdCodigoAseguradora").val(codigoAseguradora);
+        $("#hdNombreAseguradora").val($("#cmbFilter > option:selected").text());
+        
+
+
+
+        // if (CodigoAseguradoraSeleccionada != 0) {
+        //     cargarPagos(CodigoAseguradoraSeleccionada)
+        // }
+
+    }
+    
+    // Obtiene las aseguradoras que se van a utilizar para filtrar pagos.
+    function ObtenerAseguradorasParaPago() {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaPago", "Insurer")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data) {
+                AseguradorasParaPago = Data
+            }
+        })
+    }
+
+    function CargarAseguradorasParaPago() {
+        var CodigoAseguradora
+        var NombreAseguradora
+
+        // Limpiar el combo de aseguradoras.
+        $("#cmbFilter").empty()
+
+        // Agrega la primera opción del combo con código "0".
+        // $("#cmbFilter").append("<option value = '0'>&nbsp</option>")
+
+        // Mapea en "CodigosAseguradorasParaPago" los códigos de las aseguradoras.
+        CodigosAseguradorasParaPago = $.map(AseguradorasParaPago, function (Valor, Indice) {
+            return Valor.Ins_code
+        })
+        
+        $.each(AseguradorasParaPago, function (Indice, Valor) {
+            CodigoAseguradora = Valor.Ins_code
+            NombreAseguradora = Valor.Ins_name
+
+            if (NombreAseguradora.indexOf("---------") != -1)
+                $("#cmbFilter").append('<option selected value="' + CodigoAseguradora + '">' + NombreAseguradora.toUpperCase() + '</option>')
+            else
+                $("#cmbFilter").append('<option value="' + CodigoAseguradora + '">' + NombreAseguradora.toUpperCase() + '</option>')
+
+        })
+    }
+
+    function cargarPagos(parametrosFiltro)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(parametrosFiltro),
+            url: '@Url.Action("CargarPagos", "PaymentReceived")',
+            contentType: "application/json",
+            success: function (VistaParcialPagos)
+            {
+                $("#EnvolturatblPagos").html(VistaParcialPagos);
+            }
+        });
+    }
+</script>
+
+
+

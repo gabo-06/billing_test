@@ -1,0 +1,214 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Patient</h5>
+</div>
+
+<input type="hidden" id="hdCodigoPacienteSeleccionado">
+        
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblPacientes" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">Pat_code</th>
+                <th>Patient's First Name</th>
+
+                <th>Patient's Last name</th>       
+                <th>SSNumber</th>     
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th style="display: none;"></th>
+                <th>Patient's First Name</th>
+                <th>Patient's Last name</th>        
+                <th>SSNumber</th>
+                <th>Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+
+    $(document).ready(function ()
+    {
+        //debugger
+        $('[data-toggle="tooltipB"]').tooltip();
+        $('#tblPacientes').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetDataTrazabilidad", "Patient")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Pat_code" },                        
+                        { "data": "Pat_firstName" },
+                        { "data": "Pat_lastName" },                      
+                        { "data": "Pat_socialSecurityNumberD" },                     
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" data-toggle="tooltipB" data-placement="top" title="Select Patient"  class="btn selectPaciente btn-danger btn-bitbucket text-center"> Select</a> ' } }
+
+            ]
+        });
+        
+        // Evento para controlar la selección de un paciente
+        $('#tblPacientes > tbody').on('click', 'tr > td > .selectPaciente', SeleccionaPaciente_Click);
+
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaPaciente_Click(e)
+    {
+        e.preventDefault()
+
+        var codigoPacienteSeleccionado // Variable que almacenará el código del paciente seleccionado.
+        var nombrePacienteSeleccionado // Variable que almacenará el nombre del paciente seleccionado.
+        var apellidoPacienteSeleccionado // Variable que almacenará el apellido del paciente seleccionado.
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre del paciente seleccionado.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código, nombre y apellido del paciente seleccionado.
+        codigoPacienteSeleccionado = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombrePacienteSeleccionado = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+        apellidoPacienteSeleccionado = e.currentTarget.parentElement.parentElement.children[2].innerHTML
+
+        // Guarda el código del paciente seleccionado en el campo oculto.
+        $('#hdCodigoPacienteSeleccionado').val(codigoPacienteSeleccionado)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+        
+        ActualizaTrazabilidadPaciente(codigoPacienteSeleccionado, nombrePacienteSeleccionado, apellidoPacienteSeleccionado)
+    }
+
+    function RecibeSeñalNode()
+    {
+       // debugger
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('respuestaTrazabilidadPaciente', function (data) 
+        {
+            MuestraTrazabilidadTiempoReal(data)
+        })
+    }
+
+    function MuestraTrazabilidadTiempoReal(data)
+    {
+        // Si lo que contiene data.codigoPacienteActualizado es 'null' entonces tomará valor vacío.
+        var codigoPacienteActualizado = data.codigoPacienteActualizado || ''
+
+        // Esta función actualizará la tabla de búsqueda de pacientes
+        ActualizaTablaBusqueda()
+
+        // Verifica que exista un paciente seleccionado y que el código del paciente 
+        // seleccionado coincida con el código de paciente traido desde node, si es así
+        // mostrará la trazabilidad del paciente.
+        if ($('#hdCodigoPacienteSeleccionado').val().trim() != ''
+         && $('#hdCodigoPacienteSeleccionado').val().trim() == codigoPacienteActualizado.trim())
+       { 
+            ActualizaTrazabilidadPaciente(data.codigoPacienteActualizado.trim()
+                                            , data.nombrePacienteActualizado.trim()
+                                            , data.apellidoPacienteActualizado.trim())
+        }
+    }
+
+    function ActualizaTrazabilidadPaciente(codigoPacienteSeleccionado
+                                        , nombrePacienteSeleccionado
+                                        , apellidoPacienteSeleccionado)
+    {
+        //debugger
+        // Muestra la trazabilida del paciente seleccionado en la tabla de detalle "tblTrazabilidadPaciente".
+        MuestraTablaTrazabilidadPaciente(codigoPacienteSeleccionado)
+
+        // Se obtiene el título de la vista parcial de la trazabilidad de paciente, 
+        // para después concatenarlo con el nombre del paciente seleccionado.
+        tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+        $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombrePacienteSeleccionado + ' ' + apellidoPacienteSeleccionado + ')')
+    }
+
+    function MuestraTablaTrazabilidadPaciente(codigo)
+    {
+        var trazabilidadPaciente
+
+        // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+        trazabilidadPaciente = ObtieneDataTrazabilidadPaciente(codigo)
+
+        // Muestra la vista parcial de la trazabilidad del paciente seleccionado.
+        $('#DetalleInformacion').css({ 'display': 'block' });
+        $('#DetalleInformacion').html(trazabilidadPaciente);
+    }
+
+    function pintaFilaSeleccionada(e)
+    {
+        // Establece a todas la filas su formato original.
+        $('#tblPacientes > tbody > tr').css({'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+    function ObtieneDataTrazabilidadPaciente(codigo)
+    {
+        var trazabilidadPaciente
+
+        $.ajax({
+            type: 'POST'
+            , async: false
+            , data: JSON.stringify({ 'codigoPaciente': parseInt(codigo) })
+            , url: '@Url.Action("trazabilidadPaciente", "DataAudit")'
+            , contentType: "application/json"
+            , dataType: 'html'
+            , success: function (Data)
+            {
+                trazabilidadPaciente = Data
+            }
+        });
+
+        return trazabilidadPaciente
+    }
+
+    function ActualizaTablaBusqueda()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaTrazabilidad", "Patient")',
+            contentType: false,
+            contentType: false,
+            success: function (Data)
+            {
+                $('#tblPacientes').DataTable().ajax.reload();
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,120 @@
+﻿@model Billing.Web.Models.Medical
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Medical</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_code)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_code)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_code_old)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_code_old)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_firstName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_firstName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_lastName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_lastName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_address)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_address)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_phone)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_phone)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_fax)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_fax)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_zipCode)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_zipCode)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_city)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_city)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_state)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_state)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_zipCodeExt)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_zipCodeExt)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_phoneExt)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_phoneExt)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_status)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_status)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Specialty.Spe_code_old)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Specialty.Spe_code_old)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Med_alternatePhone)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Med_alternatePhone)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id=Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

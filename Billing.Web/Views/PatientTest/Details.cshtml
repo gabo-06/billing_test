@@ -1,0 +1,113 @@
+﻿@model Billing.Web.Models.Patient
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Patient</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_code)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_code)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_code_old)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_code_old)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_firstName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_firstName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_lastName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_lastName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_address)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_address)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_phone)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_phone)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_fax)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_fax)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_zipCode)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_zipCode)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_city)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_city)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_state)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_state)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_zipCodeExt)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_zipCodeExt)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_phoneExt)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_phoneExt)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_status)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_status)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Pat_birthday)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Pat_birthday)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id=Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

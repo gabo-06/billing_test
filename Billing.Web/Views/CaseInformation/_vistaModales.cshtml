@@ -1,0 +1,956 @@
+﻿<div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header header_formulario" style="padding: 7px 15px;">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title">Add New Doctor</h3>
+                                        </div>
+                                        <!--<div class="ibox-title header_formulario" >  <h5>Add New Doctor</h5> </div>-->
+
+                                    <div class="modal-body">
+                                        <form role="form" method="get" class="form-horizontal">
+                                            
+                                            <input type="hidden" id="hdCodigoModalDoctor" class="form-control" autofocus>
+                                                                                    
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">First name <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtNombreDoctor" class="form-control control_tabs " autofocus tabindex="201">                                        
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Last name <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtApellidoDoctor" class="form-control letterNombre control_tabs" tabindex="202">                                        
+                                                </div>
+                                            </div>               
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Street </label> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtDireccionDoctor" class="form-control letterNombre control_tabs"  tabindex="203">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">City <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <input type="hidden" id="hdCiudadDoctor" /> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtCiudadDoctor" class="form-control control_tabs" tabindex="204">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">State <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <input type="hidden" id="hdAbreviaturaEstadoPaisDoctor" />
+                                                <div class="col-lg-8">
+                                                    <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                                    <span style="color:red; font-size: 0.8em; font-style: italic;">(if you do not belong to any state, select the "NONE" option from the list)</span>
+                                                    <input type="text" id="txtEstadoPaisDoctor" class="form-control control_tabs"  tabindex="205">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Zip code</label> 
+                                                <div class="col-lg-4">
+                                                    <input type="text" id="txtCodigoPostalDoctor" class="form-control control_tabs" maxlength="5" tabindex="206">
+                                                </div>
+                                                <label class="col-lg-1 control-label">Ext</label> 
+                                                <div class="col-lg-3">
+                                                    <input type="text" id="txtExtensionCodigoPostalDoctor" class="form-control control_tabs" maxlength="4" tabindex="207">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Phone</label>
+                                                <div class="col-lg-4">
+                                                    <input type="text" id="txtTelefonoDoctor" class="form-control control_tabs" tabindex="208" placeholder="###-###-####" data-mask="999-999-9999">
+                                                </div>                                            
+                                                <label class="col-lg-1 control-label">Ext</label> 
+                                                <div class="col-lg-3">
+                                                    <input type="text" id="txtExtensionTelefonoDoctor" class="form-control control_tabs" maxlength="5" tabindex="209">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Alt. Phone</label>
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtTelefonoAlternativoDoctor" class="form-control control_tabs" placeholder="###-###-####" data-mask="999-999-9999" tabindex="210" >
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Fax</label> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtFaxDoctor" class="form-control control_tabs" placeholder="###-###-####" data-mask="999-999-9999" tabindex="211">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Office</label> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtOficinaDoctor" class="form-control control_tabs" tabindex="212">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Speciality </label>           <!--<span style="color:red; font-size:15px;"> (*)</span>-->
+                                                <div class="col-lg-6">
+                                                    <select id="cmbEspecialidadesDoctor" class="form-control m-b control_tabs" tabindex="213">
+                                                        <option selected value=''>-- SELECTED --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                 <button id="btnModalSpeciality"  data-target="#myModalEspecialidad" data-toggle="modal" class="btn btn-primary control_tabs" type="button" tabindex="214" data-tipo="doctor">
+                                                   Add
+                                                  </button>
+                                               </div>
+                                            </div>
+                                        </form>
+
+                                        </div>
+                                        <div class="modal-footer" style="text-align:center;">                                            
+                                            <button type="button" id="btnAsignarNuevoDoctorCaso" class="btn btn-primary control_tabs" tabindex="215">ADD TO THE DATABASE</button>
+                                            <button type="button" id="btnCancelarDoctorModal" class="btn btn-danger control_tabs" tabindex ="216"  data-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+<!--//////////////////////////////MODAL ADJUSTER//////////////////////////////////-->
+<div class="modal inmodal" id="myModalAdjuster" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                         <div class="modal-header header_formulario" style="padding: 7px 15px;">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title">Add New Adjuster</h3>
+                                        </div>
+                                        <!--<div class="ibox-title header_formulario" >  <h5>Add New Adjuster</h5> </div>-->
+
+                                    <div class="modal-body">
+                                        <form role="form" method="get" class="form-horizontal">                                            
+                                            <input id="hdCodigoModalAjustador" type="hidden" value="0">
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">First name <span style="color:red; font-size:15px;"> (*)</span></label>    
+                                                       
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtNombreAdjusterModal" class="form-control letterNombre control_tabs" tabindex="301" autofocus>                                        
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Last name <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtApellidoAdjusterModal" class="form-control control_tabs" tabindex="302">                                        
+                                                </div>
+                                            </div>  
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Phone </label>           
+                                                <div class="col-lg-4">
+                                                    <input type="text" id="txtPhoneAdjusterModal" class="form-control control_tabs" tabindex="303" placeholder="###-###-####" data-mask="999-999-9999" >                                        
+                                                </div>
+                                                <label class="col-lg-1 control-label">Ext </label>           
+                                                <div class="col-lg-3">
+                                                    <input type="text" id="txtExtAdjusterModal" class="form-control control_tabs" tabindex="304" maxlength="5">                                        
+                                                </div>
+                                            </div>  
+
+                                        </form>
+                                        </div>
+                                        <div class="modal-footer" style="text-align:center;">                                            
+                                            <button type="button" id="btnAsignarNuevoAdjusterModal" class="btn btn-primary control_tabs" tabindex="305">ADD TO THE DATABASE</button>
+                                            <button type="button" id="btnCancelarAjustadorModal" class="btn btn-danger control_tabs" data-dismiss="modal" tabindex="306">Cancel</button>
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+<!--///////////////////////////MODAL INSURER/////////////////////////////////////-->
+
+<div class="modal inmodal" id="myModalInsurer" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                       <div class="modal-header header_formulario" style="padding: 7px 15px;">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title">Add New Insurer</h3>
+                                        </div>
+                                        <!--<div class="ibox-title header_formulario" >  <h5>Add New Insurer</h5> </div>-->
+
+                                    <div class="modal-body">
+                              <form class="form-horizontal" method="get">
+                                <input type="hidden" value="0" id="hdCodigoModalInsurer">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Name <span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="401" autofocus="" id="txtNombreInsurerModal" class="form-control letterNombre control_tabs">
+                                                </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Street
+                                    </label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="402" id="txtCalleAseguradoraModal" class="form-control letter control_tabs"> 
+
+                               </div>
+                               </div>
+                               <div class="form-group">
+                                    <label class="col-sm-3 control-label">City<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <input type="hidden" value="" id="hdCiudadInsurerModal">
+                                        <input type="text" tabindex="403" autocomplete="off" class="form-control ui-autocomplete-input control_tabs" id="txtCiudadInsurerModal">
+                                                </div>
+                               </div>  
+                               <div class="form-group">
+                                    <label class="col-sm-3 control-label">State<span style="color:red; font-size:15px;"> (*)</span></label>
+                                   <div class="col-sm-6">
+                                        <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <span style="color:red; font-size: 0.8em; font-style: italic;">(if you do not belong to any state, select the "NONE" option from the list)</span>
+                                        <input type="hidden" value="" id="hdAbreviaturaEstadoPaisInsurerModal">
+                                        <input type="text" tabindex="404" autocomplete="off" class="form-control ui-autocomplete-input control_tabs" id="txtEstadoInsurerModal">                                        
+                                            </div> 
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Phone</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" tabindex="405" placeholder="###-###-####" data-mask="999-999-9999" id="txtTelefonoInsurerModal" class="form-control control_tabs">
+                                    </div>
+                                    <label class="col-sm-1 control-label">Ext</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" tabindex="406" placeholder="" maxlength="5" id="txtExtInsurerModal" class="form-control control_tabs">
+                                    </div>
+                                 </div>  
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Fax</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="407"  data-mask="999-999-9999" placeholder="###-###-####" id="FaxInsurerModal" class="form-control control_tabs">
+                                     </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Zip code</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" tabindex="408" id="txtZipInsurerModal" class="form-control control_tabs" data-mask="99999"  maxlength="5">
+                                    </div>
+                                    <label class="col-sm-1 control-label">Ext</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" tabindex="409" id="txtExtCodeInsurerModal" class="form-control control_tabs" maxlength="4">
+                                     </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">SC/TPA</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="410" placeholder="" data-mask="999-999-9999" id="txtTpaInsurerModal" class="form-control control_tabs"> 
+                                                </div>
+                                            </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Fein sc</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="411" data-mask="99-9999999"  id="txtFeinSCInsurerModal" class="form-control control_tabs">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Carrier</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="412" data-mask="999-999-9999" id="txtCarrierInsurerModal" class="form-control control_tabs">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Fein cc</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" tabindex="413" data-mask="99-9999999" id="txtFeinCCInsurerModal" class="form-control control_tabs">
+                                                </div>
+                                            </div>
+
+                                        </form>
+
+                                        </div>
+                                        <div class="modal-footer" style="text-align:center;">
+                                            <button type="button" id="btnAsignarNuevoInsurerModal" class="btn btn-primary control_tabs" tabindex="414" >ADD TO THE DATABASE</button>
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal" id="btnCancelarInsurerModal" tabindex="415" >Cancel</button>
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+<!--////////////////////////////////////////////////////////////////-->
+
+<!--///////////////////////////MODAL PROVIDER/////////////////////////////////////-->
+
+<div class="modal inmodal" id="myModalProvider" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header header_formulario" style="padding: 7px 15px;">
+                                           <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title">Add New Provider</h3>
+                                        </div>   
+                                        <!--<div class="ibox-title header_formulario" >  <h5>Add New Provider</h5> </div>-->
+                                        <input type="hidden" id="hdCodigoModalProveedor" value="0">
+                                    <div class="modal-body">
+                                        <form role="form" method="get" class="form-horizontal">
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">First name <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <div class="col-lg-5">
+                                                    <input type="text" id="txtNombreProviderModal" class="form-control control_tabs"  tabindex="501" autofocus>                                        
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Last Name <span style="color:red; font-size:15px;"> (*)</span></label>           
+                                                <div class="col-lg-5">
+                                                    <input type="text" id="txtApellidoProviderModal" class="form-control control_tabs" tabindex="502">                                        
+                                                </div>
+                                            </div>  
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Number </label>           
+                                                <div class="col-lg-5">
+                                                    <input type="text" id="txtNumberProviderModal" class="form-control control_tabs" maxlength ="12"  tabindex="503">                                        
+                                                </div>
+                                                
+                                            </div>  
+                                            
+                                   
+
+                                        </form>
+                                        </div>
+                                        <div class="modal-footer" style="text-align:center;">
+                                            <button type="button" id="btnAsignarNuevoProviderModal" class="btn btn-primary control_tabs" tabindex="504">ADD TO THE DATABASE</button>
+                                            <button type="button" class="btn btn-danger control_tabs" id="btnCancelarProviderModal" data-dismiss="modal" tabindex="505">Cancel</button>
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+<!--////////////////////////////////////////////////////////////////-->
+
+<!--///////////////////////////MODAL ATTORNEY/////////////////////////////////////-->
+
+<div class="modal inmodal" id="myModal55" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                         <div class="modal-header header_formulario" style="padding: 7px 15px;">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title">Add New Attorney</h3>
+                                        </div>  
+                                        <!--<div class="ibox-title header_formulario" >  <h5>Add New Attorney</h5> </div>-->
+
+                                    <div class="modal-body">
+                                        <form role="form" method="get" class="form-horizontal">
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">First name <span style="color:red; font-size:15px;"> (*)</span></label>              
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtNombreAbogado" class="form-control control_tabs" tabindex="601" autofocus>                                        
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Last name <span style="color:red; font-size:15px;"> (*)</span></label>            
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtApellidoAbogado" class="form-control control_tabs" tabindex="602">                                        
+                                                </div>
+                                            </div>               
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Street</label> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtDireccionAbogado" class="form-control control_tabs" tabindex="603">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">City <span style="color:red; font-size:15px;"> (*)</span></label>   
+                                                <input type="hidden" id="hdCiudadAbogado" /> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtCiudadAbogado" class="form-control control_tabs" tabindex="604">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">State <span style="color:red; font-size:15px;"> (*)</span></label>   
+                                                <input type="hidden" id="hdAbreviaturaEstadoPaisAbogado" />
+                                                <div class="col-lg-8">
+                                                    <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                                    <span style="color:red; font-size: 0.8em; font-style: italic;">(if you do not belong to any state, select the "NONE" option from the list)</span>
+                                                    <input type="text" id="txtEstadoPaisAbogado" class="form-control control_tabs" tabindex="605">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Zip code</label> 
+                                                <div class="col-lg-4">
+                                                    <input type="text" id="txtCodigoPostalAbogado" class="form-control control_tabs"  maxlength="5" tabindex="606">
+                                                </div>       
+                                                <label class="col-lg-1 control-label">Ext</label> 
+                                                <div class="col-lg-3">
+                                                    <input type="text" id="txtExtensionCodigoPostalAbogado" class="form-control control_tabs" tabindex="607" maxlength="4" >
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Phone</label>
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtTelefonoAbogado" class="form-control control_tabs" tabindex="608"  placeholder="###-###-####"   data-mask="999-999-9999">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Fax</label> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtFaxAbogado" class="form-control control_tabs" tabindex="609" placeholder="###-###-####"  data-mask="999-999-9999">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Assistant</label> 
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="txtAsistenteAbogado" class="form-control control_tabs" tabindex="610">
+                                                </div>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 8px;"> 
+                                                <label class="col-lg-3 control-label">Specialty</label>   <!-- <span style="color:red; font-size:15px;"> (*)</span>-->
+                                                <div class="col-lg-6">
+                                                    <select id="cmbEspecialidadesAbogado" class="form-control m-b control_tabs" tabindex="611">
+                                                        <option selected value=''>-- SELECTED --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-2">                                                 
+                                                 <button id="btnModalSpecialityAbogado" data-target="#myModalEspecialidadAbogado" data-toggle="modal" class="btn btn-primary control_tabs" type="button" tabindex="612" data-tipo="abogado">
+                                                   Add
+                                                  </button>
+                                               </div>
+                                            </div>
+
+                                        </form>
+                                        </div>
+                                        <div class="modal-footer" style="text-align:center;">
+                                            <button type="button" id="btnAsignarNuevoAbogadoCaso" class="btn btn-primary control_tabs" tabindex="613">ADD TO THE DATABASE</button>
+                                            <button type="button" class="btn btn-danger control_tabs"  id="btnCancelarAbogadoModal" data-dismiss="modal" tabindex="614">Cancel</button>
+                                             
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+<!--///////////////////////////MODAL PATIENT/////////////////////////////////////-->
+
+<div class="modal inmodal" id="myModalPatient" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header header_formulario" style="padding: 7px 15px;">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <!--<i class="fa fa-fa fa-warning modal-icon"></i>-->
+                                            <h3 class="modal-title">Add New Patient</h3>
+                                        </div>  
+                                        <!--<div class="ibox-title header_formulario" >  <h5>Add New Patient</h5> </div>-->
+
+                                    <div class="modal-body">
+                                        <form method="get" class="form-horizontal">
+                                <input type="hidden" value="0" id="hdCodigoModalPaciente">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">First Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre control_tabs" id="NombrePacienteModal" autofocus="" tabindex="101">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Patient's Last Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre control_tabs" id="ApellidoPacienteModal" tabindex="102">
+                                        
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">SSNumber</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control control_tabs" id="NumeroSeguroSocialDPacienteModal" data-mask="999-99-9999" placeholder="###-##-####" tabindex="103">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="FechaNacimientoModal">
+                                <label class="col-sm-3 control-label">Birthday</label>
+                                <div class="input-group date col-sm-6" style="padding-left: 16px;padding-right: 16px;">
+                                    <span class="input-group-addon addon_fechaPacienteModal"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" class="form-control dtpFecha control_tabs" id="FechaNacimientoPacienteModal" value=""  tabindex="104" placeholder= "##/##/####" data-mask="99/99/9999">     
+                                </div>
+                                </div>
+
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Street</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control control_tabs" id="DireccionPacienteModal" tabindex="105">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">City<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <input type="hidden" id="hdCiudadPacienteModal" value="">
+                                        <input type="text" class="form-control ui-autocomplete-input control_tabs" id="CiudadPacienteModal" tabindex="106" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">State<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <span style="color:red; font-size: 0.8em; font-style: italic;">(if you do not belong to any state, select the "NONE" option from the list)</span>
+                                        <input type="hidden" id="hdAbreviaturaEstadoPaisPacienteModal" value="">
+                                        <input type="text" class="form-control ui-autocomplete-input control_tabs" id="EstadoPaisPacienteModal" tabindex="107" autocomplete="off">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Zip code</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" maxlength="5" class="form-control control_tabs" id="CodigoPostalPacienteModal" tabindex="108">
+                                    </div>
+                                    <label class="col-sm-1 control-label">Ext</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" maxlength="4" class="form-control control_tabs" id="ExtensionCodigoPostalPacienteModal" tabindex="109">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Phone</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control control_tabs" id="TelefonoPacienteModal" data-mask="999-999-9999" placeholder="###-###-####" tabindex="110">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Alternative Phone 	</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control control_tabs" id="TelefonoAlternativoPacienteModal" data-mask="999-999-9999" placeholder="###-###-####"   tabindex="111">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"> Sex <span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="radio" name="Sexo" class="OpcionSexo control_tabs" id="rdbMasculinoPacienteModal" value="M" style="cursor: pointer;" tabindex="112" ckecked="true"> &nbsp; Male
+                                        <input type="radio" name="Sexo" class="OpcionSexo control_tabs" id="rdbFemeninoPacienteModal" value="F" style="cursor: pointer;" tabindex="113">&nbsp; Female
+                                    </div>
+                                </div>
+
+                            </form>
+                                    </div>
+                                        <div class="modal-footer" style="text-align:center;">                                            
+                                            <button type="button" id="btnAsignarNuevoPatientModal" class="btn btn-primary control_tabs" tabindex="114">ADD TO THE DATABASE</button>
+                                            <button type="button" id="btnEditarPatientModal" class="btn btn-primary hidden control_tabs" tabindex="115">ADD TO THE DATABASE</button>
+                                            <button type="button" class="btn btn-danger" id="btnCancelarPacienteModal control_tabs" data-dismiss="modal" tabindex="116">Cancel</button>
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+<div class="modal inmodal" id="myModalSex" tabindex="-1" role="dialog"  aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content animated fadeIn">
+			<div class="ibox-title header_formulario" >  
+				<h5>Update Sex</h5>  
+			</div>
+			<div class="modal-body">
+				<form method="get" class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Sex</label>
+						<div class="col-sm-6">
+							<input type="radio" name="Sexo" class="OpcionSexo" id="rdbMasculinoPacienteModalActualizado" value="M" style="cursor: pointer;" tabindex="12" ckecked="true"> &nbsp; Male
+							<input type="radio" name="Sexo" class="OpcionSexo" id="rdbFemeninoPacienteModalActualizado" value="F" style="cursor: pointer;" tabindex="13">&nbsp; Female
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer" style="text-align:center;">                                            
+				<button type="button" id="btnActualizarSexoPacienteModal" class="btn btn-primary">ADD TO THE DATABASE</button>
+				<button type="button" class="btn btn-danger" id ="btnCancelaActualizarSexoPacienteModal" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- ////////////////////////// MODALES HOMONIMOS//////////////////////////////////-->
+<!--////////////////////////// MODAL HOMONIMOS iNSURER//////////////////-->
+
+  <div class="modal inmodal" id="myModalInsurerHom" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Insurer were found with similiar names and surnames!.</strong> If the Insurer attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Insurer record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalInsurer">
+                                <thead >
+                                <tr>
+                                    <th >Codigo</th>
+                                    <th class="th_tabla">Name</th>
+                                    <th class="th_tabla">City</th>
+                                    <th class="th_tabla">State</th>
+                                    <th class="th_tabla">zip</th>
+                                    <th class="th_tabla">Status</th> 
+                                    <th class="th_tabla">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button  id="btnRegistrarModalInsurerHom" type="button" class="btn btn-primary" >Continue</button>
+                                            <button id="btnCancelarModalInsurerHom"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>                                            
+                                            <input  id="accion" type="hidden" value="registra" />
+                                            <input  id="seleccionado" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccion" type="hidden" value="0" />          
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+<!--/////////////////////MODAL HOMONIMOS PROVIDER//////////////////-->
+
+ <div class="modal inmodal" id="myModalProveedorHom" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Provider were found with similiar names and surnames!.</strong> If the Provider attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Provider record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalProviderHom">
+                                <thead >
+                                <tr>
+                                    <th class="th_tabla"></th>
+                                    <th class="th_tabla">First Name</th>
+                                    <th class="th_tabla">Last Name</th>
+                                    <th class="th_tabla">Id Number</th>
+                                    <th class="th_tabla">Status</th>
+                                    <th class="th_tabla" style="text-align:center;">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button  id="btnRegistrarModalProviderHom" type="button" class="btn btn-primary" >Continue</button>
+                                            <button id="btnCancelarModalProviderHom"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>                                            
+                                            <input  id="accionProviderHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoProviderHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionProviderHom" type="hidden" value="0" />   
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+<!--////////////////////////// MODAL HOMONIMOS ADJUSTER//////////////////-->
+
+  <div class="modal inmodal" id="myModalAdjusterHom" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Insurer were found with similiar names and surnames!.</strong> If the Insurer attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Insurer record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalAdjusterHom">
+                                <thead >
+                                <tr>
+                                    <th >Codigo</th>
+                                    <th class="th_tabla">Name</th>
+                                    <th class="th_tabla">City</th>
+                                    <th class="th_tabla">State</th>
+                                    <th class="th_tabla">zip</th>
+                                    <th class="th_tabla">Status</th> 
+                                    <th class="th_tabla">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button  id="btnRegistrarModalAdjusterHom" type="button" class="btn btn-primary" >Continue</button>
+                                            <button id="btnCancelarModalAdjusterHom"  type="button" class="btn btn-danger" data-dismiss="modal" >Cancel</button>
+                                            
+                                            <input  id="accionAdjusterHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoAdjusterHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionAdjusterHom" type="hidden" value="0" />          
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+<!--/////////////////////MODAL HOMONIMOS PATIENT//////////////////-->
+                      
+  <div class="modal inmodal" id="myModalPatientHom" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Patient were found with similiar names and surnames!.</strong> If the patient attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no patient record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalPatientHom">
+                                <thead >
+                                <tr>
+                                    <th>C&oacute;digo</th>
+                                    <th class="th_tabla">First Name</th>
+                                    <th class="th_tabla">Last Name</th>
+                                    <th class="th_tabla">State</th>
+                                    <th class="th_tabla" >City</th>
+                                    <th class="th_tabla" >Zip code</th>
+                                    <!--<th class="th_tabla">Address</th>-->
+                                    <th class="th_tabla">Status</th>
+                                    <th class="th_tabla">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            
+                                            <button  id="btnRegistrarModalPatientHom" type="button" class="btn btn-primary" >Continue</button>
+                                            <button id="btnCancelarModalPatientHom"  type="button" class="btn btn-danger" data-dismiss="modal" >Cancel</button>
+                                            <input  id="accionPatientHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoPatientHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionPatientHom" type="hidden" value="0" />   
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+<!--/////////////////////MODAL HOMONIMOS Doctor//////////////////-->
+                      
+  <div class="modal inmodal" id="myModalDoctorHom" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Doctor were found with similiar names and surnames!.</strong> If the patient attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no patient record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalDoctorHom">
+                                <thead >
+                                <tr>
+                                    <th ></th>
+                                    <th class="th_tabla">First Name</th>
+                                    <th class="th_tabla">Last Name</th>
+                                    <th class="th_tabla">State</th>
+                                    <th class="th_tabla" >City</th>
+                                    <th class="th_tabla" >Status</th>
+                                    <th class="th_tabla" >Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button  id="btnRegistrarModalDoctorHom" type="button" class="btn btn-primary" >Continue</button>
+                                            <button id="btnCancelarModalDoctorHom"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>                                            
+                                            <input  id="accionDoctorHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoDoctorHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionDoctorHom" type="hidden" value="0" />   
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+<!--/////////////////////MODAL HOMONIMOS ABOGADO//////////////////-->
+                      
+  <div class="modal inmodal" id="myModalAbogadoHom" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" style="margin-top: 4px;margin-right: 30px;opacity:1;color: white;"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Attorney were found with similiar names and surnames!.</strong> If the attorney attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no attorney record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalAbogadoHom">
+                                <thead >
+                                <tr>
+                                    <th class="th_tabla"></th>
+                                    <th class="th_tabla">First Name</th>
+                                    <th class="th_tabla">Last Name</th>
+                                    <th class="th_tabla">City</th>
+                                    <th class="th_tabla">State</th>
+                                    <th class="th_tabla">Status</th>
+                                    <th class="th_tabla">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button  id="btnRegistrarModalAbogadoHom" type="button" class="btn btn-primary" >Continue</button>
+                                            <button id="btnCancelarModalAbogadoHom"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>                                            
+                                            <input  id="accionAbogadoHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoAbogadoHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionAbogadoHom" type="hidden" value="0" />   
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+<!--/////////////////////MODAL ESPECIALIDAD Doctor//////////////////-->
+                      
+  <div class="modal inmodal" id="myModalEspecialidad" tabindex="-1" role="dialog"  aria-hidden="true" >
+                            <div class="modal-dialog" style="width: 30%">
+                                    <div class="modal-content animated fadeIn">
+                                        
+                                        <div class="ibox-title header_formulario">  <h5>REGISTER SPECIALITY</h5> </div>
+                                          <div class="modal-header">
+                                           <label class="col-sm-2 control-label">Speciality </label>
+                                          <div class="col-sm-5">
+                                             <input type="text"  id="txtEspecialidad" class="form-control">
+                                             <input type="hidden"  id="txtEspecialidadCodigo" value="0" class="form-control">
+                                          </div>  
+                                          <div class="col-sm-2">
+                                          <button class="btn btn-primary" id="btnRegistraAgregaEspecialidad" type="button">Save</button>              
+                                          </div>
+                                          <!--<div class="col-sm-2">
+                                          <button class="btn btn-primary" id="btnSeleccionaEspecialidad" type="button">Selected</button>              
+                                          </div>-->
+                                          <div class="col-sm-2">
+                                          <button class="btn btn-primary" id="btnCancelEspecialidad" type="button">Cancel</button>              
+                                          </div>                                    
+
+                                        </div>
+                                        <div class="modal-body">
+
+                            <table class="table table-bordered" id="tblModalEspecialidad">
+                                <thead >
+                                <tr>
+                                    <th ></th>
+                                    <th class="th_tabla">Speciality</th>
+                                    <th class="th_tabla" >Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+                                        </div>
+                                        <div class="modal-footer">                                            
+                                            <!--<button  id="btnRegistrarModalEspecialidadHom" type="button" class="btn btn-primary" >Continue</button>-->
+                                            <button id="btnCancelarModalEspecialidadHom"  type="button" class="btn btn-danger" data-dismiss="modal" >Close</button>
+                                            <input  id="accionEspecialidadHom" type="hidden" value="registra" />
+                                            <input  id="seleccionadoEspecialidadHom" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionEspecialidadHom" type="hidden" value="0" />   
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+<!--/////////////////////MODAL ESPECIALIDAD ABOGADO//////////////////-->
+                      
+  <div class="modal inmodal" id="myModalEspecialidadAbogado" tabindex="-1" role="dialog"  aria-hidden="true" >
+                            <div class="modal-dialog" style="width: 30%">
+                                    <div class="modal-content animated fadeIn">
+                                        
+                                        <div class="ibox-title header_formulario">  <h5>REGISTER SPECIALITY</h5> </div>
+                                          <div class="modal-header">
+                                           <label class="col-sm-2 control-label">Speciality </label>
+                                          <div class="col-sm-5">
+                                             <input type="text"  id="txtEspecialidadAbogado" class="form-control">
+                                             <input type="hidden"  id="txtEspecialidadCodigoAbogado" value="0" class="form-control">
+                                          </div>  
+                                          <div class="col-sm-2">
+                                          <button class="btn btn-primary" id="btnRegistraAgregaEspecialidadAbogado" type="button">Save</button>              
+                                          </div>
+                                          <!--<div class="col-sm-2">
+                                          <button class="btn btn-primary" id="btnSeleccionaEspecialidad" type="button">Selected</button>              
+                                          </div>-->
+                                          <div class="col-sm-2">
+                                          <button class="btn btn-primary" id="btnCancelEspecialidadAbogado" type="button">Cancel</button>              
+                                          </div>                                    
+
+                                        </div>
+                                        <div class="modal-body">
+
+                            <table class="table table-bordered" id="tblModalEspecialidadAbogado">
+                                <thead >
+                                <tr>
+                                    <th ></th>
+                                    <th class="th_tabla">Speciality</th>
+                                    <th class="th_tabla" >Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+                                        </div>
+                                        <div class="modal-footer">                                            
+                                            <!--<button  id="btnRegistrarModalEspecialidadHom" type="button" class="btn btn-primary" >Continue</button>-->
+                                            <button id="btnCancelarModalEspecialidadHomAbogado"  type="button" class="btn btn-danger" data-dismiss="modal" >Close</button>
+                                            <input  id="accionEspecialidadHomAbogado" type="hidden" value="registra" />
+                                            <input  id="seleccionadoEspecialidadHomAbogado" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccionEspecialidadHomAbogado" type="hidden" value="0" />   
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+<!----------------------------------------------->
+<!-- //////////////////////////////////////////////////////////////////-->
+
+

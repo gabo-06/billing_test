@@ -1,0 +1,184 @@
+﻿    <style>
+    #EnvolturatblCasos
+    {
+        padding: 1em 22%;
+    }
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>DATA AUDIT</h5>
+                </div> 
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal" id="frmBusquedaCaso">
+                        <div class="form-group text-center">                            
+                            <label class="col-sm-4 control-label">Options </label>
+                            <div class="col-sm-5">
+                                @*<input type="text" class="form-control ui-autocomplete-input" id="txtBuscaCaso" autocomplete="off">*@
+                                <select class="form-control" id="cmbRole">
+                                    <option>Select</option>
+                                    <option value="Patient">Patients</option>
+                                    <option value="Medical">Doctors</option>
+                                    <option value="Insurer">Insurers</option>
+                                    <option value="Attorney">Attorneys</option>
+                                    <option value="Adjusters">Adjusters</option>
+                                    <option value="Providers">Providers</option>
+                                    <option value="Activities">Activities</option>
+                                    <option value="Speciality">Speciality</option>
+                                    <option value="Case">Case Information Sheet</option>
+                                    <option value="Data">Data Entry</option>
+                                    <option value="Monthly">Monthly Closing</option>
+                                    <option value="Billing">Billing</option>
+                                </select>
+                            </div>                            
+                        </div>
+                    </form>                     
+                </div>                              
+                
+                <div class="ibox-content" id="EnvolturatblCasos" style="padding: 1em 3%;">
+
+                </div>
+
+                <div class="ibox-content" id="DetalleInformacion" style="display: none; padding: 1em 3%;">
+                       @* @Html.Partial("../DataAudit/lista") *@
+                </div>
+                
+            </div>
+        </div>  
+    </div>
+
+@Html.Partial("footer")
+
+<script>
+    //    $('#tblModalResultadoInvoice').find('tbody').on('click', 'tr > td > .AsignarPermiso', ModificarPermiso);
+
+    $(Inicio);
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function Hola(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+    var Roles;
+    var Opciones;
+    var codigosOpciones; // Almacena un arreglo de los códigos de todas las opciones.
+
+
+
+    function Inicio() {
+        Hola(CodigoUsuarioGlobal);
+
+        ///////CargarRolesEnCombo();
+        //ObtenerOpciones();
+        //CargarOpcionesEnTabla();
+
+        //$('#cmbRole').select2();
+
+        // Pinta todas las filas de la tabla color rosado.
+        ///$('#tblModalResultadoInvoice').find('tbody').find('tr').css({ 'background': '#e6bbbb' });
+
+        // Eventos
+        $('#cmbRole').on('change', SeleccionaRol);
+
+
+
+        $('.selectPaciente').on('click', cargaDetalle);
+        ////$('.selectPaciente').on('click', detallePaciente);
+        ////$('.selectPaciente').on('click', detallePaciente);
+        ////$('.selectPaciente').on('click', detallePaciente);
+        ////$('.selectPaciente').on('click', detallePaciente);
+        ////$('.selectPaciente').on('click', detallePaciente);
+    }
+
+
+
+    function SeleccionaRol() {
+        dato = $(this).val();
+
+        metodo = '@Url.Action("listaPaciente", "DataAudit")';
+
+        // Limpia el contenedor donde se muestra el detalle de trazabilidad de una entidad.
+        $('#DetalleInformacion').empty()
+
+        if (dato != "Select") {
+            if (dato == "Paciente")
+                metodo = '@Url.Action("listaPaciente",  "DataAudit")';
+            if (dato == "Medical")
+                metodo = '@Url.Action("listaDoctor",    "DataAudit")';
+            if (dato == "Insurer")
+                metodo = '@Url.Action("listaInsurer",   "DataAudit")';
+            if (dato == "Attorney")
+                metodo = '@Url.Action("listaAttorney",  "DataAudit")';
+            if (dato == "Adjusters")
+                metodo = '@Url.Action("listaAdjusters", "DataAudit")';
+            if (dato == "Providers")
+                metodo = '@Url.Action("listaProviders", "DataAudit")';
+            if (dato == "Activities")
+                metodo = '@Url.Action("listaActivities","DataAudit")';
+            if (dato == "Speciality")
+                metodo = '@Url.Action("listaSpeciality","DataAudit")';
+            if (dato == "Case")
+                metodo = '@Url.Action("listaCase", "DataAudit")';
+            if (dato == "Data")
+                metodo = '@Url.Action("listaDataEntry", "DataAudit")';
+            if (dato == "Monthly")
+                metodo = '@Url.Action("listaMonthly", "DataAudit")';
+            if (dato == "Billing")
+                metodo = '@Url.Action("listaBilling", "DataAudit")';
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: metodo,
+                contentType: "application/html",
+                dataType: 'html',
+                success: function (Data) {
+                    $("#EnvolturatblCasos").html(Data);
+                }
+            });
+        }
+        else {
+            $("#EnvolturatblCasos").html("");
+        }
+    }
+
+    function cargaDetalle() {
+        // console.log("detalle");
+        dato = $(this).val();
+        // console.log(dato);        
+
+        return false;
+
+        metodo = '@Url.Action("detallePaciente", "DataAudit")';
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: metodo,
+            contentType: "application/html",
+            dataType: 'html',
+            success: function (Data) {
+                // console.log(Data);
+                $("#EnvolturatblCasos").html(Data);
+            }
+        });
+    }
+
+    function MensajeError(mensaje, error) {
+        swal({
+            title: error,
+            text: mensaje
+        });
+    }
+</script>

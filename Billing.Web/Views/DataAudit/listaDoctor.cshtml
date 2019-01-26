@@ -1,0 +1,209 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Doctor</h5>
+</div>
+
+<input type="hidden" id="hdCodigoMedicoSeleccionado">
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblDoctores" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">Med_code</th>
+                <th>Doctor's Name</th>
+                <th>Doctor's Last name</th>       
+                <th>Specialty</th>     
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th style="display: none;"></th>
+                <th>Doctor's Name</th>
+                <th> Doctor's  Last name</th>        
+                <th> Specialty</th>
+                <th>Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $('[data-toggle="tooltipB"]').tooltip();
+
+        $('#tblDoctores').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetDataTrazabilidad", "Medical")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Med_code" },
+                        { "data": "Med_firstName" },
+                        { "data": "Med_lastName" },
+                        { "data": "Specialty.Spe_name" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" data-toggle="tooltipB" data-placement="top" title="Select Medical"  class="btn selectDoctor btn-danger btn-bitbucket text-center"> Select</a> ' } }
+            ]
+        });
+
+        // Evento para controlar la selección de un médico
+        $('#tblDoctores > tbody').on('click', 'tr > td > .selectDoctor', SeleccionaMedico_Click);
+
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaMedico_Click(e)
+    {
+        
+        e.preventDefault()
+
+        var codigoMedicoSeleccionado // Variable que almacenará el código del médico seleccionado.
+        var nombreMedicoSeleccionado // Variable que almacenará el nombre del médico seleccionado.
+        var apellidoMedicoSeleccionado // Variable que almacenará el apellido del médico seleccionado.
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre del médico seleccionado.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código, nombre y apellido del médico seleccionado.
+        codigoMedicoSeleccionado = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombreMedicoSeleccionado = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+        apellidoMedicoSeleccionado = e.currentTarget.parentElement.parentElement.children[2].innerHTML
+
+        // Guarda el código del médico seleccionado en el campo oculto.
+        $('#hdCodigoMedicoSeleccionado').val(codigoMedicoSeleccionado)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+
+        ActualizaTrazabilidadMedico(codigoMedicoSeleccionado, nombreMedicoSeleccionado, apellidoMedicoSeleccionado)
+    }
+
+    function RecibeSeñalNode()
+    {
+        var websocket = io.connect(ServidorPuertoNode);
+
+        websocket.on('respuestaTrazabilidadMedico', function (data)
+        {
+            MuestraTrazabilidadTiempoReal(data)
+        })
+    }
+
+    function MuestraTrazabilidadTiempoReal(data)
+    {
+        // Si lo que contiene data.codigoMedicoActualizado es 'null' entonces tomará valor vacío.
+        var codigoMedicoActualizado = data.codigoMedicoActualizado || ''
+
+        // Esta función actualizará la tabla de búsqueda de médicos
+        ActualizaTablaBusqueda()
+
+        // Verifica que exista un médico seleccionado y que el código del médico
+        // seleccionado coincida con el código de médico traido desde node, si es así
+        // mostrará la trazabilidad del médico.
+        if ($('#hdCodigoMedicoSeleccionado').val().trim() != ''
+         && $('#hdCodigoMedicoSeleccionado').val().trim() == codigoMedicoActualizado.trim())
+        {
+            ActualizaTrazabilidadMedico(data.codigoMedicoActualizado.trim()
+                                      , data.nombreMedicoActualizado.trim()
+                                      , data.apellidoMedicoActualizado.trim())
+        }
+    }
+
+    function ActualizaTrazabilidadMedico(codigoMedicoSeleccionado
+                                        , nombreMedicoSeleccionado
+                                        , apellidoMedicoSeleccionado)
+    {
+        // Muestra la trazabilida del médico seleccionado en la tabla de detalle "tblTrazabilidadMedico".
+        MuestraTablaTrazabilidadMedico(codigoMedicoSeleccionado)
+
+        // Se obtiene el título de la vista parcial de la trazabilidad de médico, 
+        // para después concatenarlo con el nombre del médico seleccionado.
+        tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+        $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombreMedicoSeleccionado + ' ' + apellidoMedicoSeleccionado + ')')
+    }
+
+    function MuestraTablaTrazabilidadMedico(codigo)
+    {
+        var trazabilidadMedico
+
+        // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+        trazabilidadMedico = ObtieneDataTrazabilidadMedico(codigo)
+
+        // Muestra la vista parcial de la trazabilidad del médico seleccionado.
+        $('#DetalleInformacion').css({ 'display': 'block' });
+        $('#DetalleInformacion').html(trazabilidadMedico);
+    }
+
+    function pintaFilaSeleccionada(e)
+    {
+        // Establece a todas la filas su formato original.
+        $('#tblDoctores > tbody > tr').css({'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+    function ObtieneDataTrazabilidadMedico(codigo)
+    {
+        var trazabilidadMedico
+
+        $.ajax({
+            type: 'POST'
+            , async: false
+            , data: JSON.stringify({ 'codigoMedico': parseInt(codigo) })
+            , url: '@Url.Action("trazabilidadMedico", "DataAudit")'
+            , contentType: "application/json"
+            , dataType: 'html'
+            , success: function (Data)
+            {
+                trazabilidadMedico= Data
+            }
+        });
+
+        return trazabilidadMedico
+    }
+
+    function ActualizaTablaBusqueda()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaTrazabilidad", "Medical")',
+            contentType: false,
+            contentType: false,
+            success: function (Data)
+            {
+                $('#tblDoctores').DataTable().ajax.reload();
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,102 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_LIST_DETAILT_PAYMENT_Result>
+
+<div class="table-responsive" id="EnvolturatblFacturas_tabla">
+    <!-- <div style="border: 1px solid #444444; padding: 0.5em; width: 116px;">
+        <span style="background-color: rgb(254, 250, 173); border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span> <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Partially Paid</span>    
+        <br />
+        <span style="background-color: rgb(186, 255, 253); border: 1px solid #6f6464; border-radius: 0.2em; padding: 0 0.5em;">&nbsp</span> <span style="color: gray; font-weight: bold; font-style: italic; font-size: 0.9em;">Unpaid</span>
+    </div>-->
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblDetallePago">
+        <thead class="th_tabla">
+            <tr>
+                <!-- 0   --> <th class="hidden">Billing Code</th>
+                <!-- 1   --> <th class="TextoAlineado">Bill Number</th>
+                <!-- 2   --> <th class="hidden">Case Code</th>
+                <!-- 3   --> <th class="TextoAlineado">claim #</th>
+                <!-- 4   --> <th class="TextoAlineado">Insurer</th>
+                <!-- 5   --> <th class="TextoAlineado">Patient</th>
+                <!-- 6   --> <th class="TextoAlineado">DOI</th>
+                <!-- 7   --> <th class="TextoAlineado">Closing Date</th>
+                <!-- 8   --> <th class="TextoAlineado">Total Amount</th>
+                <!-- 9   --> <th class="TextoAlineado">Balance Due</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        { 
+            <tr>
+                <!-- 0   --> <th class="hidden">@item.Bih_code</th>
+                <!-- 1   --> <th class="TextoAlineado">@item.Bih_code_old</th>
+                <!-- 2   --> <th class="hidden">@item.Cis_code</th>
+                <!-- 3   --> <th class="TextoAlineado">@item.Cis_caseCode</th>
+                <!-- 4   --> <th class="TextoAlineado">@item.Insurer</th>
+                <!-- 5   --> <th class="TextoAlineado">@item.Patient</th>
+                <!-- 6   --> <th class="TextoAlineado">@item.AccidentDate</th>
+                <!-- 7   --> <th class="TextoAlineado">@item.ClosingDate</th>
+                <!-- 8   --> <th class="TextoAlineado">@item.Total</th>
+                <!-- 9   --> <th class="TextoAlineado">@item.Pab_amount</th>
+            </tr>
+        }
+        <tfoot>
+            <tr>
+                <!-- 0   --> <th class="hidden"></th>
+                <!-- 1   --> <th class="TextoAlineado"></th>
+                <!-- 2   --> <th class="hidden"></th>
+                <!-- 3   --> <th class="TextoAlineado"></th>
+                <!-- 4   --> <th class="TextoAlineado"></th>
+                <!-- 5   --> <th class="TextoAlineado"></th>
+                <!-- 6   --> <th class="TextoAlineado"></th>
+                <!-- 7   --> <th class="TextoAlineado" id="LabelSaldoTotalFactura">TOTAL</th>
+                <!-- 8   --> <th class="TextoAlineado" id="SaldoTotalFactura">0.00</th>
+                <!-- 9   --> <th class="TextoAlineado"></th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(Inicio)
+
+    function Inicio() {
+        var SaldoTotalFactura = 0.00
+
+        PaginarTabla();
+
+        $('#tblDetallePago > tbody > tr').each(function () {
+            SaldoTotalFactura += parseFloat($(this)["0"].children[8].innerText.trim())
+        })
+        
+        $('#LabelSaldoTotalFactura').css({ 'color': 'red' })
+        $('#SaldoTotalFactura').text(parseFloat(SaldoTotalFactura).toFixed(2)).css({'color':'red'})
+
+        
+    }
+
+    function PaginarTabla() {
+        console.log("pagina tablaXX");
+        var i = 0;
+        var rowCount = $('#tblDetallePago tr').length;
+        var otable = $("#tblDetallePago").dataTable().fnDestroy();
+
+        otable = $("#tblDetallePago")
+        .DataTable({
+            "pageLength": 10
+            , "bFilter": false
+            , "bLengthChange": false
+            , "bInfo": false
+            , "paging": false
+            //, "ordering": false
+            ,"columnDefs": [ {
+                  "targets": [ 3, 4,5,6,7,8,9 ],
+                  "orderable": false
+              } ]
+
+        });
+
+        
+
+        //otable.column('1:visible').order('asc').draw();
+
+    }
+
+</script>

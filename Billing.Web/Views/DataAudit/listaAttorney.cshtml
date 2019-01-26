@@ -1,0 +1,214 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Attorney</h5>
+</div>
+
+<input type="hidden" id="hdCodigoAbogadoSeleccionado">
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblAbogados" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">Med_code</th>
+                <th>Attorney's Name</th>
+                <th>Attorney's Last name</th>       
+                <th>Street</th>     
+                <th>City</th>     
+                <th>State</th>     
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+            <tr>        
+                <th style="display: none;"></th>
+                <th>Attorney's Name</th>
+                <th>Attorney's Last name</th>       
+                <th>Street</th>     
+                <th>City</th>     
+                <th>State</th>     
+                <th>Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        console.log("hola");
+        $('[data-toggle="tooltipB"]').tooltip();
+
+        $('#tblAbogados').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetDataTrazabilidad", "Attorney")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                        { "data": "Att_code" },
+                        { "data": "Att_firstName" },
+                        { "data": "Att_lastName" },
+                        { "data": "Att_address" },
+                        { "data": "Att_city" },
+                        { "data": "Att_state" },
+                        { "render": function (data, type, full, meta) { return '<a href="#" data-toggle="tooltipB" data-placement="top" title="Select Attorney"  class="btn SelectAbogado btn-danger btn-bitbucket text-center"> Select</a> ' } }
+            ]
+        });
+
+        // Evento para controlar la selección de un abogado
+        $('#tblAbogados > tbody').on('click', 'tr > td > .SelectAbogado', SeleccionaAbogado_Click);
+
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaAbogado_Click(e)
+    {
+        e.preventDefault()
+
+        var codigoAbogadoSeleccionado // Variable que almacenará el código del abogado seleccionado.
+        var nombreAbogadoSeleccionado // Variable que almacenará el nombre del abogado seleccionado.
+        var apellidoAbogadoSeleccionado // Variable que almacenará el apellido del abogado seleccionado.
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre del abogado seleccionado.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código, nombre y apellido del abogado seleccionado.
+        codigoAbogadoSeleccionado = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombreAbogadoSeleccionado = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+        apellidoAbogadoSeleccionado = e.currentTarget.parentElement.parentElement.children[2].innerHTML
+
+        // Guarda el código del abogado seleccionado en el campo oculto.
+        $('#hdCodigoAbogadoSeleccionado').val(codigoAbogadoSeleccionado)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+
+        ActualizaTrazabilidadAbogado(codigoAbogadoSeleccionado, nombreAbogadoSeleccionado, apellidoAbogadoSeleccionado)
+    }
+
+    function RecibeSeñalNode()
+    {
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('respuestaTrazabilidadAbogado', function (data)
+        {
+            MuestraTrazabilidadTiempoReal(data)
+        })
+    }
+
+    function MuestraTrazabilidadTiempoReal(data)
+    {
+        // Si lo que contiene data.codigoAseguradoraActualizada es 'null' entonces tomará valor vacío.
+        var codigoAbogadoActualizado = data.codigoAbogadoActualizado || ''
+
+        // Esta función actualizará la tabla de búsqueda de abogados
+        ActualizaTablaBusqueda()
+
+        // Verifica que exista un abogado seleccionado y que el código del abogado
+        // seleccionado coincida con el código de abogado traido desde node, si es así
+        // mostrará la trazabilidad del abogado.
+        if ($('#hdCodigoAbogadoSeleccionado').val().trim() != ''
+         && $('#hdCodigoAbogadoSeleccionado').val().trim() == codigoAbogadoActualizado.trim())
+        {
+            ActualizaTrazabilidadAbogado(data.codigoAbogadoActualizado.trim()
+                                            , data.nombreAbogadoActualizado.trim()
+                                            , data.apellidoAbogadoActualizado.trim())
+        }
+    }
+
+    function ActualizaTrazabilidadAbogado(codigoAbogadoSeleccionado
+                                        , nombreAbogadoSeleccionado
+                                        , apellidoAbogadoSeleccionado)
+    {
+        // Muestra la trazabilida del abogado seleccionado en la tabla de detalle "tblTrazabilidadAbogado".
+        MuestraTablaTrazabilidadAbogado(codigoAbogadoSeleccionado)
+
+        // Se obtiene el título de la vista parcial de la trazabilidad de abogado, 
+        // para después concatenarlo con el nombre del abogado seleccionado.
+        tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+        $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombreAbogadoSeleccionado + ' ' + apellidoAbogadoSeleccionado + ')')
+    }
+
+    function MuestraTablaTrazabilidadAbogado(codigo)
+    {
+        var trazabilidadAbogado
+
+        // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+        trazabilidadAbogado = ObtieneDataTrazabilidadAbogado(codigo)
+
+        // Muestra la vista parcial de la trazabilidad del abogado seleccionado.
+        $('#DetalleInformacion').css({ 'display': 'block' });
+        $('#DetalleInformacion').html(trazabilidadAbogado);
+    }
+
+    function pintaFilaSeleccionada(e)
+    {
+        // Establece a todas la filas su formato original.
+        $('#tblAbogados> tbody > tr').css({'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+    function ObtieneDataTrazabilidadAbogado(codigo)
+    {
+        var trazabilidadAbogado
+
+        $.ajax({
+            type: 'POST'
+            , async: false
+            , data: JSON.stringify({ 'codigoAbogado': parseInt(codigo) })
+            , url: '@Url.Action("trazabilidadAbogado", "DataAudit")'
+            , contentType: "application/json"
+            , dataType: 'html'
+            , success: function (Data) {
+                trazabilidadAbogado = Data
+            }
+        });
+
+        return trazabilidadAbogado
+    }
+
+    function ActualizaTablaBusqueda()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarParaTrazabilidad", "Attorney")',
+            contentType: false,
+            contentType: false,
+            success: function (Data)
+            {
+                $('#tblAbogados').DataTable().ajax.reload();
+            }
+        });
+    }
+</script>

@@ -1,0 +1,202 @@
+﻿@{
+    //ViewBag.Title = "Plugin Integration - Datatable";
+}
+<div class="ibox-title header_formulario" style="margin-bottom: 5px;">
+    <h5>Speciality</h5>
+</div>
+
+<input type="hidden" id="hdCodigoEspecialidadSeleccionada">
+
+<div class="table-responsive" style="width:100%;">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblEspecialidad" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden"></th>
+                <th >Speciality</th>
+                <th >Type</th>  
+                <th>Select</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+            <tr>        
+                <th class="hidden"></th>
+                <th class="tabla_celda"> Speciality</th>
+                <th class="tabla_celda">Type</th>      
+                <th>Select</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {        
+        $('[data-toggle="tooltipB"]').tooltip();
+        $('#tblEspecialidad').DataTable(
+        {
+            "columnDefs": [
+                //{ "width": "5%", "targets": [0] },
+                //{ "className": "text-center custom-middle-align", "targets": [0, 1, 2, 3, 4, 5, 6] },
+                  { className: "hidden", "targets": [0] }
+            ],
+            "language":
+                {
+                    "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>"
+                },
+            "processing": true,
+            "serverSide": true,
+            "ajax":
+                {
+                    "url": '@Url.Action("GetData", "Specialty")',
+                    "type": "POST",
+                    "dataType": "JSON"
+                },
+            "columns": [
+                    { "data": "Spe_code" },
+                        { "data": "Spe_name" },
+                        { "data": "Spe_type" },
+                        { "render": function (data, type, full, meta) { return '<a href="#divPatient" title="Select Speciality"  class="btn selectEspecialidad btn-danger btn-bitbucket">Select</a>' } }
+            ]
+        });
+
+        // Evento para controlar la selección de un especialidad
+        $('#tblEspecialidad > tbody').on('click', 'tr > td > .selectEspecialidad', SeleccionaEspecialidad_Click);
+
+        RecibeSeñalNode()
+    });
+
+    function SeleccionaEspecialidad_Click(e)
+    {
+        e.preventDefault()
+
+        var codigoEspecialidadSeleccionada // Variable que almacenará el código de la especialidad seleccionada.
+        var nombreEspecialidadSeleccionada // Variable que almacenará el nombre de la especialidad seleccionada.        
+
+        // Variable que almacenará el título del contenedor de la tabla de trazabilidad, 
+        // para después concatenarlo con el nombre de la especialidad seleccionada.
+        var tituloContenedorTablaTrazabilidad
+
+        // Obtiene el código y nombre de la especialidad seleccionada.
+        codigoEspecialidadSeleccionada = e.currentTarget.parentElement.parentElement.children[0].innerHTML
+        nombreEspecialidadSeleccionada = e.currentTarget.parentElement.parentElement.children[1].innerHTML
+
+        // Guarda el código de la especialidad seleccionada en el campo oculto.
+        $('#hdCodigoEspecialidadSeleccionada').val(codigoEspecialidadSeleccionada)
+
+        // Colorea la fila seleccionada.
+        pintaFilaSeleccionada(e)
+
+        ActualizaTrazabilidadEspecialidad(codigoEspecialidadSeleccionada, nombreEspecialidadSeleccionada)
+    }
+
+    function RecibeSeñalNode()
+    {
+        var websocket = io.connect(ServidorPuertoNode)
+
+        websocket.on('respuestaTrazabilidadEspecialidad', function (data)
+        {
+            MuestraTrazabilidadTiempoReal(data)
+        })
+    }
+
+    function MuestraTrazabilidadTiempoReal(data)
+    {
+        //debugger
+
+        // Si lo que contiene data.codigoEspecialidadActualizado es 'null' entonces tomará valor vacío.
+        var codigoEspecialidadActualizada = data.codigoEspecialidadActualizada || ''
+
+        // Esta función actualizará la tabla de búsqueda de especialidadades.
+        ActualizaTablaBusqueda()
+
+        // Verifica que exista una especialidad seleccionada y que el código de la especialidad
+        // seleccionada coincida con el código de especialidad traida desde node, si es así
+        // mostrará la trazabilidad de la especialidad.
+        if ($('#hdCodigoEspecialidadSeleccionada').val().trim() != ''
+         && $('#hdCodigoEspecialidadSeleccionada').val().trim() == codigoEspecialidadActualizada.trim())
+        {
+            ActualizaTrazabilidadEspecialidad(data.codigoEspecialidadActualizada.trim()
+                                            , data.nombreEspecialidadActualizada.trim())
+        }
+    }
+
+    function ActualizaTrazabilidadEspecialidad(codigoEspecialidadSeleccionada
+                                             , nombreEspecialidadSeleccionada)
+    {
+        // Muestra la trazabilida de la especialidad seleccionada en la tabla de detalle "tblTrazabilidadEspecialidad".
+        MuestraTablaTrazabilidadEspecialidad(codigoEspecialidadSeleccionada)
+
+        // Se obtiene el título de la vista parcial de la trazabilidad de la especialidad,
+        // para después concatenarlo con el nombre de la especialidad seleccionada.        
+        tituloContenedorTablaTrazabilidad = $('#DetalleInformacion > .header_formulario > h5').html().trim()
+
+        $('#DetalleInformacion > .header_formulario > h5').html(tituloContenedorTablaTrazabilidad + ' (' + nombreEspecialidadSeleccionada + ')')
+    }
+
+    function MuestraTablaTrazabilidadEspecialidad(codigo)
+    {
+        var trazabilidadEspecialidad
+
+        // Obtiene la vista parcial que contiene la trazabilidad y que será mostrada en el contenedor "DetalleInformacion".
+        trazabilidadEspecialidad = ObtieneDataTrazabilidadEspecialidad(codigo)
+
+        // Muestra la vista parcial de la trazabilidad de la especialidad seleccionada.
+        $('#DetalleInformacion').css({ 'display': 'block' });
+        $('#DetalleInformacion').html(trazabilidadEspecialidad);
+    }
+
+    function pintaFilaSeleccionada(e)
+    {
+        // Establece a todas la filas su formato original.
+        $('#tblEspecialidad > tbody > tr').css({'background': 'transparent'
+                                            , 'color': 'black'
+                                            , 'font-style': 'normal'
+                                            , 'font-weight': 'normal'
+        });
+
+        // Coloreo la fila seleccionada
+        e.currentTarget.parentElement.parentElement.style.backgroundColor = "#e4e9ec";
+        e.currentTarget.parentElement.parentElement.style.color = "#445463";
+        e.currentTarget.parentElement.parentElement.style.fontStyle = "italic";
+        e.currentTarget.parentElement.parentElement.style.fontWeight = "bold";
+    }
+
+    function ObtieneDataTrazabilidadEspecialidad(codigo)
+    {
+        var trazabilidadEspecialidad
+
+        $.ajax({
+            type: 'POST'
+            , async: false
+            , data: JSON.stringify({ 'codigoEspecialidad': parseInt(codigo) })
+            , url: '@Url.Action("trazabilidadEspecialidad", "DataAudit")'
+            , contentType: "application/json"
+            , dataType: 'html'
+            , success: function (Data)
+            {
+                trazabilidadEspecialidad = Data
+            }
+        });
+
+        return trazabilidadEspecialidad
+    }
+
+    function ActualizaTablaBusqueda()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarEspecialidadTabla", "Specialty")',
+            contentType: false,
+            contentType: false,
+            success: function (Data)
+            {
+                $('#tblEspecialidad').DataTable().ajax.reload();
+            }
+        });
+    }
+
+</script>

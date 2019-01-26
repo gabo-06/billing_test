@@ -1,0 +1,2693 @@
+﻿@using System.Diagnostics;
+
+@model IEnumerable<Billing.Web.Models.PDataEntry_Lista>
+@{
+    var i = 0;
+    var CodigoEntradaVacio = (string)null;
+    var FechaEntradaDateTime = DateTime.Now;
+    var Unit = (string)null;
+    var PriceUnit = (string)null;
+    var RunningTotal = (string)null;
+    var CantidadEntradasDeCaso = 0;
+}
+
+<div class="table-responsive" id="TablaParaControles">
+    
+    <table class="table table-striped table-bordered  dataTables-example" id="tblEntradas" >
+        <thead class="th_tabla">
+            <tr>
+                <th>                        @* Columna 1 (Indice 0)*@
+
+                </th> 
+                <th class="hidden">         @* Columna 2 (Indice 1)*@
+                    Dae_code
+                </th>
+                <th class="hidden">         @* Columna 3 (Indice 2)*@
+                    Dae_code_old
+                </th>
+                <th >                       @* Columna 4 (Indice 3)*@
+                    Service Date
+                </th> 
+                <th>                        @* Columna 5 (Indice 4)*@
+                    Billing Activities
+                </th> 
+                <th>                        @* Columna 6 (Indice 5)*@
+                    Unit
+                </th>
+                <th>                        @* Columna 7 (Indice 6)*@
+                    Price Unit
+                </th>
+                <th>                        @* Columna 8 (Indice 7)*@
+                    Running Total
+                </th>
+                <th>                        @* Columna 9 (Indice 8)*@
+                    Description 
+                </th> 
+                <th>                        @* Columna 10 (Indice 9)*@
+
+                </th> 
+                <th class="hidden">         @* Columna 11 (Indice 10)*@
+                    Service Date
+                </th>
+                <th class="hidden">         @* Columna 12 (Indice 11)*@
+                    Numero Pagina
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @{
+            CantidadEntradasDeCaso = Model.Count();
+        }
+
+        @foreach (var item in Model)  
+        {            
+            i = i + 1;
+            
+            <tr>
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle;">  @i </td>
+                <td style="display: none;" class="CodigoEntrada"> @item.Dae_code </td> 
+                <td style="display: none;"> @item.Dae_code_old </td>
+                <td style="vertical-align: middle; width: 6000px;" >
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                        @{
+                            FechaEntradaDateTime = Convert.ToDateTime(@item.Dae_date);
+                            Debug.Write(FechaEntradaDateTime);
+                        }
+                        <input class="form-control dtpFecha" type="text" style="background: #ffffff; width: 100%;" maxlength="10" data-mask="99/99/9999" value="@FechaEntradaDateTime.ToString("MM/dd/yyyy")" />
+                    </div>
+                </td>  
+                <td style="vertical-align: middle; width: 12000px;" CodigoActividad="@item.Act_code">
+                   <select class="form-control cmbActividades" style="width: 100%;">
+                      <option value=""></option>
+                   </select>
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                    @if (item.Dae_hourAct == 0)
+                    {
+                        Unit = "";
+                    }
+                    else
+                    {
+                        Unit = item.Dae_hourAct.ToString();
+                    }
+                    <input class="form-control numeros txtUnit" type="text" style="width: 100%;"  maxlength="5"  value="@Unit"  />
+                    <input type="hidden" value="@Unit" /> 
+                </td>
+                <td style="vertical-align: middle; width: 2000px">
+                    @if (item.Dae_milesAct == 0)
+                    { 
+                        PriceUnit = "";
+                    } 
+                    else 
+                    {
+                        PriceUnit = item.Dae_milesAct.ToString(); 
+                    } 
+                    <input class="form-control txtPriceUnit" type="text" style="width: 100%;" maxlength="8"  value="@PriceUnit" />
+                </td>
+                <td style="vertical-align: middle; width: 900px">
+                   <input class="form-control txtRunningTotal" type="text" style="width: 100%;" readonly />
+                </td>
+                <td style="width: 13000px">
+                    @*<textarea class="form-control Comentario" style="height: 100px;  width: 100%;">@item.Dae_comment</textarea>*@
+                    <textarea class="form-control Comentario" style="height: 100px;   width: 100%;">@item.Dae_comment.Replace('\t', ' ').Replace('\n', ' ').Replace("\"", "\\\"").Replace("&","&amp;")</textarea>
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 22px;">
+                   <a href="#" class="btn btn-danger  btn-bitbucket EliminarEntrada">
+                     Delete
+                   </a>
+                   <input class="form-control InicialesUsuario" type="text" style="background-color: #ffffff; width: 100%;" value="@item.InicialesUsuario" readonly />
+                </td>
+                <td class="hidden">
+                    @FechaEntradaDateTime
+                    @*@FechaEntradaDateTime.ToString("MM/dd/yyyy")*@
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+            </tr>
+        }
+
+        @for (var Indice = Model.Count(); Indice < (Model.Count() + 10); Indice++)
+        {
+            i = i + 1;
+               
+            <tr>      
+                <td style="font-size: 20px; font-weight: bold; text-align: center; vertical-align: middle;">  @i </td>
+                <td style="display: none;"></td>
+                <td style="display: none;"> </td>
+                <td style="vertical-align: middle; width: 6000px;">
+                    <div class="input-group date col-sm-12' style='width: 100%;">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                                               
+                        @if (Indice == Model.Count())
+                        {
+                            // FechaEntradaDateTime
+                            <input class="form-control dtpFecha" type="text"   style ="background: #ffffff; width: 100%;" data-mask="99/99/9999" maxlength="10" value="@FechaEntradaDateTime.ToString("MM/dd/yyyy")" />                       
+                        }
+                        else
+                        {
+                            <input class="form-control dtpFecha FechaNoMostrada"    type="text" data-mask="99/99/9999" style="background: #ffffff; width: 100%;" maxlength="10" />
+                        }
+                    </div>
+                </td>
+                <td style="vertical-align: middle; width: 12000px;">
+                   <select class="form-control cmbActividades" style="width: 100%;" >
+                      <option value=""></option>
+                   </select>
+                </td>
+                <td style="vertical-align: middle; width: 2200px">
+                   <input class="form-control numeros txtUnit" type="text"  maxlength="5" style="width: 100%;"   />
+                </td>
+                <td style="vertical-align: middle; width: 2000px">
+                   <input class="form-control txtPriceUnit" type="text" maxlength="8" style="width: 100%;"   />
+                </td>
+                <td style="vertical-align: middle; width: 900px">
+                   <input class="form-control txtRunningTotal" type="text" style="width: 100%;"  readonly />
+                </td>
+                <td style="width: 13000px">
+                    <textarea class="form-control Comentario" style="height: 100px; vertical-align: middle; width: 100%;" ></textarea>
+                </td>
+                <td style="vertical-align: middle; text-align: center; width: 22px;">
+                   <a href="#" class="btn btn-danger  btn-bitbucket EliminarEntrada" style="display:none;">
+                      Delete
+                   </a>
+                   <input class="form-control InicialesUsuario" type="text" style="background-color: #ffffff; width: 100%;" readonly />
+                </td>
+                <td class="hidden">
+                    @{
+                        var FechaMayor = Convert.ToDateTime("12/28/2050");                            
+                    }
+                    @FechaMayor
+                </td>
+                <td class="hidden"> @* Numero Pagina *@
+
+                </td>
+            </tr>      
+        }
+       @{
+           Int32 Cociente = Convert.ToInt32 (Math.Floor( Convert.ToDecimal(Model.Count() / 10)));
+           Int32 CantidadPaginas = Cociente + 1;    
+         }
+        </tbody>
+    </table>
+    
+</div>
+
+<div class="col-sm-8 col-sm-offset-2 text-center">
+    <!-- <button id="btnGuardarEntradas" class="btn btn-primary" type="button"  tabindex="500" >&nbsp;&nbsp;&nbsp; Save &nbsp;&nbsp;&nbsp;</button> -->
+    <button id="btnGuardarEntradas" class="btn btn-primary" type="submit"  tabindex="500" >&nbsp;&nbsp;&nbsp; Save &nbsp;&nbsp;&nbsp;</button>
+    <input type="hidden" id="PaginaActual" />
+</div>                
+
+<script>
+    var Entradas; // Variable global que almacena las entradas pertenecientes a un caso.
+    var Actividades;
+    var ArregloEntradas = new Array(); 
+    var RegExpDecimal = /^\d+(\.\d{2})?|\.\d{1}/ig; // Expresión regular para forzar el punto decimal.
+    // var RegExpDecimal = /^\d+(?:\.\d{0,3})?$/ig; // Expresión regular para forzar el punto decimal.
+    var RegExpFecha = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/ig; // Expresión regular para forzar el formato de fecha americano.
+    var BanderaValidaciones =  false;
+    var ArregloValidacionesPendientes = new Array();
+    // var BanderaRegistroPorPagina = 0;
+    var PaginaActualGlobal;
+    var AcumuladoUnit = 0;
+    var BanderaLlamarPaginacionEnInicio = false;
+    var BanderaTipoActualizacion; // Esta bandera indica como se realiza una actualización, mediante él botón Guardar "G" o mediante paginado "P" (por defecto tendrá el valor "G").
+    var contador = 40;
+    // var ControlaCambioBanderaTipoActualizacion = 'N';
+    var RolUsuarioLogueado;
+    var arrEntradas = new Array(); // Arreglo que almacenará objetos de tipo "Entrada" y que será el que se enviará al controlador para serializar como XML.
+    
+
+    $(Inicio);
+    
+    function LimpiarArreglos()
+    {
+        ArregloEntradas = [];
+        ArregloValidacionesPendientes = [];
+        
+        var ArregloEntradas = new Array(); 
+        var ArregloValidacionesPendientes = new Array();
+    }
+
+    // $("#TablaParaControles > #tblEntradas_wrapper > .row:eq(2) > .col-sm-7 > #tblEntradas_paginate").css({"background":"blue"});
+    $("#TablaParaControles").on("click", "#tblEntradas_wrapper > .row:eq(2) > .col-sm-7 > #tblEntradas_paginate > .pagination > .paginate_button > a", function(e)                                                                                                                                     
+    {
+        // e.preventDefault();
+        // alert("asdas");
+        // $(this).off("click");
+
+        // e.stopPropagation();
+        // return false;
+        // console.log("sdfa");
+        // console.clear();
+            
+
+        // setTimeout(function()
+        // {
+        //     alert("aaaa");
+        // }, 3000);
+        // 
+        // return false;
+    });
+    function ocultaCarga()
+    {
+        console.log("oculta");
+        //setTimeout(function()
+        //{
+            $("#dvLoading").css("display", "none");
+        //}, 10);   
+    }
+    function Inicio()
+    {
+
+        RolUsuarioLogueado = $('#permiso').val().trim();     
+        
+
+        Entradas = "";
+        var BanderaValidaciones =  false;
+        var ArregloValidacionesPendientes = new Array();
+        AcumuladoUnit = 0;        
+        ///////ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val()));        //BRENHER COMENTO
+        setTimeout(function()
+        {
+            $("#dvLoading").css("display", "none");
+        }, 1500);        
+         
+        var nowDate = new Date();
+        var today  = new Date(nowDate.getFullYear(),nowDate.getMonth(),nowDate.getDate(),0,0,0,0);
+
+        if( $('#permiso').val().trim() == 'Administrator')
+            today ="1985-01-01";
+        else 
+        {
+            today =$("#txtUltimaFechaCierre").val();
+            ////alert(today);
+            
+            today = new Date(today);
+            today = today.setDate(today.getDate() + 1);
+            today = new Date(today);
+        }
+        
+        $('.input-group.date').datepicker( {
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true,
+            //format: 'yyyy-mm-dd', 
+            format: 'mm/dd/yyyy', 
+            startDate: today
+        });
+
+        $(".input-group-addon").on("click", function () {
+            // console.log("click");
+            $(this).datepicker("hide");
+            $(".dtpFecha").trigger("click");
+        });
+        
+        Actividades = ObtenerActividades();
+        
+        if (VecesSelecionaCaso == 1)
+        { 
+            PaginarTabla(); 
+            VecesSelecionaCaso = 0;  
+        }
+            
+        // PaginarTabla();
+        //console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+        // ************************************************************************************
+        $("#btnGuardarEntradas").on("click", function(e)
+        {
+            // e.preventDefault();
+            
+            // Muestra el gif de carga            
+            MuestraCarga();
+
+            Concurrent.Thread.create(function()
+            {
+                if (!ActualizacionDesdeAlerta) // Si la actualización se genera desde el mismo botón entonces va a pasar por el filtro de si quiere realmente guardar o actualizar este caso.
+                {
+                    // 
+
+                    // $("#dvLoading").css("display", "block");
+                
+                    setTimeout(function ()
+                    {
+                        // LimpiarArreglos();
+                        // CargaInformacionSegunTipoAseguradora(e);
+
+                        BanderaTipoActualizacion = "G";
+                        ActualizarEntradas(0); // El 0 significa que se va a mostrar que se muestra el mensaje que confirma el registro de las entradas.
+                    }, 50);            
+
+                    // BanderaTipoActualizacion = "G";            
+                }
+                else // Si la actualización se genera desde la alerta que se genera cuando se pasa de un proceso a otro simplemente actualiza el caso sin preguntar si quiere actualizarlo, por que ya se aceptó la advertencia
+                {
+                    // console.log("actualizando");
+                    // return false;
+                 
+                    // console.log($("#hdCodigoCaso").val());
+                    ActualizarEntradas(0);
+
+                    // CargaDeMenu(e);
+                }
+
+                ActualizacionDesdeAlerta = false;                
+            });
+            
+            
+        });
+        // ************************************************************************************
+        //console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+        $(".FechaNoMostrada").val(""); // Hace que los campos de fecha de las entradas que no están llenas no muestren ningún valor.
+        // Controlando evento de los controles de las entradas.
+        
+        ocultaCarga();
+        if (VecesSelecionaCaso == 1) // Después de la primera selección de un caso, la variable "VecesSelecionaCaso" siempre va a ser "0" (Sólo se vuelve "1" cuando se selecciona un caso).
+        {
+            ultimaPagina();
+            VecesSelecionaCaso = 0;
+        }
+        
+        ancla();
+        console.log("ancla");
+        ultimaPagina();  
+    }
+
+     
+    function ActualizarEntradas(Tipo)
+    {   
+        // BanderaCambioProceso = false;
+        BanderaErrorValidacion = false;
+        
+        // console.clear();
+        // console.log("actualiza entradas desde advertencia");
+
+        var CodigoActividadPF = ArregloEntradas[0]["CodigoActividad"]; // Unit de la primera fila.
+        var UnitPF = ArregloEntradas[0]["Unit"]; // Codigo de actividad de la primera fila.
+
+        if (CodigoActividadPF === undefined && UnitPF == "") // Si no hay una actividad seleccionada ni un Unit ingresado no procederá a registrar entradas por que no hay entradas que registrar.
+        {
+            $("#dvLoading").css("display", "none");
+            return false;        
+        }
+
+        var Banderita = false;
+
+        // console.log("actualiza entradas desde advertencia");
+        // console.log("BanderaValidaciones: " + BanderaValidaciones);
+
+        if (BanderaValidaciones) // Si hay validaciones pendientes.
+        {
+            // console.log("actualiza entradas desde advertencia 2");
+
+            $.each(ArregloValidacionesPendientes, function (i, val)
+            {
+                if (val.Unit != "")
+                {
+                    mensaje = val.Unit;
+                    error = "Error";
+                    MensajeError(mensaje, error);
+                    // e.stopPropagation();
+                    Banderita = true;
+                    return false;        
+                }
+                
+                if(val.PriceUnit != "")
+                {
+                    mensaje = val.PriceUnit;
+                    error = "Error";
+                    MensajeError(mensaje, error);
+                    // e.stopPropagation();
+                    Banderita = true;
+                    return false;                        
+                }
+            });
+
+            if (!Banderita) // Si nunca se presentó ningún error
+                BanderaValidaciones = false; // Quiere decir que ya no hay más calidaciones pendientes.
+        }
+        
+        if(!BanderaValidaciones) // Si ya no hay validaciones pendientes.
+        {   
+
+            // LimpiarArreglos();
+            // CargaInformacionSegunTipoAseguradora(e);
+
+            var CodigoCaso;
+            var EntradasJsonTexto;
+
+            // Variables que almacenan los valores de la tabla de entradas.
+            // ------------------------------------------------------------
+            var NumeroCorrelativoEntrada;
+            var CodigoNuevoEntrada;
+            var CodigoAntiguoEntrada;
+            var FechaEntrada;
+            var CodigoActividad;
+            var DescripcionActividad;
+            var Unit; // (hourAct).
+            var PriceUnit; // (milesAct).
+            var Comentario;
+            // ------------------------------------------------------------
+
+            // console.clear();
+            // console.log(Bandera10);
+            // console.log(VecesSelecionaCaso);
+
+            var Bandera1 = false; // Bandera que indica si sólo se ha establecido la fecha de entrada.
+            var Bandera2 = false; // Bandera que indica si sólo se ha seleccionado una actividad. 
+            var Bandera3 = false; // Bandera que indica si se encontró alguna entrada con fecha y actividad seleccionada pero sin "Unit".
+            var Bandera4 = false; // Bandera que indica si se encontró alguna entrada con fecha y actividad seleccionada pero sin "Unit".
+            var Bandera5 = false; // Bandera que indica si se encontró alguna entrada sin fecha.
+            var Bandera6 = false; // Bandera que indica si se encontró alguna entrada sin actividad.
+            var Bandera7 = false; // Bandera que indica si se encontró alguna entrada sin Unit.
+            var Bandera8 = false; // Bandera que indica que si la actividad es diferente de "MILES" y el "Unit" es mayor que 9 no lo permita.
+            var Bandera9 = false; // Bandera que indica si la fecha ingresada es menor a la ultima fecha de cierre.
+            var Bandera10 = false; // Bandera que indica que si la fecha ingresada es menor a la ultima fecha de cierre se va a pedir una confirmación (sólo para el sol "Administrator").
+             
+            var IndiceFaltaPriceUnit = 0; // Indice de la fila donde falta el PriceUnit.
+            var IndiceDemasPriceUnit = 0; // Indice de la fila donde está demás el PriceUnit.
+
+            // var EntradasJsonObjeto; 
+
+            // Obtiene el código del caso seleccionado.
+            CodigoCaso = parseInt($("#hdCodigoCaso").val());
+            
+            // console.clear();
+            // console.log(ArregloEntradas);
+            // console.log(ArregloEntradas);
+
+            // console.log("Primer CodigoCaso: " + CodigoCaso);
+
+            // console.log(ArregloEntradas);
+
+            if (VecesSelecionaCasoParaFechaMenor == 1)
+            {
+                VecesSelecionaCasoParaFechaMenor = 0;
+            }
+            
+            // Arma el JSON en formato de texto que contendrá los valores de las entradas que serán llevados a la base en forma de XML para actualizar e insertar.
+            // EntradasJsonTexto = '{ "Entradas" : [';
+            arrEntradas = new Array();
+            $.each(ArregloEntradas, function (i, val)
+            {
+                // Obtiene los valores de los controles de cada fila.
+                NumeroCorrelativoEntrada = val.CorrelativoEntrada; // Correlativo de entrada.
+                CodigoNuevoEntrada = val.CodigoNuevoEntrada; // Código nuevo de entrada.
+                CodigoAntiguoEntrada = val.CodigoAntiguoEntrada;// Código antiguo de entrada.
+                FechaEntrada = val.FechaEntrada // Fecha de entrada.
+                CodigoActividad = (val.CodigoActividad != null) ? val.CodigoActividad : null; // Código de Actividad.
+                DescripcionActividad = val.DescripcionActividad; // Descripción de actividad.
+                Unit = val.Unit; // Unit de entrada (hourAct).
+                PriceUnit = val.PriceUnit; // Price/Unit de entrada (milesAct).
+                Comentario = val.Comentario; // Comentario de entrada.
+
+                //console.log(Comentario);
+                // console.log(FechaEntrada);
+                // console.log("FechaEntrada: " + FechaEntrada.trim() + " - CodigoActividad:" + CodigoActividad + " - DescripcionActividad: " + DescripcionActividad + " - Unit: " + Unit);
+                
+                // console.log(NumeroCorrelativoEntrada + ' - ' + Unit);
+                // console.log(PriceUnit);
+                // console.log(Comentario);
+                // console.log("*******************************************************************************************************************");
+
+                /****************************** VALIDACION ******************************/
+                // Fecha de entrada (0).
+                // Actividad        (1).
+                // Unit             (1).
+                if (((FechaEntrada.trim() == '' || (!(FechaEntrada.trim().match(RegExpFecha)))) && CodigoActividad != null && Unit != '') || 
+                    ((FechaEntrada.trim() == '' || (!(FechaEntrada.trim().match(RegExpFecha)))) && CodigoActividad == null && Unit != '') ||
+                    ((FechaEntrada.trim() == '' || (!(FechaEntrada.trim().match(RegExpFecha)))) && CodigoActividad != null && Unit == ''))
+                {
+                    Bandera5 = true;
+                    return false;
+                }
+                /************************************************************************/
+                  
+                /****************************** VALIDACION ******************************/
+                // Fecha de entrada (1).
+                // Actividad        (0).
+                // Unit             (0).
+                if (FechaEntrada != '' && CodigoActividad == null && Unit == '')
+                {
+                    // console.log("uno");
+
+                    Bandera2 = true;
+                    Bandera3 = false;
+                    Bandera4 = false;
+                    Bandera6 = false;
+                    return false;
+
+                    // console.clear();
+                    // console.log(Bandera2);
+                }
+                // console.log("dos");
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // Fecha de entrada (1).
+                // Actividad        (1).
+                // Unit             (0).              
+                if (FechaEntrada != '' && CodigoActividad != null && Unit == '')
+                {
+                    // console.log("Bandera 4 deberia activarse");
+                    Bandera4 = true;
+                    return false;
+                }
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // Fecha de entrada (1). 
+                // Actividad        (0).
+                // Unit lleno       (1).
+                if (FechaEntrada != '' && CodigoActividad == null && Unit != '')
+                {
+                    // console.clear();
+                    // console.log("Unit: " + Unit);
+                    Bandera6 = true;
+                    return false;
+                }
+                /************************************************************************/
+                
+                /****************************** VALIDACION ******************************/
+                // Fecha de entrada (1).
+                // Actividad        (1).
+                // Unit lleno       (1).
+                if (FechaEntrada != '' && CodigoActividad != null && Unit != '')
+                {
+                    // console.log("validacion 5 - Indice " + (i + 1));
+
+                    Bandera2 = false;
+                    Bandera3 = true;
+                    Bandera4 = false; // últimos agregados por gabo el 10/13/2016
+                    Bandera6 = false; // últimos agregados por gabo el 10/13/2016
+                    // return false; 
+                }
+                /************************************************************************/
+
+                /****************************** VALIDACION ******************************/
+                // Fecha de entrada llena.
+                // Actividad diferente de "MILES" y precio mayor que 9.
+                // Unit lleno.
+                if (FechaEntrada != '' && DescripcionActividad != "MILES" && Unit > 9)
+                {
+                    Bandera8 = true;
+                    return false;
+                }
+                /************************************************************************/
+                /****************************** VALIDACION ******************************/
+                // fecha Cierre
+                // Valida Fechas Menores a fecha de cierre   
+                ;
+                // console.log($("#txtUltimaFechaCierre").val());
+
+                if (Date.parse(FechaEntrada) <= Date.parse( $("#txtUltimaFechaCierre").val()))
+                {
+                    
+                    // console.clear();
+                    // console.log(CodigoNuevoEntrada);
+
+                    // Si el rol del usuario logueado NO es "Administrator" y se está intentando "actualizar" una entrada con fecha menor.
+                    // if (RolUsuarioLogueado != 'Administrator' && CodigoNuevoEntrada.toString().trim() != '')
+                    if (RolUsuarioLogueado != 'Administrator' && CodigoNuevoEntrada != null)
+                    {
+                        Bandera9 = true;
+                        return false;
+                    }
+                    // Si el rol del usuario logueado NO es "Administrator" y se está intentando "registrar" una entrada con fecha menor.
+                    if (RolUsuarioLogueado != 'Administrator' && CodigoNuevoEntrada == null)
+                    {
+                        Bandera9 = true;
+                        return false;
+                    }
+
+                    // 
+                    // Si el rol del usuario logueado es "Administrator" y se está intentando "registrar" una entrada con fecha menor.
+                    if (RolUsuarioLogueado == 'Administrator' && CodigoNuevoEntrada == null)
+                     // && VecesSelecionaCasoParaFechaMenor == 0
+                     // || BanderaPagino == false)
+                    {
+                        console.log(NumeroCorrelativoEntrada);
+                        Bandera10 = true; // Bandera10 se activa para que muestre la confirmación de si desea realizar el registro de entradas (con fechas anteriores a la última fecha de cierre).
+                        // return false;
+                    }
+                }
+                /************************************************************************/
+
+                /************************************************************************* VALIDACION *************************************************************************/
+                // Si hay una fecha establecida y la actividad es de tipo:"MILES", "POSTAGE", 
+                // "EXPENSES", "MEDICAL RECORDS", "TOLLS", "CONFERENCE FEE", "PARKING" 
+                // y no se ha ingresado un valor en el campo "Price/Unit", lo fuerza a que se ingrese.
+                if (FechaEntrada != ''
+                    && (DescripcionActividad == "MILES"
+                    || DescripcionActividad == "POSTAGE"
+                    || DescripcionActividad == "EXPENSES"
+                    || DescripcionActividad == "MEDICAL RECORDS"
+                    || DescripcionActividad == "TOLLS"
+                    || DescripcionActividad == "CONFERENCE FEE"
+                    || DescripcionActividad == "PARKING")
+                    && PriceUnit == '')
+                {
+                    Bandera2 = false;
+
+                    if (IndiceFaltaPriceUnit == 0) 
+                    {
+                        Bandera1 = true; // Establece la bandera a true por que encontroó una entrada con fecha y actividad seleccionada pero con campo "Unit" vacío.
+                        IndiceFaltaPriceUnit = i;
+                    }
+
+                    return false;
+                }
+                /**************************************************************************************************************************************************************/
+
+                /************************************************************************* VALIDACION *************************************************************************/
+                // Si no se elige ninguna de las actividades mencionadas anteriormente  y si hay Price/Unit que advierta que no debe tener Price/Unit
+                if (FechaEntrada != ''
+                    && (DescripcionActividad != "MILES"
+                    &&  DescripcionActividad != "POSTAGE"
+                    &&  DescripcionActividad != "EXPENSES"
+                    &&  DescripcionActividad != "MEDICAL RECORDS"
+                    &&  DescripcionActividad != "TOLLS"
+                    &&  DescripcionActividad != "CONFERENCE FEE" 
+                    &&  DescripcionActividad != "PARKING")
+                    &&  PriceUnit != '')
+                {
+                    // console.log("validacion 4 - Indice " + (i + 1));
+                    // console.log("PriceUnit: " + PriceUnit);
+
+                    Bandera2 = false;
+
+                    if (IndiceDemasPriceUnit == 0) 
+                    {
+                        Bandera7 = true; // Establece la bandera a true por que encontró una entrada con fecha y actividad seleccionada pero con campo "Unit" vacío.
+                        IndiceDemasPriceUnit = i;
+                    }
+
+                    return false;
+                }
+                /**************************************************************************************************************************************************************/
+
+                //arrEntradas=[];
+                
+                // Armar el arreglo de entradas se va a ernviar al controlador para seriailizar.
+                var objEntrada = new Entrada();
+
+                objEntrada.NumeroCorrelativoEntrada = NumeroCorrelativoEntrada;
+                objEntrada.CodigoCaso               = CodigoCaso;
+                objEntrada.CodigoNuevoEntrada       = ((CodigoNuevoEntrada == null) ? null : parseInt(CodigoNuevoEntrada));
+                objEntrada.CodigoAntiguoEntrada     = CodigoAntiguoEntrada;
+                objEntrada.FechaEntrada             = FechaEntrada;
+                objEntrada.CodigoActividad          = ((CodigoActividad == null) ? null : parseInt(CodigoActividad));
+                objEntrada.Unit                     = ((Unit == "") ? 0 : parseFloat(Unit));
+                objEntrada.PriceUnit                = ((PriceUnit == "") ? 0 : parseFloat(PriceUnit));
+                objEntrada.Comentario               = Comentario.replace(/\t/g, ' ').replace('\t', ' ').replace(/\n/g, ' ').replace(/\'/g, "\'").replace("&","&amp;");
+                objEntrada.CodigoUsuarioGlobal      = CodigoUsuarioGlobal;
+
+                arrEntradas.push(objEntrada);
+
+                // if (i == 0)
+                // {
+                //     EntradasJsonTexto += '{' +
+                //                                 ' "NumeroCorrelativoEntrada": ' + NumeroCorrelativoEntrada +
+                //                                 ', "Cis_code": ' + CodigoCaso +
+                //                                 ', "Dae_code": ' + ((CodigoNuevoEntrada == null) ? null : parseInt(CodigoNuevoEntrada)) +
+                //                                 ', "Dae_code_old": "' + CodigoAntiguoEntrada + '"' +
+                //                                 ', "Dae_date": "' + FechaEntrada + '"' +
+                //                                 ', "Act_code": ' + ((CodigoActividad == null) ? null : parseInt(CodigoActividad)) +
+                //                                 ', "Dae_hourAct": ' + ((Unit == "") ? 0 : parseFloat(Unit)) +
+                //                                 ', "Dae_milesAct": ' + ((PriceUnit == "") ? 0 : parseFloat(PriceUnit)) +
+                //                                 ', "Dae_comment": "' + Comentario.replace(/\t/g, ' ').replace('\t', ' ').replace(/\n/g, ' ').replace(/\'/g, "\'").replace("&","&amp;") + '"' + // El Replace reemplaza los tabs en el comentario
+                //                                 ', "Use_code": ' + CodigoUsuarioGlobal +
+                //                             '}';
+                // }
+                // else    
+                // { 
+                //     EntradasJsonTexto += ', {' +
+                //                                 ' "NumeroCorrelativoEntrada": ' + NumeroCorrelativoEntrada +
+                //                                 ', "Cis_code": ' + CodigoCaso +
+                //                                 ', "Dae_code": ' + ((CodigoNuevoEntrada == null) ? null : parseInt(CodigoNuevoEntrada)) +
+                //                                 ', "Dae_code_old": "' + CodigoAntiguoEntrada + '"' +
+                //                                 ', "Dae_date": "' + FechaEntrada + '"' +
+                //                                 ', "Act_code": ' + ((CodigoActividad == null) ? null : parseInt(CodigoActividad)) +
+                //                                 ', "Dae_hourAct": ' + ((Unit == "") ? 0 : parseFloat(Unit)) +
+                //                                 ', "Dae_milesAct": ' + ((PriceUnit == "") ? 0 : parseFloat(PriceUnit)) +
+                //                                 // ', "Dae_comment": "' + Comentario.replace(/\t/g, ' ').replace('\t', ' ').replace(/\n/g, ' ').replace(/\'/g, "\'").replace(/\"/g, "\"").replace("&","&amp;") + '"' + // El Replace reemplaza los tabs en el comentario
+                //                                 ', "Dae_comment": "' + Comentario.replace(/\t/g, ' ').replace('\t', ' ').replace(/\n/g, '').replace(/\\/g, " ").replace(/\'/g, "\'").replace(/\"/g, "\"").replace("&","&amp;") + '"' + // El Replace reemplaza los tabs en el comentario
+                //                                 ', "Use_code": ' + CodigoUsuarioGlobal +
+                //                             '}';
+                // }
+            });
+            // EntradasJsonTexto += ']}';
+
+            // console.log(arrEntradas);
+            // return false;
+
+            // Convierte el StringJSON en ObjectJSON.
+            // EntradasJsonObjeto = JSON.parse(EntradasJsonTexto);
+            //console.log("probandoEntradas");
+            //console.log(ArregloEntradas);
+            //console.log(arrEntradas);
+            if(Bandera6)
+            {
+                mensaje = "Activity is required for entry in row " + NumeroCorrelativoEntrada;
+                error = "Error";
+                $("#dvLoading").css("display", "none");//Agregado por Brenher
+                BanderaErrorValidacion = true;
+                //return false;
+
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                // console.clear();
+                // console.log(PaginaActual);
+
+                // IrAPaginaEspecifica(PaginaActual);                
+                // MensajeError(mensaje, error);
+                // $("#dvLoading").css("display", "none");
+                // return false;                   
+            }
+             
+            if(Bandera5)
+            {
+                mensaje = "The date in row " + NumeroCorrelativoEntrada + " is incorrect";
+                error = "Error";
+                $("#dvLoading").css("display", "none");//Agregado por Brenher
+                BanderaErrorValidacion = true;
+                //return false;
+
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                // console.clear();
+                // console.log(PaginaActual);
+
+                // IrAPaginaEspecifica(PaginaActual);                
+                // MensajeError(mensaje, error);
+                // $("#dvLoading").css("display", "none");
+                // return false;  
+            } 
+
+            if (Bandera1) // Es por que SI debería tener Price.
+            {
+                $("#tblEntradas > tbody > tr:eq(" + (NumeroCorrelativoEntrada - 1) + ") > td:eq(6) > .txtPriceUnit").focus();
+                mensaje = "The billed item on row " + NumeroCorrelativoEntrada + " must have price.";
+                error = "Error";
+                $("#dvLoading").css("display", "none");//Agregado por Brenher
+                BanderaErrorValidacion = true;
+                //return false;
+
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                // console.clear();
+                // console.log(PaginaActual);
+                
+                // IrAPaginaEspecifica(PaginaActual);
+                // MensajeError(mensaje, error);
+                // $("#dvLoading").css("display", "none");
+                // return false;
+            }
+
+            if (Bandera4) // Es por que hay fecha, actividad y no Unit.
+            {
+                //alert("XXXXX");
+                $("#tblEntradas > tbody > tr:eq(" + (NumeroCorrelativoEntrada - 1) + ") > td:eq(5) > .txtUnit").focus();
+                mensaje = "Missing data in row " + NumeroCorrelativoEntrada;
+                error = "Error";
+                 $("#dvLoading").css("display", "none");//Agregado por Brenher
+                BanderaErrorValidacion = true;
+                //return false;
+
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                // console.clear();
+                // console.log(PaginaActual);
+
+                // IrAPaginaEspecifica(PaginaActual);
+                // MensajeError(mensaje, error);
+                // $("#dvLoading").css("display", "none");
+                // return false;
+            }
+
+            if (Bandera7) // Es por que NO debería tener Price.
+            {
+                $("#tblEntradas > tbody > tr:eq(" + (IndiceDemasPriceUnit ) + ") > td:eq(6) > .txtPriceUnit").focus();
+                mensaje = "The billed item on row " + (IndiceDemasPriceUnit + 1) + " must not have price.";
+                error = "Error";
+                $("#dvLoading").css("display", "none");
+                BanderaErrorValidacion = true;
+                //return false;
+                
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                // console.clear();
+                // console.log(PaginaActual);
+
+                // IrAPaginaEspecifica(PaginaActual);
+                // MensajeError(mensaje, error);
+                // $("#dvLoading").css("display", "none");
+                // return false;                
+            }
+
+            if (Bandera8) // Es por que la actividad es diferente de MILES y el "Unit" es mayor que 9.
+            {
+                $("#tblEntradas > tbody > tr:eq(" + (NumeroCorrelativoEntrada - 1) + ") > td:eq(5) > .txtUnit").focus();
+                mensaje = "The value is not allowed in row " + NumeroCorrelativoEntrada;
+                error = "Error";
+                $("#dvLoading").css("display", "none");//Agregado por Brenher
+                BanderaErrorValidacion = true;
+                //return false;
+
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                // console.clear();
+                // console.log(PaginaActual);
+
+                // IrAPaginaEspecifica(PaginaActual);
+                // MensajeError(mensaje, error);
+                // $("#dvLoading").css("display", "none");
+                // return false;
+            }
+            if (Bandera9) // Es por que la fecha ingresada es menor que la ultima fecha de cierre. 
+            {
+                // console.clear();
+                // console.log(CodigoNuevoEntrada);
+
+                // console.log(CodigoNuevoEntrada.toString());
+
+                // Verifica si la entrada aún no tiene un código asignado
+                // if (CodigoNuevoEntrada.toString().trim() == '')
+                // {
+                    $("#tblEntradas > tbody > tr:eq(" + (NumeroCorrelativoEntrada - 1) + ") > td:eq(3) > .txtUnit").focus();                
+                    mensaje = "You cannot enter a data entry date from a billing cycle that has been closed(" + $("#txtUltimaFechaCierre").val() + "). Please verify in row " + (NumeroCorrelativoEntrada );                
+                    error = "Error";
+
+                    // BanderaErrorValidacion = true;
+                    //return false;
+
+                    // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);
+                    // console.clear();
+                    // console.log(PaginaActual);
+
+                    // IrAPaginaEspecifica(PaginaActual);
+                    // MensajeError(mensaje, error);
+                    // $("#dvLoading").css("display", "none");
+                    // return false;
+                // }
+            }
+
+
+            // console.clear();
+            // console.log('por la raja de tu falda');
+
+            // Si Bandera10 está activa es por que se está intentando registrar o actualizar una entrada con fecha anterior a la última fecha de registro (para el rol "Administrator").
+            if (Bandera10 == true)
+            {              
+
+                // Se pide una confirmación al administrador de si quiere agregar entradas con una fecha menor al último cierre
+                swal({               
+                    async: false,
+                    title: 'Confirmation',
+                    text: 'Allow old date entries from the current billing cycle?',
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    closeOnConfirm: false,
+                    closeOnCancel: true
+                },                
+                function (isConfirm)
+                { 
+                    // Si confirma el registro de las entradas a pesar de tener entradas con fechas menores a la última fecha de registro entonces se registrarán.
+                    if (isConfirm)
+                    {
+                        // 
+
+                        if (BanderaErrorValidacion)
+                        {
+                            // console.log("aaaaaaaaaaaaaaaaaaaaaaa");
+                            MensajeError(mensaje, error);
+                            // $("#dvLoading").css("display", "none");
+                
+                            return false;
+                        }
+            
+                        // console.log("bbbbbbbbbbbbbbbbbbb");
+                        // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);            
+                        // IrAPaginaEspecifica(PaginaActual);
+
+                        
+                        // console.clear();
+                        // console.log(arrEntradas);
+
+                        // si la Bandera2 permanece activa simplemente actualiza las entradas originales por que no hubo ninguna agregación.
+                        if (Bandera2)
+                        {
+                            // 
+                            // console.clear
+                            // console.log(EntradasJsonObjeto);
+
+                            var ArregoIndiceRepetidos = [];
+
+                            
+
+                            for (var i = 0; i < arrEntradas.length - 1; i++) 
+                            {
+                                if(arrEntradas[i].FechaEntrada != "" &&
+                                   arrEntradas[i].CodigoActividad != "" &&
+                                   arrEntradas[i].Unit != "")
+                                {
+                                    for (var j = 1; j < arrEntradas.length; j++) 
+                                    {
+                                        if (arrEntradas[i].FechaEntrada             == arrEntradas[j].FechaEntrada &&
+                                            arrEntradas[i].CodigoActividad          == arrEntradas[j].CodigoActividad &&
+                                            arrEntradas[i].Unit                     == arrEntradas[j].Unit &&
+                                            arrEntradas[i].PriceUnit                == arrEntradas[j].PriceUnit &&
+                                            arrEntradas[i].Comentario               == arrEntradas[j].Comentario &&
+                                            arrEntradas[i].NumeroCorrelativoEntrada != arrEntradas[j].NumeroCorrelativoEntrada)
+                                        {
+                                            if (ArregoIndiceRepetidos.indexOf(arrEntradas[i].NumeroCorrelativoEntrada) == -1)
+                                                ArregoIndiceRepetidos.push(arrEntradas[i].NumeroCorrelativoEntrada);
+
+                                            if (ArregoIndiceRepetidos.indexOf(arrEntradas[j].NumeroCorrelativoEntrada) == -1)
+                                                ArregoIndiceRepetidos.push(arrEntradas[j].NumeroCorrelativoEntrada);
+                                        }                            
+                                    }    
+                                }
+                            } 
+
+                            if (ArregoIndiceRepetidos.length != 0)
+                            {
+                                var IndicesConcatenados = "";
+                    
+                                for (var i = 0; i < ArregoIndiceRepetidos.length; i++) 
+                                {
+                                    IndicesConcatenados += ArregoIndiceRepetidos[i] + ", ";
+                                }
+                                
+                                
+                                error="Alert";
+                                mensaje = "You are trying to enter a duplicate entry. Please verify in rows: " + IndicesConcatenados ;
+                                MensajeError(mensaje, error);
+                                // $("#dvLoading").css("display", "none");
+                                // console.log("aqui");
+                                // return false;
+                            }
+                            else
+                            {
+                                
+                                // 1
+                                console.log("111111111111111111");
+                                $.ajax({
+                                    type: "POST",
+                                    async: false,
+                                    data: JSON.stringify({ 'Entradas' : arrEntradas }),
+                                    url: '@Url.Action("RegistraActualizaEntradas", "DataEntry")',
+                                    contentType: "application/json",
+                                    dataType: 'json',
+                                    success: function (Datos)
+                                    {
+                                        // console.log(Datos);
+                                        // 
+                                        Bandera10 = false;
+                                        BanderaPagino = (BanderaPagino == false) ? true : false;
+
+
+                                        if (Datos.response.FilaActualizada == 0 && Datos.response.FilaRegistrada == 0)
+                                        {
+                                            if (Tipo == 0)
+                                            {
+                                                mensaje = "Your information has been saved";
+                                                error = "Success";
+                                                MensajeError(mensaje, error);
+
+                                                // console.log("apa apa apa apa apa apa ");
+                                                return false;
+                                            }                        
+                                        }                        
+                                        else if (Datos.response.FilaActualizada != 0)
+                                        {
+                                            
+                                            mensaje = "You are trying to enter a duplicate entry. Please verify in row :" + Datos.response.FilaActualizada;
+                                            error = "Alert";
+                                            MensajeError(mensaje, error);
+
+                                        }
+                                        else if (Datos.response.FilaRegistrada != 0)
+                                        {
+                                            
+
+                                            mensaje = "You are trying to enter a duplicate entry. Please verify in row :" + Datos.response.FilaRegistrada;
+                                            error = "Alert";
+                                            MensajeError(mensaje, error);
+                                        }
+                                    }
+                                });
+
+                                // console.log("aqui guardo");
+                                // return false;
+
+                                BanderaErrorValidacion = false; 
+                                BanderaCambioProceso = false;
+                
+                                LimpiarArreglos();
+                                // CargaEntradas(parseInt($("#hdCodigoCaso").val()));
+                                // console.log("mas");
+
+                                ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val())); // Despues de actualizar las entradas se llama a la función "ObtenerEntradasNuevamente" para volver a traer las entradas de la base y actualizar en la vista con los códigos de las nuevas entradas insertadas.                                
+
+                                PaginaActualGlobal = MantenerPaginaActual();
+
+                                if (Tipo == 0) // Se va a mostrar mensaje
+                                {
+                                    // console.log("llama");
+                                    PaginarTabla();
+
+                                    if (VecesSelecionaCaso == 0)
+                                    {
+                                        CargarInformacionCaso($("#hdCodigoPaciente").val(), $("#hdCodigoCaso").val(), "n");
+                                        PaginarTabla();
+                                    }
+                                }
+                                else
+                                {
+                    
+                                }
+                
+                                // console.clear();
+                                // console.log("antes de IrAPaginaEspecifica");
+                                if (BanderaTipoActualizacion == "G")
+                                {
+                                    // console.log("antes de ");
+                                    IrAPaginaEspecifica(PaginaActualGlobal);
+                                    BanderaTipoActualizacion = "";
+                                }
+
+                                if (BanderaTipoActualizacion == "P")
+                                {
+                                    // console.log("la primera vez que pagino " + PaginaActualGlobal);
+                                    IrAPaginaEspecifica(PaginaActualGlobal);                
+                                    BanderaTipoActualizacion = "P";
+                                }
+
+                                $("#dvLoading").css("display", "none");
+                                return false;
+                            }
+                        }
+
+                        if (Bandera3)
+                        {
+                            // console.clear();
+                            // console.log(EntradasJsonObjeto);
+
+                            var ArregoIndiceRepetidos = [];
+
+                            
+                            // console.clear();
+                            // console.log(arrEntradas);
+
+
+                            for (var i = 0; i < arrEntradas.length - 1; i++) 
+                            {
+                                if(arrEntradas[i].FechaEntrada != "" &&
+                                   arrEntradas[i].CodigoActividad != "" && 
+                                   arrEntradas[i].Unit != "")
+                                {
+                                    for (var j = 1; j < arrEntradas.length; j++) 
+                                    {
+                                        if (arrEntradas[i].FechaEntrada             == arrEntradas[j].FechaEntrada &&
+                                            arrEntradas[i].CodigoActividad          == arrEntradas[j].CodigoActividad &&
+                                            arrEntradas[i].Unit                     == arrEntradas[j].Unit &&
+                                            arrEntradas[i].PriceUnit                == arrEntradas[j].PriceUnit &&
+                                            arrEntradas[i].Comentario               == arrEntradas[j].Comentario &&
+                                            arrEntradas[i].NumeroCorrelativoEntrada != arrEntradas[j].NumeroCorrelativoEntrada )
+                                        {
+                                            if (ArregoIndiceRepetidos.indexOf(arrEntradas[i].NumeroCorrelativoEntrada) == -1)
+                                                ArregoIndiceRepetidos.push(arrEntradas[i].NumeroCorrelativoEntrada);
+
+                                            if (ArregoIndiceRepetidos.indexOf(arrEntradas[j].NumeroCorrelativoEntrada) == -1)
+                                                ArregoIndiceRepetidos.push(arrEntradas[j].NumeroCorrelativoEntrada);
+                                        }
+                                    }    
+                                }
+                            }                
+
+                            if (ArregoIndiceRepetidos.length != 0)
+                            {
+                                var IndicesConcatenados = "";
+                    
+                                for (var i = 0; i < ArregoIndiceRepetidos.length; i++) 
+                                {
+                                    IndicesConcatenados += ArregoIndiceRepetidos[i] + ", ";
+                                }
+                    
+                                
+
+                                error="Alert";
+                                mensaje="You are trying to enter a duplicate entry. Please verify in rows: " + IndicesConcatenados;
+                                MensajeError(mensaje, error);
+
+                                $("#dvLoading").css("display", "none");
+                                return false;
+                            }
+                            else
+                            {
+                                
+                                // 2
+                                console.log("22222222222222222");
+                                $.ajax({
+                                    type: "POST",
+                                    async: true,
+                                    // data: JSON.stringify(EntradasJsonObjeto),
+                                    data: JSON.stringify({ 'Entradas' : arrEntradas }),
+                                    url: '@Url.Action("RegistraActualizaEntradas", "DataEntry")',
+                                    contentType: "application/json",
+                                    dataType: 'json',
+                                    success: function (Datos)
+                                    {
+                                        // console.clear();
+                                        // console.log(Datos);
+
+                                        Bandera10 = false;
+                                        BanderaPagino = (BanderaPagino == false) ? true : false;
+
+                                        // return false;
+
+                                        if (Datos.response.FilaActualizada == 0 && Datos.response.FilaRegistrada == 0)
+                                        {
+                                            if (Tipo == 0)
+                                            {
+                                                mensaje = "Your information has been saved";
+                                                error = "Success";
+                                                MensajeError(mensaje, error);
+
+                                                // console.log("apu apu apu apu apu ");
+                                                return false;
+                                            }                        
+                                        }                        
+                                        else if (Datos.response.FilaActualizada != 0)
+                                        {
+                                            
+
+                                            mensaje = "You are trying to enter a duplicate entry. Please verify in row " + Datos.response.FilaRegistrada;
+                                            error = "Alert";
+                                            MensajeError(mensaje, error);
+                                        }
+                                        else if (Datos.response.FilaRegistrada != 0)
+                                        {
+                                            
+
+                                            mensaje = "You are trying to enter a duplicate entry. Please verify in row " + Datos.response.FilaRegistrada;
+                                            error = "Alert";
+                                            MensajeError(mensaje, error);
+                                        }
+                                    }
+                                });
+
+                                // console.log("aqui guardo");
+                                // return false;
+
+                                BanderaErrorValidacion = false; 
+                                BanderaCambioProceso = false;
+
+                                LimpiarArreglos();
+                                // CargaEntradas(parseInt($("#hdCodigoCaso").val()));
+                                // console.log("mas2");
+                                ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val())); // Despues de actualizar las entradas se llama a la función "ObtenerEntradasNuevamente" para volver a traer las entradas de la base y actualizar en la vista con los códigos de las nuevas entradas insertadas.
+                
+                                PaginaActualGlobal = MantenerPaginaActual();      
+                
+                                if (Tipo == 0) // Se va a mostrar mensaje 
+                                {
+                                    // console.log("llama");
+                                    PaginarTabla();
+
+                                    if (VecesSelecionaCaso == 0)
+                                    {
+                                        CargarInformacionCaso($("#hdCodigoPaciente").val(), $("#hdCodigoCaso").val(), "n");
+                                        PaginarTabla();
+                                    }
+                                }
+                                else
+                                {
+                                    // $(".SeleccionarCaso").trigger("click");
+                                }
+
+                                if (BanderaTipoActualizacion == "G")
+                                {
+                                    IrAPaginaEspecifica(PaginaActualGlobal);
+                                    BanderaTipoActualizacion = ""; 
+                                }
+
+                                if (BanderaTipoActualizacion == "P")
+                                {
+                                    IrAPaginaEspecifica(PaginaActualGlobal);                 
+                                    BanderaTipoActualizacion = "P";
+                                }
+
+                                $("#dvLoading").css("display", "none");
+                                return false;
+                            }
+                        }                           
+                    }
+                        // Si no confirma, aborta el registro de entradas.
+                    else
+                    {
+                        $("#dvLoading").css("display", "none"); 
+                        return false;
+                    }
+
+                });
+            }
+            else
+            {
+                // ******************************************************************************************************************************************
+                if (BanderaErrorValidacion)
+                {
+                    // console.log("aaaaaaaaaaaaaaaaaaaaaaa");
+                    MensajeError(mensaje, error);
+                    // $("#dvLoading").css("display", "none");
+                
+                    return false;
+                }
+            
+                // console.log("bbbbbbbbbbbbbbbbbbb");
+                // var PaginaActual = Math.floor(NumeroCorrelativoEntrada/10);            
+                // IrAPaginaEspecifica(PaginaActual);
+
+                // console.clear();
+                // console.log(EntradasJsonObjeto);
+
+                // si la Bandera2 permanece activa simplemente actualiza las entradas originales por que no hubo ninguna agregación.
+                if (Bandera2)
+                {
+                    var ArregoIndiceRepetidos = [];
+
+                    
+                    // console.clear();
+                    // console.log(arrEntradas);
+
+
+                    for (var i = 0; i < arrEntradas.length - 1; i++) 
+                    {
+                        if(arrEntradas[i].FechaEntrada    != "" &&
+                           arrEntradas[i].CodigoActividad != "" &&
+                           arrEntradas[i].Unit            != "")
+                        {
+                            for (var j = 1; j < arrEntradas.length; j++) 
+                            {
+                                if (arrEntradas[i].FechaEntrada             == arrEntradas[j].FechaEntrada &&
+                                    arrEntradas[i].CodigoActividad          == arrEntradas[j].CodigoActividad &&
+                                    arrEntradas[i].Unit                     == arrEntradas[j].Unit &&
+                                    arrEntradas[i].PriceUnit                == arrEntradas[j].PriceUnit &&
+                                    arrEntradas[i].Comentario               == arrEntradas[j].Comentario &&
+                                    arrEntradas[i].NumeroCorrelativoEntrada != arrEntradas[j].NumeroCorrelativoEntrada)
+                                {
+                                    if (ArregoIndiceRepetidos.indexOf(arrEntradas[i].NumeroCorrelativoEntrada) == -1)
+                                        ArregoIndiceRepetidos.push(arrEntradas[i].NumeroCorrelativoEntrada);
+
+                                    if (ArregoIndiceRepetidos.indexOf(arrEntradas[j].NumeroCorrelativoEntrada) == -1)
+                                        ArregoIndiceRepetidos.push(arrEntradas[j].NumeroCorrelativoEntrada);
+                                }                            
+                            }    
+                        }
+                    }
+
+                    if (ArregoIndiceRepetidos.length != 0)
+                    {
+                        var IndicesConcatenados = "";
+                    
+                        for (var i = 0; i < ArregoIndiceRepetidos.length; i++) 
+                        {
+                            IndicesConcatenados += ArregoIndiceRepetidos[i] + ", ";
+                        }
+                    
+                        
+
+                        error="Alert";
+                        mensaje = "You are trying to enter a duplicate entry. Please verify in rows: " + IndicesConcatenados ;
+                        MensajeError(mensaje, error);
+                        // $("#dvLoading").css("display", "none");
+                        // console.log("aqui");
+                        return false;
+                    }
+                    else
+                    {
+                        
+                        // 3
+                        console.log("33333333333333333333333333333");
+                        // Concurrent.Thread.create(function()
+                        // {
+                            $.ajax({
+                                type: "POST",
+                                async: false,
+                                // data: JSON.stringify(EntradasJsonObjeto),
+                                data: JSON.stringify({ 'Entradas' : arrEntradas }),
+                                url: '@Url.Action("RegistraActualizaEntradas", "DataEntry")',
+                                contentType: "application/json",
+                                dataType: 'json',
+                                success: function (Datos)
+                                {
+                                    // console.log(Datos);
+
+                                    Bandera10 = false;
+                                    BanderaPagino = (BanderaPagino == false) ? true : false;
+
+                                    if (Datos.response.FilaActualizada == 0 && Datos.response.FilaRegistrada == 0)
+                                    {
+                                        if (Tipo == 0)
+                                        {
+                                            Concurrent.Thread.create(function()
+                                            {
+                                                setTimeout(function()
+                                                {
+                                                    console.log("--333333333333333333333333333--");
+                                                    enter = $("#txtEnter").val();
+                                                    if(enter == 0) // si no es enter
+                                                    {
+                                                        mensaje = "Your information has been saved";
+                                                        error = "Success";
+                                                        MensajeError(mensaje, error);
+                                                    }
+                                                    $("#txtEnter").val("0");
+                                                    // console.log("apu apu apu apu apu ");
+                                                    return false;                                                
+                                                },10);
+
+                                            });
+                                        }                        
+                                    }                        
+                                    else if (Datos.response.FilaActualizada != 0)
+                                    {
+                                        
+
+                                        mensaje = "You are trying to enter a duplicate entry. Please verify in row " + Datos.response.FilaActualizada;
+                                        error = "Alert";
+                                        MensajeError(mensaje, error);
+
+                                    }
+                                    else if (Datos.response.FilaRegistrada != 0)
+                                    {
+                                        
+
+                                        mensaje = "You are trying to enter a duplicate entry. Please verify in row " + Datos.response.FilaRegistrada;
+                                        error = "Alert";
+                                        MensajeError(mensaje, error);
+                                    }
+                                }
+                            });
+                        // });
+
+                        // console.log("aqui guardo");
+                        // return false;
+
+                        BanderaErrorValidacion = false; 
+                        BanderaCambioProceso = false;
+                
+                        LimpiarArreglos();
+                        // CargaEntradas(parseInt($("#hdCodigoCaso").val()));
+                            // console.log("mas");
+
+                        ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val())); // Despues de actualizar las entradas se llama a la función "ObtenerEntradasNuevamente" para volver a traer las entradas de la base y actualizar en la vista con los códigos de las nuevas entradas insertadas.                                
+                    
+                        PaginaActualGlobal = MantenerPaginaActual();
+
+                        if (Tipo == 0) // Se va a mostrar mensaje
+                        {
+                            // console.log("llama");
+                            PaginarTabla();
+
+                            if (VecesSelecionaCaso == 0)
+                            {
+                                CargarInformacionCaso($("#hdCodigoPaciente").val(), $("#hdCodigoCaso").val(), "n");
+                                PaginarTabla();
+                            }
+                        }
+                        else
+                        {
+                    
+                        }
+                
+                        // console.clear();
+                        // console.log("antes de IrAPaginaEspecifica");
+                        if (BanderaTipoActualizacion == "G")
+                        {
+                            // console.log("antes de ");
+                            IrAPaginaEspecifica(PaginaActualGlobal);                
+                            BanderaTipoActualizacion = "";
+                        }
+
+                        if (BanderaTipoActualizacion == "P")
+                        {
+                            // console.log("la primera vez que pagino " + PaginaActualGlobal);
+                            IrAPaginaEspecifica(PaginaActualGlobal);                
+                            BanderaTipoActualizacion = "P";
+                        }
+
+                        $("#dvLoading").css("display", "none");
+                        return false;
+                    }
+                }
+
+            if (Bandera3)
+            {
+                
+                var ArregoIndiceRepetidos = [];
+
+                
+                // console.clear();
+                // console.log(arrEntradas);
+
+
+                for (var i = 0; i < arrEntradas.length - 1; i++) 
+                {
+                    if(arrEntradas[i].FechaEntrada != "" &&
+                       arrEntradas[i].CodigoActividad != "" && 
+                       arrEntradas[i].Unit != "")
+                    {
+                        for (var j = 1; j < arrEntradas.length; j++) 
+                        {
+                            if (arrEntradas[i].FechaEntrada             == arrEntradas[j].FechaEntrada &&
+                                arrEntradas[i].CodigoActividad          == arrEntradas[j].CodigoActividad &&
+                                arrEntradas[i].Unit                     == arrEntradas[j].Unit &&
+                                arrEntradas[i].PriceUnit                == arrEntradas[j].PriceUnit &&
+                                arrEntradas[i].Comentario               == arrEntradas[j].Comentario &&
+                                arrEntradas[i].NumeroCorrelativoEntrada != arrEntradas[j].NumeroCorrelativoEntrada)
+                            {
+                                if (ArregoIndiceRepetidos.indexOf(arrEntradas[i].NumeroCorrelativoEntrada) == -1)
+                                    ArregoIndiceRepetidos.push(arrEntradas[i].NumeroCorrelativoEntrada);
+
+                                if (ArregoIndiceRepetidos.indexOf(arrEntradas[j].NumeroCorrelativoEntrada) == -1)
+                                    ArregoIndiceRepetidos.push(arrEntradas[j].NumeroCorrelativoEntrada);
+                            }
+                        }    
+                    }
+                }                
+
+                if (ArregoIndiceRepetidos.length != 0)
+                {
+                    var IndicesConcatenados = "";
+                    
+                    for (var i = 0; i < ArregoIndiceRepetidos.length; i++) 
+                    {
+                        IndicesConcatenados += ArregoIndiceRepetidos[i] + ", ";
+                    }
+                    
+                    
+
+                    error="Alert";
+                    mensaje="You are trying to enter a duplicate entry. Please verify in rows: " + IndicesConcatenados;
+                    MensajeError(mensaje, error);
+
+                    $("#dvLoading").css("display", "none");
+                    return false;
+                }
+                else
+                {
+                    
+                    // 4
+                    console.log("44444444444444444444444444444");
+                    //debugger
+                    $.ajax({
+                        type: "POST",
+                        async: true,
+                        // data: JSON.stringify(EntradasJsonObjeto),
+                        data: JSON.stringify({ 'Entradas' : arrEntradas }),
+                        url: '@Url.Action("RegistraActualizaEntradas", "DataEntry")',
+                        contentType: "application/json",
+                        dataType: 'json',
+                        success: function (Datos)
+                        {
+                            
+                            //console.clear();
+                            //console.log(Datos);
+
+                            Bandera10 = false;
+                            BanderaPagino = (BanderaPagino == false) ? true : false;
+                             
+                            // return false;
+
+                            if (Datos.response.FilaActualizada == 0 && Datos.response.FilaRegistrada == 0)
+                            {
+                                if (Tipo == 0)
+                                {
+                                    console.log("--44444444444444444444444444444--");
+                                    enter = $("#txtEnter").val();
+                                    if(enter == 0) // si no es enter
+                                    {
+                                        mensaje = "Your information has been saved";
+                                        error = "Success";
+                                        MensajeError(mensaje, error);
+                                    }
+                                    $("#txtEnter").val("0");
+                                    return false;
+                                }                        
+                            }                        
+                            else if (Datos.response.FilaActualizada != 0)
+                            {
+                                
+
+                                mensaje = "You are trying to enter a duplicate entry. Please verify in row :" + Datos.response.FilaRegistrada;
+                                error = "Alert";
+                                MensajeError(mensaje, error);
+                            }
+                            else if (Datos.response.FilaRegistrada != 0)
+                            {
+                                
+
+                                mensaje = "You are trying to enter a duplicate entry. Please verify in row :" + Datos.response.FilaRegistrada;
+                                error = "Alert";
+                                MensajeError(mensaje, error);
+                            }
+                        }
+                    });
+
+                    // return false;
+
+                    BanderaErrorValidacion = false; 
+                    BanderaCambioProceso = false;
+
+                    LimpiarArreglos();
+                    // CargaEntradas(parseInt($("#hdCodigoCaso").val()));
+                    // console.log("mas2");
+                    ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val())); // Despues de actualizar las entradas se llama a la función "ObtenerEntradasNuevamente" para volver a traer las entradas de la base y actualizar en la vista con los códigos de las nuevas entradas insertadas.
+                
+                    PaginaActualGlobal = MantenerPaginaActual();      
+                
+                    if (Tipo == 0) // Se va a mostrar mensaje 
+                    {
+                        // console.log("llama");
+                        PaginarTabla();
+
+                        if (VecesSelecionaCaso == 0)
+                        {
+                            CargarInformacionCaso($("#hdCodigoPaciente").val(), $("#hdCodigoCaso").val(), "n");
+                            PaginarTabla();
+                        }
+                    }
+                    else
+                    {
+                        // $(".SeleccionarCaso").trigger("click");
+                    }
+
+                    if (BanderaTipoActualizacion == "G")
+                    {
+                        IrAPaginaEspecifica(PaginaActualGlobal);
+                        BanderaTipoActualizacion = ""; 
+                    }
+
+                    if (BanderaTipoActualizacion == "P")
+                    {
+                        IrAPaginaEspecifica(PaginaActualGlobal);                 
+                        BanderaTipoActualizacion = "P";
+                    }
+
+                    $("#dvLoading").css("display", "none");
+                    return false;
+                }
+            }
+                // ******************************************************************************************************************************************            
+            }
+
+            // console.clear();
+            // console.log("esconde dvLoading");
+        }
+    }
+
+    function ObtenerEntradasNuevamente(CodigoCaso)
+    {
+        // console.clear();
+         console.log("aqui aqui ");
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoCaso": CodigoCaso }),
+            url: '@Url.Action("ListaEntradasDeCaso", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                //edher
+				//console.clear()
+				//console.log(Data)
+                Entradas = Data; // La variable "Entradas" es global.
+                // console.log(Entradas);
+            }
+        });
+    }
+
+    function ObtenerActividades()
+    {
+        var Actividades;
+
+        $.ajax({
+            type: "POST",
+            async: false,            
+            url: '@Url.Action("ListaActividades", "Activity")',
+            contentType: "application/json",
+            dataType: 'json',
+            //cache: true,            
+            success: function (Data)
+            {
+                Actividades = Data;
+            }
+        });
+         
+        return Actividades;
+    }
+    
+    function MantenerPaginaActual()
+    {
+        var otable = $("#tblEntradas").DataTable();
+        var PaginaActual;
+
+        var info = otable.page.info();
+        PaginaActual = info.page + 1;   
+
+        return PaginaActual;
+    }
+
+    function ReiniciarDataTable()
+    {
+        var otable2;
+
+        otable2 = $("#tblEntradas").DataTable({
+            "pageLength": 10
+            ,"bFilter": false
+            ,"lengthChange":false            
+            ,order: [[10, "asc"]]
+        })
+
+        return otable2;
+    }
+
+    // function ProcesarCadaColumna(ptabla, pIndicePrimeraColumna)
+    function ProcesarCadaColumna(otable, IndicePrimeraColumna)
+    {
+        // console.clear();
+        // console.log("entra");
+
+        // var otable = ptabla || ReiniciarDataTable();
+        // var IndicePrimeraColumna = 1 || pIndicePrimeraColumna;
+        
+        
+        //debugger;
+        //console.log(ArregloEntradas);
+        
+        //$("#txtEnter").val("0");
+        otable.column(0).nodes().to$().each(function (index)
+        {
+            ArregloEntradas[index] = Array();
+            ArregloValidacionesPendientes[index] = Array();
+
+            // ArregloEntradas[index]["CorrelativoEntrada"] = parseInt($(this)["0"].innerHTML.trim());
+            ArregloEntradas[index]["CorrelativoEntrada"] = IndicePrimeraColumna;
+
+            $(this)["0"].innerHTML = IndicePrimeraColumna;
+            IndicePrimeraColumna += 1;
+        });  
+        //console.log(ArregloEntradas);
+        //alert("akii");
+        // --------------------------------------------------------------------------------------------------------------
+        // Obtiene los códigos nuevos de cada entrada para llenarlas en ArregloEntradas.
+        otable.column(1).nodes().to$().each(function (index)        
+        {           
+            // console.log(Entradas.length);
+
+            var CodigoNuevoEntrada = $(this)["0"].innerHTML.trim();
+
+            ArregloEntradas[index]["CodigoNuevoEntrada"] = (CodigoNuevoEntrada == "") ? null : parseInt(CodigoNuevoEntrada);
+            
+            if (CodigoNuevoEntrada == "")
+                $(this)["0"].parentElement.children[10].innerHTML = "12/28/2050";
+
+            // Se comparan los códigos (nuevos) de las entradas, que se traen nuevamente de la base de datos con los códigos.
+            if (index < Entradas.length) // Esta condición permite que se evalúen los controles de la tabla que contienen datos.
+            {
+                // console.log("primera condicion");
+
+                if (Entradas[index]["Dae_code"].toString().trim() == CodigoNuevoEntrada) // Si la fila de controles en la que se está actualmente tiene código nuevo de entrada, no hace nada.
+                {
+                    // console.log("primera de primera condicion");
+                    // console.log((index + 1) + " - " + CodigoNuevoEntrada + " - " + "Tiene código");
+                }
+                else // Pero si la fila de controles en la que se está actualmente no tiene código nuevo de entrada, entonces se actualizará con el nuevo código traído de la base.
+                {
+                    // console.log("dentro de condicion");
+
+                    // console.log((index + 1) + " - " + Entradas[index]["Dae_code"].toString().trim() + " - " + "No tiene código");
+
+                    // console.clear();
+                    // console.log(Entradas[index]["Dae_code"].toString().trim());
+
+                    // debugger
+                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    $(this)["0"].innerHTML = Entradas[index]["Dae_code"].toString().trim(); // Aquí tienen que asignarse los código nuevos de las entradas que se insertaron a las columna "CodigoNuevoEntrada".
+                    ArregloEntradas[index]["CodigoNuevoEntrada"] = parseInt(Entradas[index]["Dae_code"].toString().trim());
+                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    var ActividadHTML = $(this)["0"].parentElement.children[4].children["0"];
+					$(ActividadHTML).val(Entradas[index]["Act_code"].toString().trim())
+                    ArregloEntradas[index]["CodigoActividad"] = parseFloat($(ActividadHTML).val());
+                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    var UnitHTML = $(this)["0"].parentElement.children[5].children["0"];
+					
+                    if (parseFloat(UnitHTML) == 0 
+                        || UnitHTML == null
+                        || UnitHTML.toString().trim() == '0'
+                        || UnitHTML.toString().trim() == '')
+                    {
+                        $(UnitHTML).val('');
+                        ArregloEntradas[index]["Unit"] = 0;
+                    }
+                    else
+                    {
+                        $(PriceUnitHTML).val(Entradas[index]["Dae_hourAct"].toString().trim());
+                        ArregloEntradas[index]["Unit"] = parseFloat($(PriceUnitHTML).val());
+                    }                    
+                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------                    
+                    var PriceUnitHTML = $(this)["0"].parentElement.children[6].children["0"];                    
+
+                    if (parseFloat(PriceUnitHTML) == 0 
+                        || PriceUnitHTML == null
+                        || PriceUnitHTML.toString().trim() == '0'
+                        || PriceUnitHTML.toString().trim() == '')
+                    {
+                        $(PriceUnitHTML).val('');
+                        ArregloEntradas[index]["PriceUnit"] = 0;
+                    }
+                    else
+                    {
+                        $(PriceUnitHTML).val(Entradas[index]["Dae_milesAct"].toString().trim());
+                        ArregloEntradas[index]["PriceUnit"] = parseFloat($(PriceUnitHTML).val());
+                    }
+                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------					
+                    var DescripcionHTML = $(this)["0"].parentElement.children[8].children["0"];                    
+                    $(DescripcionHTML).val(Entradas[index]["Dae_comment"].toString().trim());
+					ArregloEntradas[index]["Comentario"] = $(DescripcionHTML).val().trim();
+                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    var EnlaceEliminar = $(this)["0"].parentElement.children[9].children["0"];
+                    var CajaTextoInicialesUsuarioLogueado = $(this)["0"].parentElement.children[9].children["1"];
+                    
+                    $(EnlaceEliminar).css({"display":"block"});
+                    $(CajaTextoInicialesUsuarioLogueado).val(NombreUsuarioGlobal.substring(0, 1).toUpperCase() + ApellidoUsuarioGlobal.substring(0, 1).toUpperCase());
+                }
+            }
+        });
+        // --------------------------------------------------------------------------------------------------------------
+        // Obtiene los códigos antiguos de cada entrada para llenarlas en ArregloEntradas.
+        otable.column(2).nodes().to$().each(function (index)
+        {
+            ArregloEntradas[index]["CodigoAntiguoEntrada"] = $(this)["0"].innerHTML.trim();
+        }); 
+        // --------------------------------------------------------------------------------------------------------------
+        // Obtiene las fechas de cada entrada para llenarlas en ArregloEntradas.
+        otable.column(3).nodes().to$().each(function (index)
+        {
+            var ControlFecha = $(this).find(".dtpFecha");
+            var FechaActual = $(this).find(".dtpFecha").val();
+            var IconoControlFecha = $(this).find(".dtpFecha").parent(".input-group").find(".input-group-addon");
+         
+            // console.log(ControlFecha);
+
+            var ComboActividadesHTML = $(this)["0"].parentElement.children[4].children["0"];
+            var UnitHTML = $(this)["0"].parentElement.children[5].children["0"];
+
+            ControlFecha.off("change");
+            ControlFecha.off("focusin");
+            ControlFecha.off("focusout");
+            IconoControlFecha.off("click");
+
+            /////////////////
+            fechaActual = new Date();
+            fechaActual =  (fechaActual.getMonth() + 1)  + "/" + fechaActual.getDate() + "/"  + fechaActual.getFullYear();
+            /////////////////
+            ArregloEntradas[index]["FechaEntrada"] = $(this).find(".dtpFecha").val();
+            tabindex = index + "3"  ;
+            ControlFecha.attr("tabindex", tabindex);
+
+            ControlFecha.on("focusin", function(e)
+            {
+                // e.stopPropagation();
+                // $(".datepicker-orient-bottom").css({"background":"red"});                
+            });
+
+            ControlFecha.on("focusout", function(e)
+            {                   
+                // Verifica que se haya elegido una actividad y se haya ingresado un Unit, si no es asi aborta el evento;
+                if (($(ComboActividadesHTML).val() == "") && ($(UnitHTML).val().trim() == ""))
+                    // return false;
+                    // console.log("focusout_xxx");
+                if ((e.target.value.trim() != "") && !e.target.value.match(RegExpFecha)) // Si la fecha está llena y no tiene el formato correcto.
+                {
+                    BanderaValidaciones = true;
+                    
+                    ArregloEntradas[index]["FechaEntrada"] = e.target.value.trim();                    
+
+                    mensaje = "The Date in row " + (index + 1) + " is incorrect.";
+                    error = "Error";
+                    MensajeError(mensaje, error);
+                     
+                    // $(this).val(FechaActual);
+                    ArregloValidacionesPendientes[index]["FechaEntrada"] = "The date in row " + (index + 1) + " is incorrect.";
+                    return false;        
+                }
+                
+
+                if (e.target.value.trim() == "" || e.target.value.match(RegExpFecha)) // si la fecha está vacía o tiene el formato correcto.
+                {
+                    ArregloValidacionesPendientes[index]["FechaEntrada"] =  "";
+                }
+
+                // Este "if" es para que si se borra una fecha y sale del control automaticamente se vuelva a rellenar con la fecha que tenía.
+                if ($(ControlFecha).val() == "")
+                    $(ControlFecha).val(FechaActual);
+
+                ArregloEntradas[index]["FechaEntrada"] = e.target.value.trim();     
+                $(this)["0"].parentElement.parentElement.parentElement.children[10].innerHTML = e.target.value;
+
+                // console.log($(this)["0"].parentElement.parentElement.parentElement.children[10].innerHTML);
+            }); 
+            
+            ControlFecha.on("change", function (e)
+            {                
+                BanderaCambioProceso = true;
+
+                ///////////////////////////////////// VALIDACION DE FECHAS PASADAS AL MES DE CIERRE /////////////////////////////////////
+
+                // console.log(e.target.value);
+                // console.log(fechaActual);
+
+                //fecha_ultimo_cierre = $("#txtUltimaFechaCierre").val(); 
+                //if(fecha_ultimo_cierre!= "" && fecha_ultimo_cierre != null )
+                //{
+                //    if(( Date.parse(e.target.value)<=Date.parse(fecha_ultimo_cierre)) && ($(this).parent("td").parent("tr").find("td:eq(3)").html() != "") ) 
+                //    {
+                //        console.log("change_ControlFechayy");                            
+                //        nrofila =  parseInt(index) + 1;
+                //        mensaje  = "You cannot enter a data entry date from a billing cycle that has been closed ( " + fecha_ultimo_cierre + ")  . Please verify in row ( " + nrofila  + ")" ;
+                //        error ="Error";
+                //        MensajeError(mensaje,error);
+                //        //e.target.focus();
+                //        //ControlFecha.datepicker("setDate",fechaActual);                     
+                //        ControlFecha.focus();
+                //        console.log("change_ControlFechayy");
+                //        return false;                        
+                //    }
+                //}
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                
+                // Obtiene el código nuevo de entrada de la entrada donde se modifica la fecha.
+                var CodigoNuevoEntrada = $(this)["0"].parentElement.parentElement.parentElement.children[1].innerHTML.trim()
+                //console.log(CodigoNuevoEntrada);
+
+                // cuando es digit y quiere registrar o actualizar.
+                if (
+                        Date.parse($(ControlFecha).val()) <= Date.parse( $("#txtUltimaFechaCierre").val())
+                        &&
+                        RolUsuarioLogueado == 'digit'
+                    )
+                {
+                    MensajeError('The digit role can\'t enter a date less than the last closing date.', 'Error');                
+                    $(ControlFecha).val(FechaActual);
+                }
+
+                // Cuando es administrador y quiere actualizar.
+                if (
+                        Date.parse($(ControlFecha).val()) <= Date.parse( $("#txtUltimaFechaCierre").val())
+                        &&
+                        RolUsuarioLogueado == 'Administrator'                        
+                        && 
+                        CodigoNuevoEntrada != ""
+                    )
+                {                
+                    swal({               
+                        async: false,
+                        title: 'Confirmation',
+                        text: 'The date entered is less than the last closing date. Do you want to keep it?',
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        cancelButtonText: "No",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                        },                
+                        function (isConfirm)
+                        { 
+                            // Si dice que NO se puede actualizar con una fecha menor para el "Administrador", entonces se queda con la fecha actual
+                            if (!isConfirm)
+                            {
+                                $(ControlFecha).val(FechaActual);
+                            }
+                            // Si dice que SI se puede.
+                            else
+                            {
+                                $(ControlFecha).val(e.target.value.trim());
+                                ArregloEntradas[index]["FechaEntrada"] = e.target.value.trim();     
+
+                                $(".sweet-overlay").css({ "display": "none" });
+                                $(".showSweetAlert").css({ "display": "none" });
+                                $("body").css({ "overflow": "visible" });
+
+                                // return true;
+                            }
+                    })                    
+                }
+
+                // Verifica que se haya elegido una actividad y se haya ingresado un Unit, si no es asi aborta el evento;
+                if (($(ComboActividadesHTML).val() == "") && ($(UnitHTML).val().trim() == ""))
+                    return false;
+                
+                ArregloEntradas[parseInt(e.target.parentElement.parentElement.parentElement.cells["0"].innerText) - 1]["FechaEntrada"] = e.target.value;
+                $(this)["0"].parentElement.parentElement.parentElement.children[10].innerHTML = e.target.value;
+
+                // console.log($(this)["0"].parentElement.parentElement.parentElement.children[10].innerHTML);
+
+                $(this).parent("td").attr("FechaEntrada", e.target.value);
+            });
+
+            IconoControlFecha.on("click", function () 
+            {
+                // console.log($(this).parent(".input-group").find(".dtpFecha"));
+                $(this).parent(".input-group").find(".dtpFecha").trigger("click");
+                $(this).parent(".input-group").find(".dtpFecha").focus();
+            });
+        });
+        // --------------------------------------------------------------------------------------------------------------
+        // Llena los combos y establece los valores seleccionados de actividad para cada entrada, obteniéndolos también para llenarlos en ArregloEntradas.
+        otable.column(4).nodes().to$().each(function (index)
+        {
+            var ComboActividades = $(this).find("select");
+            var CodigoActividad;            
+
+            ComboActividades.off("focusout");
+            ComboActividades.off("change");
+
+            $.each(Actividades, function (i, val)
+            {
+                // Por esto es importante poner en el campo oculto del combo de actividades el valor de una actividad seleccionada, por que cada vez que hace el paginado verifica cual es la actividad que tiene la fila en la que está.
+                CodigoActividad = parseInt(ComboActividades.parent("td").attr("CodigoActividad"));
+                
+                if (CodigoActividad == val.Act_code)
+                {
+                    ComboActividades.append("<option selected value=" + val.Act_code + ">" + val.Act_description + "</option>");
+
+                    ArregloEntradas[index]["CodigoActividad"] = val.Act_code;
+                    ArregloEntradas[index]["DescripcionActividad"] = val.Act_description;
+                }
+                else
+                {  
+                    ComboActividades.append("<option value=" + val.Act_code + ">" + val.Act_description + "</option>");
+                }
+            });
+
+            tabindex = index + "4";
+            ComboActividades.attr("tabindex", tabindex);
+
+            ComboActividades.on("focusout", function (e)
+            {                
+
+                var FechaFilaActual = $(this).parent("td").parent("tr").find("td:eq(3)").find(".dtpFecha").val();
+                var Indice = $(this)["0"].parentElement.parentElement.rowIndex; // Obtiene el indice de la siguiente fila.                    
+
+                if (!((Indice % 10) == 0)) // Para que no tome en cuenta la última fila de la tabla al momento de generar la fecha en la fila siguiente del combo donde se selecciona un actividad.
+                {
+                    // Si la fecha de la siguiente fila de donde se está no tiene aún fecha, se le asigna la fecha de la fila donde se está.
+                    if ($(this)["0"].parentElement.parentElement.parentElement.children[Indice].children[3].children["0"].children[1].value.trim() == "") 
+                    {
+                        // $(this)["0"].parentElement.parentElement.parentElement.children[Indice].children[3].children["0"].children[1].value = FechaFilaActual;
+                        var ControlFechaSiguienteHTML = $(this)["0"].parentElement.parentElement.parentElement.children[Indice].children[3].children["0"].children[1];
+                        $(ControlFechaSiguienteHTML).datepicker("setDate", FechaFilaActual);
+                    }
+
+                    // $(".dtpFecha").datepicker(FechaFilaActual);
+                }
+
+                var FechaBruto = new Date();
+                var Mes = (FechaBruto.getMonth() + 1).toString();
+                var Dia = FechaBruto.getDate().toString();
+                var Año = FechaBruto.getFullYear().toString();
+                var FechActual = RellenarCerosIzquierdaNumero(Mes, 2) + '/' + RellenarCerosIzquierdaNumero(Dia, 2) + '/' + Año;                
+                
+                // console.log(FechaFilaActual);
+                ArregloEntradas[index]["FechaEntrada"] = FechaFilaActual;
+
+                // console.log(e.target.value);
+                if(e.target.value.trim() != "")
+                {
+                    // $(this)["0"].parentElement.parentElement.parentElement.children[10].innerHTML = FechaFilaActual;
+                    $(this)["0"].parentElement.parentElement.children[10].innerHTML = FechaFilaActual;
+                    return false;
+                }
+                else
+                {
+                    $(this)["0"].parentElement.parentElement.children[10].innerHTML = "12/28/2050";
+                    return false;
+                } 
+            });
+
+            ComboActividades.on("change", function(e)
+            {
+                BanderaCambioProceso = true;
+
+                var FechaFilaActual = $(this).parent("td").parent("tr").find("td:eq(3)").find(".dtpFecha").val();
+
+                ///////////////////////////////////// VALIDACION DE FECHAS PASADAS AL MES DE CIERRE /////////////////////////////////////
+                //console.log("changeFechaxxxx");                   
+                //fecha_ultimo_cierre = $("#txtUltimaFechaCierre").val();
+                //console.log(FechaFilaActual);
+                //console.log(fecha_ultimo_cierre);
+
+                //if(Date.parse(FechaFilaActual) <= Date.parse(fecha_ultimo_cierre)) 
+                //{
+                //    console.log("fecha de cierre mayor a fecha actual");
+                //    //$(this).parent("td").parent("tr").find("td:eq(3)").find(".dtpFecha").datepicker("setDate",fechaActual);
+                //    nrofila =  parseInt(index) + 1 ;
+                //    mensaje  = "You cannot enter a data entry date from a billing cycle that has been closed ( " + fecha_ultimo_cierre + ")  . Please verify in row ( " + nrofila  + ")" ;
+                //    error ="Error";
+                //    MensajeError(mensaje,error);
+                //    $(this).parent("td").parent("tr").find("td:eq(3)").find(".dtpFecha").focus();  
+                //    //$(this).parent("td").parent("tr").find("td:eq(3)").find(".dtpFecha").datepicker("setDate",fechaActual);
+                //    ComboActividades.val("");
+                //    return false;                        
+                //}
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                ArregloEntradas[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1]["CodigoActividad"] = (e.target.value.trim() == "") ? null : parseInt(e.target.value);
+                ArregloEntradas[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1]["DescripcionActividad"] = (e.target.selectedOptions["0"].innerHTML == "") ? null : e.target.selectedOptions["0"].innerHTML;                
+
+                //console.log(ArregloEntradas[index]["DescripcionActividad"]);
+
+                // Pone en el campo oculto del combo de actividades el código de la actividad seleccionada.
+                $(this).parent("td").attr("CodigoActividad", $(this)["0"].selectedOptions["0"].value); 
+                // console.log($(this).parent("td").attr("CodigoActividad"));
+
+                // console.log(e.target.value);
+                if(e.target.value.trim() != "")
+                {
+                    // $(this)["0"].parentElement.parentElement.parentElement.children[10].innerHTML = FechaFilaActual;
+                    $(this)["0"].parentElement.parentElement.children[10].innerHTML = FechaFilaActual;
+                    return false;
+                }
+                else
+                {
+                    // console.log(e.target.value.trim());
+                    // ArregloEntradas[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1].splice(0, 1);
+
+
+                    // ArregloEntradas[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1]["CodigoActividad"] = null;
+                    // ArregloEntradas[parseInt($(this)["0"].parentElement.parentElement.cells["0"].innerText) - 1]["DescripcionActividad"] = null;
+
+                    $(this)["0"].parentElement.parentElement.children[10].innerHTML = "12/28/2050";
+                    return false;
+                }
+
+                // console.log($(this)["0"].parentElement.parentElement.children[10].innerHTML);
+            });
+        }); 
+        // --------------------------------------------------------------------------------------------------------------
+        // Valida sólo número para Unit y obtiene sus valores para llenarlos en ArregloEntradas.
+        otable.column(5).nodes().to$().each(function (index)
+        {
+            var UnitCajaTexto = (isNaN($(this)["0"].children["0"].defaultValue)) ? "" : $(this)["0"].children["0"].defaultValue.trim();
+
+            ArregloEntradas[index]["Unit"] = (UnitCajaTexto == "") ? "" : parseFloat(UnitCajaTexto);            
+            ArregloValidacionesPendientes[index]["Unit"] = "";
+            var UnitHTML = $(this)["0"].children["0"]; // Obtiene 
+
+            $(this).off("keydown");
+            $(this).off("keypress");
+            $(this).off("focusout");
+            $(this).off("change");
+
+
+            tabindex = index + "5";
+            $(this).children("input").attr("tabindex", tabindex);
+
+            $(this).on("keydown", function(e)
+            {
+                // 
+
+                if (e.keyCode == 27) // Cuando se presiona la tecla ESC se establece el valor por defecto que tiene el Unit.
+                {
+                    $(this)["0"].children["0"].value = $(this)["0"].children[1].defaultValue; // Aquí se establece el valor por defecto que tiene el Unit.
+                }
+            });
+
+            $(this).on("keypress", validaNumeros);
+
+            $(this).on("focusout", function(e)
+            {                   
+
+                // var ValorUnit = (e.target.value == "undefined") ? "" : e.target.value;
+                // console.clear();
+                // console.log(e.target.value);
+                     
+                // console.log($(this)["0"].children["0"].defaultValue);
+                // return false;
+
+                if ((e.target.value.trim() != "") && (!(parseFloat(e.target.value) > 0 && parseFloat(e.target.value) < 1)))
+                {
+                    mensaje = "Be advised that the value is " + (e.target.value) + " .";
+                    error = "Alert";
+                    MensajeError(mensaje, error);
+
+                    ArregloValidacionesPendientes[index]["Unit"] = "'Unit' does not have the correct format in row " + (index + 1) + " .";                                                            
+                    
+                    return false;
+                }
+                 
+                // Si "Unit" está lleno y no tiene el formato correcto.
+                if ((e.target.value.trim() != "") && !e.target.value.match(RegExpDecimal))
+                {
+                    // console.clear();
+                    // console.log("activa BanderaValidaciones");
+                    BanderaValidaciones = true;
+
+                    mensaje = "'Unit' does not have the correct format in row " + (index + 1) + " .";
+                    error = "Error";
+                    MensajeError(mensaje, error);
+
+                    ArregloValidacionesPendientes[index]["Unit"] = "'Unit' does not have the correct format in row " + (index + 1) + " .";
+
+                    // console.clear();
+                    // console.log("bbbbb");
+                    
+                    return false;        
+                }
+                
+                if (e.target.value.trim() == "" || e.target.value.match(RegExpDecimal)) // si el "Unit" está vacío o tiene el formato correcto.
+                {
+                    ArregloValidacionesPendientes[index]["Unit"] = "";
+
+                    if (e.target.value.match(RegExpDecimal)) // Si el "Unit" tiene el formato correcto.
+                    {
+                        $(this)["0"].children["0"].value = parseFloat($(this)["0"].children["0"].value).toFixed(2); // si el "Unit" tiene el formato correcto, al salir de la caja de texto simplemente fija el valor con poniendole parte entera y dos decimales.
+                    }
+                }
+
+                // console.clear();
+
+            });
+                 
+            $(this).on("change", function (e)
+            {
+                BanderaCambioProceso = true;
+
+                // console.clear();
+                ArregloEntradas[parseInt($(this)["0"].parentElement.cells["0"].innerText) - 1]["Unit"] = (e.target.value.trim() == "") ? "" : parseFloat(e.target.value);
+                $(this)["0"].children["0"].defaultValue = parseFloat(e.target.value); // Para que el valor del Unit quede pegado en el control.
+                      
+                console.log("//////////////////////////////////////////////");
+                console.log(ArregloEntradas[index]["Unit"]);
+                console.log("//////////////////////////////////////////////");
+            });
+        });
+
+        // --------------------------------------------------------------------------------------------------------------
+        // Valida sólo número para Price/Unit y obtiene sus valores para llenarlos en ArregloEntradas.
+        otable.column(6).nodes().to$().each(function (index)
+        {
+            var PriceUnitCajaTexto = (isNaN($(this)["0"].children["0"].defaultValue)) ? "" : $(this)["0"].children["0"].defaultValue.trim();
+
+            ArregloEntradas[index]["PriceUnit"] = (PriceUnitCajaTexto == "") ? "" : parseFloat(PriceUnitCajaTexto);
+            ArregloValidacionesPendientes[index]["PriceUnit"] = "";
+
+
+            tabindex = index + "6";
+            $(this).children("input").attr("tabindex", tabindex);
+
+
+
+            $(this).off("keypress");
+            $(this).off("focusout");
+            $(this).off("change");
+
+            $(this).on("keypress", validaNumeros);
+
+            $(this).on("focusout", function(e)
+            {
+                if ((e.target.value.trim() != "") && !e.target.value.match(RegExpDecimal)) // Si "Unit" está lleno y no tiene el formato correcto.
+                {
+                    BanderaValidaciones = true;
+
+                    mensaje = "'Price/Unit' does not have the correct format in row " + (index + 1) + " .";
+                    error = "Error";
+                    MensajeError(mensaje, error);
+
+                    ArregloValidacionesPendientes[index]["PriceUnit"] = "'Price/Unit' does not have the correct format in row " + (index + 1) + " .";
+
+                    // return false;                        
+                }
+                else if   (e.target.value.trim() == "" || e.target.value.match(RegExpDecimal)) // si "Price/Unit" está vacío o tiene el formato correcto.
+                {
+                    // console.log("no hay validaciones pendientes");
+                    ArregloValidacionesPendientes[index]["PriceUnit"] = "";
+                    // BanderaValidaciones = false;
+                }
+            });
+
+            $(this).on("change", function (e)
+            {
+                BanderaCambioProceso = true;
+
+                ArregloEntradas[parseInt($(this)["0"].parentElement.cells["0"].innerText) - 1]["PriceUnit"] = (e.target.value.trim() == "") ? "" : parseFloat(e.target.value);
+                $(this)["0"].children["0"].defaultValue = parseFloat(e.target.value); // Para que el valor del Price/Unit quede pegado en el control.
+            });
+        });
+        // --------------------------------------------------------------------------------------------------------------
+        // Establece los valoreas de Running Total.
+        otable.column(7).nodes().to$().each(function (index)
+        {
+            var RunningTotal = 0;            
+            var PriceUnitHTML = $(this)["0"].parentElement.children[6].children["0"];
+            var RunningTotalHTML = $(this)["0"].parentElement.children[7].children["0"];
+
+                
+
+            // if($(PriceUnitHTML).val().trim() != "") // Si en la fila actual tiene Price/Unit 
+            // {
+            //     console.log($(PriceUnitHTML).val().trim());
+            //     $(RunningTotalHTML).val(""); // El RunningTotal será vacío.
+            // }
+
+            if ($("#txtAseguradora").val().trim() == "AMTRUST C/O CARLISLE & ASSOC")
+            {
+                if (index == 0)
+                {
+                    if ($(PriceUnitHTML).val().trim() == "" ) // Sólo si la fila actual no tiene PriceUnit se calcula el acumulado.
+                    {
+                        ArregloEntradas[index]["RunningTotal"] = parseFloat(ArregloEntradas[index]["Unit"]);
+                        RunningTotal = parseFloat(ArregloEntradas[index]["Unit"]);
+                    
+                        AcumuladoUnit = parseFloat(ArregloEntradas[index]["Unit"]);
+                    }
+                    else // Si la fila actual tiene PriceUnit el acumulado será cero en esa fila
+                    {
+                        RunningTotal = 0;
+                        AcumuladoUnit = 0;
+
+                        ArregloEntradas[index]["RunningTotal"] = 0;
+                    }
+                }
+                else
+                {
+                    
+                    // if (ArregloEntradas[index]["Unit"] != "")
+                    if ($(PriceUnitHTML).val().trim() == "" ) // Sólo si la fila actual no tiene PriceUnit se calcula el acumulado.
+                    {
+                        // ArregloEntradas[index]["RunningTotal"] = parseFloat(ArregloEntradas[index]["Unit"]) + parseFloat(ArregloEntradas[index - 1]["RunningTotal"]);
+                        ArregloEntradas[index]["RunningTotal"] = parseFloat(ArregloEntradas[index]["Unit"]) + parseFloat(AcumuladoUnit);
+                        RunningTotal = parseFloat(ArregloEntradas[index]["Unit"]) + parseFloat(AcumuladoUnit);
+
+                        AcumuladoUnit = RunningTotal;
+                    }
+                    else // Si la fila actual tiene PriceUnit el acumulado será cero en esa fila.
+                    {
+                        // RunningTotal = 0;
+                        // AcumuladoUnit = 0;
+
+                        // ArregloEntradas[index - 1]["RunningTotal"] = 0;
+                        // $(RunningTotalHTML).val("hola");
+                        
+                        
+                    }
+                }
+            }
+            else
+            {
+                RunningTotal = "";
+                AcumuladoUnit = "";
+            }
+            
+            // console.log(AcumuladoUnit);
+
+
+
+            // Le da formato de dos decimales al RunningTotal.
+            if (AcumuladoUnit != "")
+                $(this).find(".txtRunningTotal").val(AcumuladoUnit.toFixed(2));
+
+            // Hace que para las filas que no contienen entradas el RunningTotal no muestre nada.
+            if ($(this)["0"].parentElement.children["1"].innerText.trim() == "")
+                $(this).find(".txtRunningTotal").val("");
+
+            if($(PriceUnitHTML).val().trim() != "") // Si en la fila actual tiene Price/Unit 
+            {
+                // console.log($(PriceUnitHTML).val().trim());
+                $(RunningTotalHTML).val(""); // El RunningTotal será vacío.
+            }
+
+        });
+        // --------------------------------------------------------------------------------------------------------------
+        // Obtiene los comentarios de cada entrada.
+        otable.column(8).nodes().to$().each(function (index)
+        {
+            ArregloEntradas[index]["Comentario"] = $(this)["0"].children["0"].defaultValue.trim();
+
+            tabindex = index + "8";
+            $(this).children("textarea").attr("tabindex", tabindex);
+
+            $(this).off("change");
+            $(this).off("keyup");
+                 
+            $(this).on("change", function (e)
+            {
+                //debugger
+                BanderaCambioProceso = true;
+
+                ArregloEntradas[parseInt($(this)["0"].parentElement.cells["0"].innerText) - 1]["Comentario"] = e.target.value;
+                $(this)["0"].children["0"].defaultValue = e.target.value; // Para que el valor del comentario quede pegado en el control.
+            });
+           
+            $(this).on("keyup", function (e) 
+            { 
+                if(e.keyCode == 13)
+                {                                        
+                    ArregloEntradas[parseInt($(this)["0"].parentElement.cells["0"].innerText) - 1]["Comentario"] = e.target.value;
+                    $(this)["0"].children["0"].defaultValue = e.target.value; // Para que el valor del comentario quede pegado en el control.
+
+                    Concurrent.Thread.create(MuestraCarga);
+                    $("#txtEnter").val("1");//1 indica que es enter y no mostrara alert modal
+                    $("#btnGuardarEntradas").trigger("click");
+                }
+            });                
+        });
+        // --------------------------------------------------------------------------------------------------------------
+        // Controla el evento click del botón eliminar.
+        otable.column(9).nodes().to$().each(function (index)
+        {
+            var BotonEliminar = $(this).find(".EliminarEntrada");
+            BotonEliminar.off("click");
+            BotonEliminar.on("click", EliminaEntrada);
+        });
+        // --------------------------------------------------------------------------------------------------------------
+        // Columna para almacenar el número de la página.
+        otable.column(11).nodes().to$().each(function (index)
+        {
+            var MaximoIndice = $(this)["0"].parentElement.children["0"].innerHTML;
+            var NumeroPagina = Math.floor(parseInt(MaximoIndice) / 10);
+
+            // $(this)["0"].innerHTML = ;
+
+            // var info = otable.page.info();
+            // PaginaActualGlobal = info.page + 1;   
+            
+            // otable.trigger("page.dt");
+            // console.log(NumeroPagina);
+
+            $(this)["0"].innerHTML = NumeroPagina + 1;
+        });
+
+        // otable.draw();    
+    }
+
+    function IrAPaginaEspecifica(PaginaEspecifica)
+    {            
+        // console.log("muchos 1: " + PaginaEspecifica);
+
+        var table = $('#tblEntradas').dataTable();
+        table.fnPageChange(PaginaEspecifica - 1, true);
+
+        // console.log("dentro de IrAPaginaEspecifica");
+        // console.log("Pagina actual: " + PaginaEspecifica);
+
+        // console.log("muchos 2: " + PaginaEspecifica);
+        // return false;
+    }
+
+    function IrAPaginaEspecificaDepuesDePaginar(PaginaEspecifica)
+    {
+        // var otable2 = $("#tblEntradas").dataTable().fnDestroy();
+        otable2 = $("#tblEntradas").dataTable()
+
+        otable2.fnPageChange(PaginaEspecifica - 1, true);
+    }
+
+    function PaginarTabla()
+    {
+        var otable = $("#tblEntradas").dataTable().fnDestroy();
+        var IndicePrimeraColumna = 1;
+        //alert("PaginarTabla");
+        otable = $("#tblEntradas").DataTable({
+            "pageLength": 10
+            ,"bFilter": false
+            ,"lengthChange":false
+            ,"ordering" : false 
+            ,order: [[10, "asc"]]
+        })
+        .on("page.dt", function(e)
+        {   
+            
+            setTimeout(function()
+            {
+                contador += 1;             
+            
+                var info = otable.page.info();
+                PaginaActualGlobal = info.page + 1;   
+                                
+                ActualizarEntradas(1); // el 1 significa que no va a mostrar el mensaje que confirma el registro.
+				ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val()));
+                ProcesarCadaColumna(otable, IndicePrimeraColumna); // Para que vuelva a recorrer los controles de todas las páginas ya que por defecto no lo hace cuando se pasa de una página a otra.
+                controlaTab();
+                
+                return false;
+            }, 10);
+        });
+
+        if (BanderaElimino)
+        {            
+            ProcesarCadaColumna(otable, IndicePrimeraColumna);
+            IrAPaginaEspecifica(PaginaActualGlobal);
+            BanderaElimino = false;
+            return false;
+        }
+
+        ObtenerEntradasNuevamente(parseInt($("#hdCodigoCaso").val()));        
+        ProcesarCadaColumna(otable, IndicePrimeraColumna);
+    }
+
+    function validaNumeros(e)
+    {
+        // if (e.which == 27)
+        // {
+        // console.log(e);
+        // return false;
+        // $(this)["0"].children["0"].value = $(this)["0"].children["0"].defaultValue;
+        // }
+
+        if (!((e.which >= 48 && e.which <= 57) || (e.which == 40 || e.which == 41) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 46)))//46punto
+        {
+            e.preventDefault();
+            return false;
+        }
+    }
+ 
+    ////////////////////////////////////TAB INDEX/////////////////////////////////////
+    controlaTab();
+    //////////////////////////////////////////////////////////////////////////////////
+  
+    function MensajeError(mensaje, error)
+    {
+        swal({
+            title: error, 
+            text: mensaje
+        });
+    }
+
+    function EliminaEntrada(e)
+    {
+        e.preventDefault();
+                
+        MuestraCarga();
+
+        //alert("EliminaEntrada");
+
+        var CodigoEntrada;
+        var CodigoUsuarioQueElimina;
+        var Resultado;
+
+        CodigoEntrada = 0
+        CodigoUsuarioQueElimina = 0;
+        Resultado = 0;
+
+        CodigoUsuarioQueElimina = CodigoUsuarioGlobal;
+        CodigoEntrada = parseInt($(this).parent("td").parent("tr").find("td:eq(1)").html());
+        
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoEntrada": CodigoEntrada, "CodigoUsuario": CodigoUsuarioQueElimina }),
+            url: '@Url.Action("EliminaEntrada", "DataEntry")',
+            contentType: "application/json",
+            dataType: 'json', 
+            success: function (Dato) 
+            {
+                Resultado = Dato; 
+                
+                Concurrent.Thread.create(function()
+                {
+                    mensaje = "Deleted";
+                    error = "Success";
+                    MensajeError(mensaje, error);
+                    // $("#dvLoading").css("display", "none");
+                });
+            }
+        });
+
+        BanderaElimino = true;
+        // $(".SeleccionarCaso").trigger("click");
+            
+        CargarInformacionCaso($("#hdCodigoPaciente").val(), $("#hdCodigoCaso").val(), "n");
+        
+        console.clear();
+        console.log(BanderaElimino);
+        PaginarTabla();
+    }
+    
+        function ultimaPagina()
+        {
+            console.log("UltimaPagina");
+            var cantidad = @CantidadPaginas;
+            var table = $('#tblEntradas').dataTable();
+        
+            table.fnPageChange(cantidad - 1, true);
+        }
+
+        function RellenarCerosIzquierdaNumero(n, p, c)
+        {
+            var pad_char = typeof c !== 'undefined' ? c : '0';
+            var pad = new Array(1 + p).join(pad_char);
+            return (pad + n).slice(-pad.length);
+        }
+        function controlaTab()
+        {
+                            
+            $('.form-control').on('keydown',function (e) 
+            {
+                
+                console.log("control_keydown");
+                if (e.keyCode==9)
+                {
+                    e.preventDefault();
+                    var tabindex = $(this).attr('tabindex');
+                    console.log(tabindex);
+                    if(tabindex == "03" || tabindex == "04" || tabindex == "05"  || tabindex == "06" || tabindex == "08")
+                    {
+                        tabindex = parseInt(tabindex) + parseInt(1);
+                        tabindex = "0"+tabindex;
+                    }
+                    else 
+                        tabindex ++;
+                
+                
+                    console.log(tabindex);
+
+                    if( $(this).hasClass("txtPriceUnit") ==true)
+                    {              
+                        if( tabindex == "07" )//cantidad ya sumada
+                        {
+                            tabindex = parseInt(tabindex) + parseInt(1);
+                            console.log(tabindex);
+                            tabindex = "0"+tabindex;
+                        }
+                        else 
+                            tabindex ++;
+                        console.log(tabindex);
+                    }             
+                    if( $(this).hasClass("Comentario") ==true)
+                    {
+                        tabindex = parseInt(tabindex) +parseInt(4) ;
+                        console.log(tabindex);                    
+                    }
+
+
+
+                    if( $(this).hasClass("dtpFecha") ==true)
+                    {
+                        //console.log("dtpFecha a act");
+                        $("[tabindex='"+ tabindex +"']").focus(); 
+                    }
+                    else 
+                        $("[tabindex='"+ tabindex +"']").focus();
+                }
+                
+            });
+            
+        }
+
+
+        function MensajeConfirmacion(mensaje, titulo , miFuncion, objetoArgumentos)
+        {
+            // 
+            console.log('estoy estoy estoy estoy estoy estoy estoy estoy estoy estoy ');
+            var respuesta;
+
+            swal({               
+                async: false,
+                title: titulo,
+                text: mensaje,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            },
+            function (isConfirm)
+            {       
+                if (isConfirm)
+                {
+                    
+                    respuesta = true;
+                }
+                else
+                    respuesta = false;
+
+                // 
+                // miFuncion(isConfirm, objetoArgumentos);
+                // miFuncion();
+            })
+
+            return respuesta;
+        }
+
+        /*
+        var RespuestaConfirmacion = function ()
+        {
+            console.log('denro de la función');
+        }
+        */
+
+        function Entrada()
+        {
+            var NumeroCorrelativoEntrada;
+            var CodigoCaso;
+            var CodigoNuevoEntrada;
+            var CodigoAntiguoEntrada;
+            var FechaEntrada;
+            var CodigoActividad;
+            var Unit;
+            var PriceUnit;
+            var Comentario;
+            var CodigoUsuarioGlobal;
+        }
+</script>
+
+
+<style>
+    table.dataTable thead .sorting_asc::after { /*oculta icono ordenacion n tabla*/
+    content: "";
+    display:none;
+}
+
+    table.dataTable thead .sorting::after {/*oculta icono ordenacion n tabla*/
+    content: "";
+    display:none;
+}
+
+</style>

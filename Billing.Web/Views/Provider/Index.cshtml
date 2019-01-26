@@ -1,0 +1,1023 @@
+﻿@model IEnumerable<Billing.Web.Models.Provider>
+
+@{
+    ViewBag.Title = "Provider";
+}
+
+
+<div >
+       <div class="row">
+           <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12" id="divPatient">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title  header_formulario">
+                            <h5>REGISTER PROVIDERS</h5>
+                            
+                        </div>
+                        
+                        <div class="ibox-content" id="frmRegistroProveedor" style="display: none;">
+                            <form method="get" class="form-horizontal"> 
+                                <input type="hidden" id="hdCodigo" />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">First Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre" id="Nombre" autofocus  tabindex="1"/>
+                                    </div>
+                                </div>
+                                @*<div class="hr-line-dashed"></div>*@
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Last Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control letterNombre" id="Apellido" tabindex="2" /> 
+                                        @* 
+                                        <span class="help-block m-b-none">
+                                            A block of help text that breaks onto a new line and may extend beyond one line.
+                                        </span>
+                                         *@
+                                    </div>
+                                </div>
+
+                                @*<div class="hr-line-dashed"></div>*@
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Id Number</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="idNumber" maxlength="12"  tabindex="3" />
+                                    </div>
+                                </div>
+                           
+
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-8 col-sm-offset-2 text-center">
+                                        <button id="btnRegistrar" class="btn btn-primary" type="submit" tabindex="4">Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" tabindex="5" disabled>Update</button>                                        
+                                        <button id="btnCancelar" class="btn btn-danger" type="button" tabindex="5" >Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Provider")">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+           <!--///////////////////LISTA///////////////////////-->
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger"   id="EnlaceCrearNuevo" type="button" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+                        <button type="button" class="btn btn-primary"  id="btnModal" data-toggle="modal" data-target="#myModal4" style="display:none;"></button>
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                         @Html.Partial("Provider_List")
+                    </div>
+                </div>
+            </div>
+            </div>    
+          
+</div>
+
+
+@Html.Partial("footer")
+
+<!--/////////////////////MODAL//////////////////-->
+
+  <div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog"  aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content animated fadeIn">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <i class="fa fa-fa fa-warning modal-icon"></i>
+                                            <h4 class="modal-title">Matches Found</h4>
+                                            <!--<small>Patients were found with similiar names and surnames!.</small>-->
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Provider were found with similiar names and surnames!.</strong> If the Provider attemps to register this in the following list, click Cancel to not register duplicate data, if you are sure that there is no Provider record, click to continue.</p>
+
+
+
+                            <table class="table table-bordered" id="tblModalProvider">
+                                <thead >
+                                <tr>
+                                    <th class="th_tabla"></th>
+                                    <th class="th_tabla">First Name</th>
+                                    <th class="th_tabla">Last Name</th>
+                                    <th class="th_tabla">Id Number</th>
+                                    <th class="th_tabla">Status</th>
+                                    <th class="th_tabla" style="text-align:center;">Select</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                              
+                                </tbody>
+                            </table>
+
+                       
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button id="btnCancelarModal"  type="button" class="btn btn-white" data-dismiss="modal" >Cancel</button>
+                                            <button  id="btnRegistrarModal" type="button" class="btn btn-primary" >Continue</button>
+                                            <input  id="accion" type="hidden" value="registra" />
+                                            <input  id="seleccionado" type="hidden" value="0" />                                                    
+                                            <input  id="estadoSeleccion" type="hidden" value="0" />                                                    
+                                             
+                                        </div>
+                                    </div>
+                            </div>
+</div>
+
+
+
+<!----------------------------------------------->
+
+
+
+
+<script>
+
+    var websocket = io.connect(ServidorPuertoNode);
+    websocket.on('funcionProveedorDesdeNode', function (data) {
+        funcionProveedorDesdeNode_llamada(data);
+    });
+
+    // Función que libera el caso del usuario logueado actualmente.
+    function LiberaCasoDeUsuarioActual(CodigoUsuarioActual) {
+        // console.log(CodigoUsuarioActual);
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuarioActual": CodigoUsuarioActual }),
+            url: '@Url.Action("LiberaCasoDeUsuarioActual", "CaseInformation")',
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
+
+
+    LiberaCasoDeUsuarioActual(CodigoUsuarioGlobal);
+
+    $('input:text').on('keypress', function (e) {
+
+        if (e.which == 13 || e.which == 9 ) {
+           // console.log("xx");
+            currentTabIndex = parseInt($(this).attr("tabindex"));
+
+            currentTabIndex = currentTabIndex + 1;
+            $("input[tabindex=" + currentTabIndex + "]").select();
+            e.preventDefault();
+        }
+
+    });
+    $('input.letter').on('keypress', function (e) {
+
+        console.log(e.which);
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+
+
+
+
+    $('input.letterNombre').on('keypress', function (e) {
+
+        console.log(e.which);
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0 || e.which == 45) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+
+
+    function LimpiarControlesRegistro()
+    {
+        $("#Nombre").val("");
+        $("#Apellido").val("");
+        $("#idNumber").val("");
+    }
+
+    function VerificarContraccionFormularioRegistro() {
+        if ($("#frmRegistroProveedor").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    //function LlenarProveedor(Codigo,
+    //                        Nombre,
+    //                        Apellido,
+    //                        idNumber)
+    //{
+    //    var proveedorJson =
+    //        {
+    //        "Pro_code": Codigo,
+    //        "Pro_firstName": Nombre,
+    //        "Pro_lastName": Apellido,
+    //        "Pro_number": idNumber
+    //    }
+    //    return proveedorJson;
+    //}
+
+    function RegistrarProveedor(e)////////////////registrando
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Last name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else
+        {
+            e.preventDefault();
+
+
+            var proveedor = LlenarProveedor(0
+                                          , $("#Nombre").val().trim()
+                                          , $("#Apellido").val().trim()
+                                          , $("#idNumber").val().trim());
+
+
+            // Primero verifica que no exista un proveedor homónimo.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(proveedor),
+                url: '@Url.Action("BuscarHomonimos", "Provider")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    console.clear();
+                    console.log(Data);
+
+                    if (!Data.Resultado) // Si no se encuentran homónimos
+                    {
+                        // Llamará al código que registrará al provider.
+                        
+                        metodoRegistraProvider(e,proveedor);
+                    }
+                    else // Si se encontraron homónimos.
+                    {
+                        // Muestra las coincidencias de hómónimos.
+                        console.log("xxxxx");
+                        llenaModal(Data, 'registra');
+                    }
+
+                }
+            });
+
+
+
+
+        }
+    }
+
+
+
+    function EditarProveedor(e)
+    {
+        e.preventDefault();
+
+        var otable = $("#tblProveedor").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+        
+
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+
+        /* 
+        La siguiente línea obtiene el código del proveedor seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del proveedor seleccionado. 
+        */
+        var CodigoProveedor = $(this).parent().parent().find("td:eq(0)").html();
+
+        console.clear();
+        console.log(CodigoProveedor);
+
+        var Proveedor;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoProveedor) }),
+            url: '@Url.Action("ObtenerDatosParaEditar", "Provider")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Proveedor = (Data);
+                $("#frmRegistroProveedor").css("display", "block");
+            }
+        });
+
+        var position = $("#divPatient").position();
+        scroll(0, position.top);
+  
+        // myDate = convierteFecha(Proveedor.Pat_birthday);
+        // Proveedor.Pat_birthday = myDate;
+
+        
+        console.log(Proveedor);
+
+        CargarDatosFormulario(Proveedor); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+        $("#divPatient").find("#Nombre").focus();
+        
+        $("#apos").val(aPos);
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+    function LlenarProveedor(Codigo,
+                        Nombre,
+                        Apellido,
+                        idNumber) {
+        var proveedorJson =
+            {
+                "Pro_code": Codigo
+                ,"Pro_firstName": Nombre.toUpperCase()
+                ,"Pro_lastName": Apellido.toUpperCase()
+                ,"Pro_number": idNumber.toUpperCase()
+                ,"Pro_operatorUser": CodigoUsuarioGlobal
+                }
+
+        return proveedorJson;
+    }
+
+
+    function MensajeError(mensaje,error)
+    {
+            swal({
+                title: mensaje,
+                text: error
+            });
+    }
+
+    function EliminaProveedorModal(e)
+    {
+        e.preventDefault();
+
+        var codPro = $(this).parent().parent().find("td:eq(0)").html();
+        var nomPro = $(this).parent().parent().find("td:eq(1)").html();
+        var apePro = $(this).parent().parent().find("td:eq(2)").html();
+
+        dato = nomPro.trim() + " " + apePro.trim();
+
+        //var otable = $("#tblProveedor").dataTable();
+        //var target_row = $(this).closest("tr").get(0);
+        //var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        $("#frmRegistroProveedor").css("display", "none");
+
+        swal({
+            title: "Do you want to delete this provider?",
+            text: "You will not be able to recover the information from " + dato +"!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                swal("Deleted!", "Your file information has been deleted.", "success");
+                //EliminarProveedor(codPro, aPos, otable);
+                EliminarProveedor(codPro);
+
+                // En "EliminaPacienteModal".
+                actualizaTrazabilidad(codPro, nomPro, apePro)
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated !!", "error");
+                return 0;
+            }
+        });
+    }
+
+
+    function CancelarRegistro()
+    {
+        $("#frmRegistroProveedor").css("display", "none");
+        LimpiarControlesRegistro();
+        $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+        $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Proveedor)
+    {        
+
+        $("#frmRegistroProveedor").css("display", "block");
+
+        $("#hdCodigo").val(Proveedor.Pro_code);
+        $("#Nombre").val(Proveedor.Pro_firstName);
+        $("#Apellido").val(Proveedor.Pro_lastName);
+        $("#idNumber").val(Proveedor.Pro_number);
+
+    }
+
+
+
+    
+
+    function ActualizarDatos(e)////////////////actualizando
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Last name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }    
+        else {
+            /////////////////////////////////////////////////////////////////////////////
+
+            e.preventDefault();
+          
+            aPos = $("#apos").val();
+
+            var proveedor = LlenarProveedor($("#hdCodigo").val().trim()
+                                          , $("#Nombre").val().trim()
+                                          , $("#Apellido").val().trim()
+                                          , $("#idNumber").val().trim());
+
+
+            // Primero verifica que no exista un proveedor homónimo.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(proveedor),
+                url: '@Url.Action("BuscarHomonimos", "Provider")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    console.clear();
+                    console.log(Data);
+
+                    if (!Data.Resultado) // Si no se encuentran homónimos
+                    {
+                        // Llamará al código que registrará al provider.
+                        console.log("xxAki");
+                        metodoActualizaProvider(e,proveedor, "activo");
+                    }
+                    else // Si se encontraron homónimos.
+                    {
+                        // Muestra las coincidencias de hómónimos.
+                        console.log("xxxxx");
+                        llenaModal(Data, 'actualiza');
+                    }
+
+                }
+            });
+
+
+
+
+        }
+    }
+
+
+
+
+    function EliminarProveedor(CodigoProveedor)
+    //function EliminarProveedor(CodigoProveedor, pos, otable)
+    {
+        $("#frmRegistroProveedor").css("display", "none");
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoProveedor) }),
+            url: '@Url.Action("Delete", "Provider")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+
+                if (Data[0].ProviderErrorCode == 50000) { /// 50000 es el nro de error general 
+                    mensaje = Data[0].ErrorMessage //"You can not delete patient he has an active case!!!";
+                    MensajeError("Error!", mensaje);
+                    
+                }
+                else
+                {
+                    Proveedor = (Data);
+                    dato = "";
+                    recargaInformacionTabla(dato);
+                    controlaTab();
+
+                    websocket.emit('funcionActualizacionTablaProveedorNode', 'Mantenedor_Proveedores');
+                    websocket.on('funcionProveedorDesdeNode', function (data) {
+                        funcionProveedorDesdeNode_llamada(data);
+                    });
+
+
+                }
+            }
+        });
+    }
+
+
+
+
+
+    
+
+    function AgregaFila(Proveedor) {
+    //function AgregaFila(Proveedor, CodPatNew) {
+        ////Proveedor.Cit_code = "--";
+        ////console.log(Proveedor);
+        ////console.log("agregaFila");
+        ////$('#tblProveedor').dataTable().fnAddData([
+        ////  CodPatNew, Proveedor.Pro_firstName, Proveedor.Pro_lastName, Proveedor.Pro_number, '<a class="btn EditarProveedor btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarProveedor  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>']);
+
+        ////var otable = $("#tblProveedor").dataTable().fnDestroy();
+        ////otable = $('.dataTables-example').DataTable({
+        ////    columnDefs: [{ className: "hidden", "targets": [0] }],
+        ////    dom: '<"html5buttons"B>lTfgitp',
+        ////    buttons: [
+        ////        { extend: 'copy' },
+        ////        { extend: 'csv' },
+        ////        { extend: 'excel', title: 'ExampleFile' },
+        ////        { extend: 'pdf', title: 'ExampleFile' },
+
+        ////        {
+        ////            extend: 'print',
+        ////            customize: function (win) {
+        ////                $(win.document.body).addClass('white-bg');
+        ////                $(win.document.body).css('font-size', '10px');
+
+        ////                $(win.document.body).find('table')
+        ////                        .addClass('compact')
+        ////                        .css('font-size', 'inherit');
+        ////            }
+        ////        }
+        ////    ]
+        ////});
+        dato = Proveedor.Pro_firstName + " " + Proveedor.Pro_lastName;
+        //otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+        ///otable =  $("#tblPacientes").dataTable({ "columnDefs": [{className:"hidden","targets": [0,6,8]}]  });
+
+        websocket.emit('funcionActualizacionTablaProveedorNode', 'Mantenedor_Proveedores');
+        websocket.on('funcionProveedorDesdeNode', function (data) {
+            funcionProveedorDesdeNode_llamada(data);
+        });
+    }
+
+    function EditaFila(Proveedor) {
+    //function EditaFila(Proveedor, pos, otable) {
+        //////Proveedor.Cit_code = "--";
+        //////Proveedor.Sta_code = "--";
+        //////console.log("pruebas");
+        //////console.log(Proveedor.Pro_code);
+        //////console.log("----");
+        //////console.log(Proveedor);
+        //////otable.fnUpdate([
+        //////Proveedor.Pro_code, Proveedor.Pro_firstName, Proveedor.Pro_lastName,Proveedor.Pro_number, '<a class="btn EditarProveedor btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarProveedor btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>'], pos, undefined, true);
+
+  
+        dato = Proveedor.Pro_firstName + " " + Proveedor.Pro_lastName;
+        ///otable = $('.dataTables-example').dataTable().fnFilter(dato);
+        recargaInformacionTabla(dato);
+
+        websocket.emit('funcionActualizacionTablaProveedorNode', 'Mantenedor_Proveedores');
+        websocket.on('funcionProveedorDesdeNode', function (data) {
+            funcionProveedorDesdeNode_llamada(data);
+        });
+
+    }
+
+    function recargaInformacionTabla(dato_busca)
+    {
+        console.log("recargaInformacionTabla");
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListarProveedorTabla", "Provider")',
+            contentType: false,
+            contentType: false,
+            success: function (Data) {
+                console.log("correcto");
+                $('#tblProveedor').DataTable().ajax.reload();
+                if (dato_busca != "")
+                    setTimeout(function () { otable = $('#tblProveedor').dataTable().fnFilter(dato_busca) }, "1000");
+                else {
+                    console.log("limpiaFiltro");
+                    setTimeout(function () { otable = $('#tblProveedor').dataTable().fnFilter("") }, "1000");
+                }
+            }
+        });
+    }
+
+    var websocket = io.connect(ServidorPuertoNode);
+
+    $(document).ready(function () 
+    {
+        // Actualiza la variable globlal "ProcesoActual" declarada en index.cshtml de MasterViewer con el nombre del proceso donde se está actualmente (Para los mantenedores se actualiza con una cadena vacía ya que no se requiere mostrar una advertencia cuando se abandona alguno de ellos).
+        ProcesoActual = "";
+        // console.log(ProcesoActual);        
+
+    
+
+        // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+        $("#EnlaceCrearNuevo").on("click", function (e) {
+
+            e.preventDefault();
+
+            LimpiarControlesRegistro();
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+            if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+                $("#frmRegistroProveedor").css("display", "block");
+
+
+            var position = $("#divPatient").position();
+            scroll(0, position.top);
+            $("#divPatient").find("#Nombre").focus();
+        });
+
+        $("#btnRegistrar").on("click", RegistrarProveedor); // Dispara la función que registra un Proveedor, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblProveedor > tbody").on("click", "tr > td > .EditarProveedor", EditarProveedor); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblProveedor > tbody").on("click", "tr > td > .EliminarProveedor", EliminaProveedorModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+        $("#btnRegistrarModal").on("click", registraActualizaModalProvider);
+        controlaTab();
+    });
+
+    function controlaTab() {
+
+        $('.form-control').on('keydown', function (e) {
+            //
+            console.log("control_keydown");
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                var tabindex = $(this).attr('tabindex');
+                console.log(tabindex);
+                tabindex++;
+                console.log(tabindex);
+                $("[tabindex='" + tabindex + "']").focus();
+            }
+
+        });
+    }
+
+
+    function llenaModal(Data, accion) {
+       
+        $("#seleccionado").val(0);
+        ///////////////////////////////////////////////////////////////        
+
+        $("#tblModalProvider").DataTable().clear();
+        $.each(Data.Resultado, function (i, val) {
+            if (val.Pro_firstName != null || val.Pro_lastName != null)
+            {
+                if (val.Pro_status == true)
+                    status = "Active";
+                else
+                    status = "Inactive";
+
+                $('#tblModalProvider').dataTable().fnAddData([
+                    val.Pro_code, val.Pro_firstName, val.Pro_lastName, val.Pro_number, status, "<input type='radio'  name='idRadio' value='" + val.Pro_code + "'>"]);
+            }
+        });
+
+
+        var otable = $("#tblModalProvider").dataTable().fnDestroy();
+        otable = $('#tblModalProvider').DataTable({
+            //columnDefs: [{ className: "hidden", "targets": [0] }],
+            columnDefs: [{ className: "text-center", "targets": "_all" }],
+            columnDefs: [{ className: "hidden", "targets": [0] }]
+            
+        });
+
+        $("#accion").val(accion);
+        $("#btnModal").trigger("click");
+
+    }
+
+    // Esta función se ejecuta para actualizar el mantenedor de auditoría a través de node.
+    function actualizaTrazabilidad(codigoProveedor, nombreProveedor, apellidoProveedor)
+    {
+        var parametros
+
+        parametros = {
+            'codigoProveedorActualizado': codigoProveedor
+           , 'nombreProveedorActualizado': nombreProveedor
+           , 'apellidoProveedorActualizado': apellidoProveedor
+        }
+
+        websocket.emit('actualizaTrazabilidadProveedor', parametros)
+    }
+
+    function metodoRegistraProvider(e,proveedor) 
+    {
+        e.preventDefault();
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(proveedor),
+            url: '@Url.Action("Create", "Provider")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data[0].ErrorMessage == "") {
+                        AgregaFila(proveedor, Data[0].ProviderErrorCode);
+                        mensaje = "Success!";
+                        error = "Data saved Successfully!!!";
+                        MensajeError(mensaje, error);
+                        $("#frmRegistroProveedor").css("display", "none");
+
+                        // En "metodoRegistraProvider".
+                        actualizaTrazabilidad(proveedor.Pro_code, proveedor.Pro_firstName, proveedor.Pro_lastName)
+                    }
+                    else {
+                        if (Data[0].PatientErrorCode == 2601) {
+                            $("#NumeroSeguroSocialD").focus();
+                            mensaje = "The social security number already exists";
+                        }
+                        else
+                            mensaje = "Error in register!!";
+
+                        error = Data[0].ErrorMessage;
+                        codigo = Data[0].PatientErrorCode;
+                        MensajeError(mensaje, Data[0].ErrorMessage);
+                    }
+                }
+            })
+
+    }
+
+    function metodoActualizaProvider(e,Proveedor, activo)
+    {
+        e.preventDefault();
+        aPos = $("#apos").val();
+        console.log("registraActualizaModalProvider");
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify(Proveedor),
+            url: '@Url.Action("ActualizarDatos", "Provider")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    ProveedorX = Proveedor;
+                    Proveedor = (Data);
+                    
+                    if (Data[0].ErrorMessage == "")
+                    {
+                        var codNew = Data[0].ProviderErrorCode;//aqui envia  codigo del actualizado
+                        //var otable = $("#tblProveedor").dataTable();
+
+                        if (aPos <= 0)
+                        {
+                            console.log("nuevo - modal");
+                            //aPos = otable.fnGetPosition($("#" + ProveedorX.Pro_code).closest('tr')[0]);
+                        }
+                        else {
+                            console.log("edicion - modal");
+                            if ($("#seleccionado").val() > 0 && activo == "activo")//si es activo toma el valor de la fila, si es inactivo agregara
+                            {
+                                console.log("edicion - modal - 2");
+                                //aPos = otable.fnGetPosition($("#" + codNew).closest('tr')[0]);
+                            }
+                        }
+                        console.log("registraActualizaModalProvider");
+
+                        
+                        if (activo == "inactivo")
+                            AgregaFila(ProveedorX);
+                            //AgregaFila(ProveedorX, codNew);
+                        if (activo == "activo")
+                            EditaFila(ProveedorX);
+                            //EditaFila(ProveedorX, aPos, otable);
+
+                        
+                        mensaje = "Success!";
+                        error = "Data Saved Successfully!!!";
+                        LimpiarControlesRegistro();
+                        $("#frmRegistroProveedor").css("display", "none");
+
+                        // En "metodoActualizaProvider".
+                        actualizaTrazabilidad(ProveedorX.Pro_code, ProveedorX.Pro_firstName, ProveedorX.Pro_lastName)
+                    }
+                    else {
+
+                        mensaje = "Error!";
+                        error = Data[0].ErrorMessage + "...";
+                        $("#NumeroSeguroSocialD").focus();//el error solo se muestra en SSD
+                    }
+
+
+                    MensajeError(mensaje, error);
+
+                }
+            });
+   
+     }
+
+
+    function registraActualizaModalProvider(e) //mg
+    {
+
+        accion = $("#accion").val();
+        seleccionado = $("#seleccionado").val();
+        estadoSeleccion = $("#estadoSeleccion").val();
+        
+        if(seleccionado >0) 
+            $("#hdCodigo").val(seleccionado);//doy valor al codigo de cliente, codigo tomado desde modal, para que asi se pueda modificar
+
+        var Proveedor = LlenarProveedor($("#hdCodigo").val()
+                              , $("#Nombre").val().trim()
+                              , $("#Apellido").val().trim()
+                              , $("#idNumber").val().trim())
+
+
+
+        if (seleccionado > 0)//si selecciono alguna fila
+        {
+            if (estadoSeleccion == "Inactive") // si el estado de la fila seleccionada es inactivo
+            {
+                ////////////////// Pregunta cuando esta inactivo
+                swal({
+                    title: "Do you want to active provider?",
+                    text: "You will not be able to recover the information !",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, activate it!",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                },
+               function (isConfirm) {
+                   if (isConfirm) {
+                       //swal("Ok!", "Your information has been saved.", "success");
+                       console.log("registraActualizaModalProvider");
+                       metodoActualizaProvider(e, Proveedor,"inactivo");
+                       $("#btnCancelarModal").trigger("click");
+                       $("#btnCancelar").trigger("click");
+                   }
+                   else {
+                       swal("Cancelled", "The information was not saved !!", "error");
+                       return 0;
+                   }
+               });
+
+            } // cuando el estado de la fila es activo
+            else {
+                
+            
+                metodoActualizaProvider(e,Proveedor,"activo");
+                error = "Data Saved Successfully!!!";
+                mensaje = "Success!";
+                MensajeError(mensaje, error);
+                $("#btnCancelarModal").trigger("click");
+                $("#btnCancelar").trigger("click");
+            }
+
+
+        }
+        else// cuando no selecciono nada
+        {
+          
+            if (accion=='registra')
+                metodoRegistraProvider(e, Proveedor);
+            else 
+                metodoActualizaProvider(e, Proveedor, "activo");
+
+            $("#btnCancelarModal").trigger("click");
+            $("#btnCancelar").trigger("click");
+        }
+    }
+
+
+    $("#tblModalProvider tbody").on('click', 'tr', function ()  //selecciona fila de tabla  
+    {
+
+        var name;  // pro_firstname
+        var apellido;// pro_lastname
+        var idnumber; // pro_number        
+        var status; // Ins_status
+        var codigo; // Ins_code
+        var seleccionado;
+
+
+        var aPos = $("#tblModalProvider").dataTable().fnGetPosition(this);
+        var aData = $("#tblModalProvider").dataTable().fnGetData(aPos);
+
+        console.log(aData);
+        codigo = aData[0];        
+        status = aData[4];
+        
+
+
+        console.log(status);
+        console.log(codigo);
+
+        var $radios = $("input:radio[name=idRadio]");
+        $radios.filter('[value=' + codigo + ']').prop('checked', true);
+        $("#seleccionado").val(codigo);
+        $("#estadoSeleccion").val(status);
+        
+
+    });
+
+
+
+
+    function funcionProveedorDesdeNode_llamada(data) {
+        // debugger;
+        console.log("funcion_n_Proveedor");
+        console.log(data);
+        dato_busca = ""; // este campo se usa para filtro en tabla
+        //var otable = $("#tblActividad").dataTable();
+        recargaInformacionTabla(dato_busca);
+    }
+
+
+
+</script>          

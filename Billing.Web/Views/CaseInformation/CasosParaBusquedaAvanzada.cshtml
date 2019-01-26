@@ -1,0 +1,275 @@
+﻿@model IEnumerable<Billing.Web.Models.CasoBusquedaAvanzada>
+
+
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblCasos">
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th> 
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden"> 
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th> 
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                               
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th> 
+                    STATUS
+                </th>
+                <th>
+                    SELECT
+                </th>
+            </tr>
+        </thead>
+        <tbody style="display: none;">
+        @foreach (var item in Model) 
+        {
+            <tr id="@Html.DisplayFor(modelItem => item.CaseCode)">  
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.CaseCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClaimNumber)
+                </td>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.PatientCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Patient)
+                </td>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.Patient2 )
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Insurer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccidentDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+              <td style="text-align: center;">
+                    <a href="#detalleCase" class="btn SeleccionarCaso btn-danger btn-bitbucket" >Select</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+@*       <tbody style="display: none;">
+       
+            <tr >  
+                <td class="hidden">                   
+                </td>
+                <td>                 
+                </td>
+                <td class="hidden">                   
+                </td>
+                <td>                    
+                </td>
+                <td class="hidden">                
+                </td>
+                <td>                   
+                </td>
+                <td>                  
+                </td>
+                <td>                 
+                </td>            
+                <td>                 
+                </td>            
+            </tr>        
+        </tbody>*@
+        <tfoot>
+            <tr>
+                <th class="hidden">
+                    CASE CODE
+                </th>
+                <th >         
+                    CLAIM #               
+                </th>
+                <th class="hidden">
+                    PATIENT CODE                                                                                                                                                                           
+                </th>
+                <th>
+                    PATIENT                                                                                                                                                                                                   
+                </th>
+                <th class="hidden">
+                    PATIENT  LAST NAME                                                                                                                                                                                                 
+                </th>
+                <th>
+                    INSURER                                                                                              
+                </th>
+                <th>
+                    ACCIDENT DATE
+                </th>
+                <th>
+                    STATUS
+                </th>
+                <th>SELECT</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<script>
+    $(Inicio);
+
+    function Inicio() {
+        // console.log("vista_parcial");
+        //llenaTest();
+        PaginarTabla();
+        OcultarControlesDecorativosDataTable();
+        $("#TablaParaBusquedaAvanzadaCasos").on("keyup", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#TablaParaBusquedaAvanzadaCasos").on("input", "#tblCasos_wrapper > #tblPacientes_filter > label > .form-control", MostrarOcultarCoincidencias);
+        $("#tblCasos_filter").css({ "display": "none" });
+        //antes en index
+        $("#tblCasos > tbody").on("click", "tr > td > .SeleccionarCaso", SeleccionarCaso);
+        //$(".SeleccionarCaso").on("click", SeleccionarCaso);
+
+
+        //agregado
+        //$("#tblCasos > tbody").css({ "display": "table-row-group" });
+        //$("#tblCasos_paginate").css("display", "block");
+
+    }
+
+    function PaginarTabla() {
+        var otable = $("#tblCasos").dataTable().fnDestroy();
+
+        otable = $("#tblCasos").DataTable({
+            "pageLength": 5,
+            //"columnDefs": [{ "targets": [0, 1, 2, 3, 5, 6, 7], "searchable": false }]
+            "columnDefs": [{ "targets": [0, 1, 2, 4, 5, 6, 7], "searchable": false }],
+            //"deferRender":true
+            //"proccessing": true,
+            //"serverSide": true 
+
+        });
+        // console.log("fin_paginarTabla");
+    }
+
+    function OcultarControlesDecorativosDataTable() {
+        $("#tblCasos_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+           
+    }
+
+
+    function MostrarOcultarCoincidencias(e) {
+
+        //console.log("ert");
+        //console.log($(this).val().trim());
+
+        if ($(this).val().trim() == "")
+            $("tbody").css({ "display": "none" });
+        else
+            $("tbody").css({ "display": "table-row-group" });
+    }
+
+
+    function llenaTest()
+    {
+        var objeto = null;
+        console.log("************************************************************************");
+       $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("testListaCasosParaBusquedaAvanzada", "CaseInformation")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    //console.log(Data);
+                    //objeto = JSON.stringify(Data);
+                    objeto = Data;
+                    //console.log(objeto);
+                    //EstadosPais = Data;
+                    //ListaPacientes = Data;
+                }
+        });
+
+          //$("#tblPacientes").DataTable().clear(); //mg
+        console.log("************************************************************************");
+        var otable = $("#tblCasos").dataTable().fnDestroy();
+
+        otable = $("#tblCasos").DataTable({
+            "data": objeto,
+            "deferRender": true
+            @*"ajax": {
+                "type": "POST",
+                "dataSrc":"Data",
+                "url": '@Url.Action("testListaCasosParaBusquedaAvanzada", "CaseInformation")',
+                "columns": [
+                    { "data": "CaseCode" },
+                    { "data": "ClaimNumber" },
+                    { "data": "PatientCode" },
+                    { "data": "Patient" },
+                    { "data": "Patient2" },
+                    { "data": "Insurer" },
+                    { "data": "AccidentDate" },
+                    { "data": "Status" }
+                           ]
+            }*@
+
+        });
+
+        @*otable = $("#tblCasos").DataTable({
+            "ajax": {
+                "url": '@Url.Action("testListaCasosParaBusquedaAvanzada", "CaseInformation")',
+                "contentType": "application/json",
+                "dataType": 'json',
+                "type": "POST",
+            },
+            "bDestroy" : true,
+            "columns": [
+                { "data": "CASE CODE" },
+                { "data": "CLAIM #" },
+                { "data": "PATIENT CODE" },
+                { "data": "PATIENT" },
+                { "data": "PATIENT  LAST NAME" },
+                { "data": "INSURER" },
+                { "data": "ACCIDENT DATE" },
+                { "data": "STATUS" }
+            ]
+        });*@
+
+
+
+
+
+        //return false;
+        //$.each(ListaPacientes, function (i, Paciente) {
+        //        $('#tblPacientes').dataTable().fnAddData([
+        //            Paciente.Pat_code, Paciente.Pat_firstName, Paciente.Pat_lastName, Paciente.Pat_birthday, Paciente.Pat_socialSecurityNumberD, Paciente.Pat_address, Paciente.Cit_code, Paciente.Pat_city,
+        //             Paciente.Sta_code, Paciente.Pat_state, Paciente.Pat_zipCode, Paciente.Pat_zipCodeExt, Paciente.Pat_phone, Paciente.Pat_fax, Paciente.Pat_sex, '<a class="btn EditarPaciente btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarPaciente  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>']);
+            
+        //});
+
+        //var otable = $("#tblPacientes").dataTable().fnDestroy();
+        //otable = $('#tblPacientes').DataTable({
+        //    columnDefs: [{ className: "hidden", "targets": [0] }]
+        //});
+
+
+        //return false;
+      
+
+    
+    }
+
+
+</script>

@@ -1,0 +1,1174 @@
+﻿@model IEnumerable<Billing.Web.Models.PPatient>
+
+@{
+    ViewBag.Title = "Patient";
+}
+
+
+@*<div class="wrapper wrapper-content animated fadeInRight" >*@
+<div>
+    
+          <div class="row">
+
+                               <!--///////////////////FORMULARIO///////////////////////-->
+                <div class="col-lg-12"  id="divPatient">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title header_formulario">
+                        <h5>REGISTER PATIENT</h5>
+
+                    </div>
+                    <div id="frmRegistroPaciente" class="ibox-content" style="display: none;"  >
+                        <div class="row">
+                             <form method="get" class="form-horizontal" >
+                                <input type="hidden" id="hdCodigo" />
+                            <div class="col-sm-6 b-r">
+                                    <div class="form-group">
+                                    <label class="col-sm-3 control-label">First Name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control letter" id="Nombre" tabindex="1" autofocus />
+                                    </div>
+                                    </div>
+                                    <div class="form-group">
+                                    <label class="col-sm-3 control-label">Last name<span style="color:red; font-size:15px;"> (*)</span></label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control letter" tabindex="2" id="Apellido" /> 
+                                    </div>
+                                   </div>
+                                <div id="FechaBirthday" class="form-group">
+                                <label class="col-sm-3 control-label">Birthday</label>
+                                <div style="padding-left: 16px;padding-right: 16px;" class="input-group date col-sm-9">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" readonly="" value="" id="FechaNacimiento" class="form-control" tabindex="3">
+                                </div>
+                            </div>
+                                    <div class="form-group">
+                                    <label class="col-sm-3 control-label">Ssn</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="NumeroSeguroSocialD" tabindex="4" data-mask ="999-99-9999"  />
+                                    </div>
+                                    </div>
+
+                                     <div class="form-group">
+                                    <label class="col-sm-3 control-label">Address</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="Direccion" tabindex="5"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">State<span style="color:red; font-size:15px;"> (*)</span>
+                                        <a href="#"  data-toggle="tooltipA" data-placement="top" title="Type a word to find matches -  (if you do not belong to any state, select the -NONE- option from the list)">?</a>
+                                    </label>
+                                    
+                                    <div class="col-sm-9">
+                                        <!--<span style="font-size: 0.8em; font-style: normal;">type a word to find matches</span>
+                                        <span style="color:red; font-size: 0.8em; font-style: italic;">(if you do not belong to any state, select the "NONE" option from the list)</span>-->
+                                        <input type="hidden" id="hdAbreviaturaEstadoPais" />
+                                        <input type="text" class="form-control" id="EstadoPais" tabindex="6"/>                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">City<span style="color:red; font-size:15px;"> (*)</span> 
+                                    <a href="#"  data-toggle="tooltipB" data-placement="top" title="Type a word to find matches">?</a>
+                                    </label>                                    
+                                    <div class="col-sm-9">
+                                        <input type="hidden" id="hdCiudad" />
+                                        <input type="text" class="form-control" id="Ciudad" tabindex="7"/>
+                                    </div>
+                                </div>
+
+                                    <div class="col-lg-offset-2 col-lg-10">
+                                        <button id="btnRegistrar" class="btn btn-danger" type="submit" style="background-color: #b42734;">Register</button>
+                                        <button id="btnActualizar" class="btn btn-white" type="button" disabled>Update</button>
+                                        <button id="btnCancelar" class="btn btn-danger" type="button" style="background-color: #b42734;">Cancel</button>
+                                        <input type="hidden" id="apos" value="0" >
+                                        <input type="hidden" id="atable" value="0" >
+                                        <input type="hidden" id="url" value="@Url.Action("Create", "Patient")">
+                                    </div>
+                                    
+                               
+                            </div>
+                            <div class="col-sm-6"> 
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Zip code</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" maxlength ="5" class="form-control"  id="CodigoPostal" tabindex="8"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Zip code ext</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" maxlength ="4" class="form-control" id="ExtensionCodigoPostal"  tabindex="9"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Phone</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="Telefono"  data-mask ="999-999-9999" placeholder="" tabindex="10"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Alt phone</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="TelefonoAlternativo" data-mask ="999-999-9999" tabindex="11"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Sex</label>
+                                    <div class="col-sm-9">
+                                        <input type="radio" name="Sexo" class="OpcionSexo" id="rdbMasculino" value="M" style="cursor: pointer;" selected ="selected"/> &nbsp Male
+                                        <input type="radio" name="Sexo" class="OpcionSexo" id="rdbFemenino" value="F"  style="cursor: pointer;" /> &nbsp Female
+                                    </div>
+                                </div>
+
+                            </div>
+                                 </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                </div>
+
+
+
+       <div class="row">
+           
+           <!--///////////////////LISTA///////////////////////-->
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <button class="btn btn-danger"   id="EnlaceCrearNuevo" type="button" style="background-color: #b42734;" >
+                            <i class="fa fa-paste"></i> Create New
+                         </button>
+
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblPacientes" >
+                    <thead style="background-color: #b42734;color: white;">
+                    <tr>
+        <th class="hidden tabla_celda"></th>
+        <th >         
+            FIRST NAME
+        </th>
+        <th class="tabla_celda">
+            LAST NAME
+        </th>
+        <th class="tabla_celda">
+            BIRTHDAY
+        </th>
+        <th class="tabla_celda">
+            SSN
+        </th>
+        <th class="tabla_celda">
+            ADDRESS
+        </th>
+        <th style="display: none;">
+            CITY CODE
+        </th>
+        <th class="tabla_celda">
+            CITY
+        </th>
+        <th style="display: none;">
+            STATE CODE
+        </th>
+        <th class="tabla_celda">
+            STATE
+        </th>
+        <th class="tabla_celda">
+            ZIP CODE
+        </th>
+        <th class="tabla_celda">
+            ZIP CODE EXT
+        </th>
+        <th class="tabla_celda">
+            PHONE
+        </th>
+        <th class="tabla_celda">
+            ALT PHONE
+        </th>
+        <th class="tabla_celda">
+            SEX
+        </th>                               
+        <th class="tabla_celda">
+            OPERATIONS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+ 
+@foreach (var item in Model) {
+    <tr>
+        <td class="hidden">
+            @Html.DisplayFor(modelItem => item.Pat_code)
+        </td>
+        @*
+        <td>
+            @Html.DisplayFor(modelItem => item.Pat_code_old)
+        </td>
+        *@
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_firstName)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_lastName)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.FechaSistemaToString )
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_socialSecurityNumberD)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_address)
+        </td>
+        <td style="display: none;">
+            @Html.DisplayFor(modelItem => item.Cit_code)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Pat_city)
+        </td>
+        <td style="display: none;">
+            @Html.DisplayFor(modelItem => item.Sta_code)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_state)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_zipCode)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_zipCodeExt)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_phone)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_fax)
+        </td>
+        <td class="tabla_celda">
+            @Html.DisplayFor(modelItem => item.Pat_sex)
+        </td>       
+        <td class="tabla_celda">
+            <a href="#divPatient" class="btn EditarPaciente btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; 
+            <a class="btn EliminarPaciente btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger" /> </a>
+        </td>
+    </tr>
+}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+        
+        <th style="display: none;">
+            @Html.DisplayNameFor(model => model.Pat_code)
+        </th>
+        @*
+        <th>
+            @Html.DisplayNameFor(model => model.Pat_code_old)
+        </th>
+        *@
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_firstName)*@
+            FIRST NAME
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_lastName)*@
+            LAST NAME
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_birthday)*@
+            BIRTHDAY
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_socialSecurityNumberD)*@
+            SSN
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_address)*@
+            ADDRESS
+        </th>
+        <th style="display: none;" class="tabla_celda">
+            CITY CODE
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_city)*@
+            CITY
+        </th>
+        <th style="display: none;" class="tabla_celda"> 
+            STATE CODE
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_state)*@
+            STATE
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_zipCode)*@
+            ZIP CODE
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_zipCodeExt)*@
+            ZIP CODE EXT
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_phone)*@
+            PHONE
+        </th>
+        <th class="tabla_celda">
+            @*@Html.DisplayNameFor(model => model.Pat_fax)*@
+            ALT PHONE
+        </th>
+        <th class="tabla_celda">
+            SEX
+        </th>         
+        <th class="tabla_celda">OPERATIONS</th>
+                    </tr>
+                    </tfoot>
+                    </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            </div>    
+          
+</div>
+
+
+@Html.Partial("footer")
+
+
+
+<style>
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td 
+{
+  padding: 4px;
+}
+
+</style>
+
+<script>
+    
+
+    $('input.letter').on('keypress', function (e) {
+
+        if ((e.which == 209 || e.which == 241) || (e.which == 225 || e.which == 233 || e.which == 237 || e.which == 243 || e.which == 250) || (e.which == 46 || e.which == 193 || e.which == 190 || e.which == 201 || e.which == 205 || e.which == 211 || e.which == 218)) {
+
+        } else {
+            if (!((e.which >= 65 && e.which <= 90) || (e.which == 32 || e.which == 8 || e.which == 0) || (e.which >= 97 && e.which <= 122))) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        $('[data-toggle="tooltipA"]').tooltip();
+        $('[data-toggle="tooltipB"]').tooltip();
+    });
+
+
+    function LimpiarControlesRegistro()
+    {
+        $("#Nombre").val("");
+        $("#Apellido").val("");
+        $("#NumeroSeguroSocialD").val("");
+        $("#Direccion").val("");
+
+        $("#hdAbreviaturaEstadoPais").val("");
+        $("#EstadoPais").val("");
+        $("#hdCiudad").val("");
+        $("#Ciudad").val("");
+        
+        $("#CodigoPostal").val("");
+        $("#ExtensionCodigoPostal").val("");
+        $("#Telefono").val("");
+        $("#TelefonoAlternativo").val("");
+        $("#FechaNacimiento").datepicker("setDate", new Date());
+        
+        $("#rdbMasculino").prop("checked", false);
+        $("#rdbFemenino").prop("checked", false);
+    }
+
+    function VerificarContraccionFormularioRegistro()
+    {
+        console.log("brenher");
+        if ($("#frmRegistroPaciente").css("display") == "none") // Verifica si el formulario de registro está contraído y si es así retorna true.
+            return true;
+    }
+
+    function LlenarPaciente( Codigo
+                            ,Nombre
+                            ,Apellido
+                            ,FechaNacimiento
+                            ,NumeroSeguroSocial
+                            ,Direccion
+                            ,AbreviaturaEstadoPais
+                            ,NombreCiudad
+                            ,CodigoPostal
+                            ,ExtensionCodigoPostal
+                            ,Telefono
+                            ,TelefonoAlternativo
+                            ,Sexo)
+    {
+        var PacienteJson =
+            {
+            "Pat_code": Codigo
+            ,"Pat_firstName": Nombre
+            ,"Pat_lastName": Apellido
+            ,"Pat_birthday": FechaNacimiento
+            ,"Pat_socialSecurityNumberD": NumeroSeguroSocial
+            ,"Pat_address": Direccion
+            ,"Pat_state": AbreviaturaEstadoPais
+            ,"Pat_city": NombreCiudad
+            ,"Pat_zipCode": CodigoPostal
+            ,"Pat_zipCodeExt": ExtensionCodigoPostal
+            ,"Pat_phone": Telefono
+            ,"Pat_fax": TelefonoAlternativo
+            ,"Pat_sex": Sexo
+        }
+        return PacienteJson;
+    }
+
+    function RegistrarPaciente(e)
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Last name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#hdAbreviaturaEstadoPais").val() == "") // Valida la obligatoriedad del ciudad 
+        {
+            e.stopPropagation();
+            
+            mensaje = "Error!";
+            error = "Select a State from the list!!...";
+            MensajeError(mensaje, error);
+
+            $("#EstadoPais").focus();
+
+            return false;
+        }
+        else if ($("#hdCiudad").val() == "" && $("#Ciudad").val() == "") // Valida la obligatoriedad de la ciudad (valida que se seleccione una ciudad del autocompletado o que se escriba una ciudad en la caja de texto)
+        {
+            e.stopPropagation();
+
+            mensaje = "Error!";
+            error = "Select or type a City from the list!!...";
+            MensajeError(mensaje, error);
+
+            $("#Ciudad").focus();
+
+            return false;
+        }
+        else
+        {
+            e.preventDefault();
+            var NombreCiudad;
+            var Sexo = null; // almacena el sexo del paciente que se va a registrar
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            Sexo = ($("#rdbMasculino").prop("checked") == true ? "M" : "F") // obtiene el sexo
+
+            // console.clear();
+            // console.log(Sexo);
+            // 
+            // return false;
+
+            var Paciente = LlenarPaciente(null
+                                          , $("#Nombre").val().trim()
+                                          , $("#Apellido").val().trim()
+                                          , $("#FechaNacimiento").val().trim()
+                                          , $("#NumeroSeguroSocialD").val().trim()
+                                          , $("#Direccion").val().trim()
+                                          , $("#hdAbreviaturaEstadoPais").val()
+                                          , NombreCiudad
+                                          , $("#CodigoPostal").val().trim()
+                                          , $("#ExtensionCodigoPostal").val().trim()
+                                          , $("#Telefono").val().trim()
+                                          , $("#TelefonoAlternativo").val().trim()
+                                          , Sexo)
+
+            // ************************* Verificaión de homónimos *******************************
+            var CantidadHomonimos = 0;
+
+            //console.clear();
+            //console.log(Paciente.Pat_state);
+            //console.log(Paciente.Pat_city);
+            //console.log("prueb sex");
+            
+
+            // Primero verifica que no exista un paciente homónimo.
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Paciente),
+                url: '@Url.Action("BuscarHomonimos", "Patient")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    CantidadHomonimos = Data;
+                }
+            });
+
+            if (CantidadHomonimos == 1) // Si encontró homónimos aborta el registro
+            {
+                mensaje = "Successful!";
+                error = "Similar data were found,You want to register?";
+                MensajeError(mensaje, error);
+                return false; // Aquí sale fuera de la funcíón sin terminar el registro.
+            }
+            // **************************************************************************************
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Paciente),
+                url: '@Url.Action("Create", "Patient")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data) {
+                    if (Data[0].ErrorMessage == "") {
+                        AgregaFila(Paciente, Data[0].PatientErrorCode);
+                        mensaje = "Successful!";
+                        error = "Data save correctly...";
+                        MensajeError(mensaje, error);
+                        ExpandirFormularioRegistro($("#frmRegistroPaciente").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+                    }
+                    else {
+                        if (Data[0].PatientErrorCode == 2601) {
+                            $("#NumeroSeguroSocialD").focus();
+                            mensaje = "The social security number already exists";
+                        }
+                        else
+
+                            mensaje = "Error in register!!";
+                        error = Data[0].ErrorMessage;
+                        codigo = Data[0].PatientErrorCode;
+                        MensajeError(mensaje, Data[0].ErrorMessage);
+                    }
+                }
+            });
+        }
+    }
+
+    function EditarPaciente(e)
+    {
+        e.preventDefault();
+
+        var otable = $("#tblPacientes").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        LimpiarControlesRegistro();
+
+        $("#btnRegistrar").attr("disabled", true); // Deshabilita el botón registrar.
+        $("#btnActualizar").attr("disabled", false); // Habilita el botón actualizar.
+
+        /* 
+        La siguiente línea obtiene el código del paciente seleccionado.
+        El primer parent obtiene la columna padre del botón editar que se ha presionado,
+        el segundo parent obtiene la fila padre de la columna padre del botón editar que se ha presionado,
+        para finalmente con el método "find" en esa misma fila buscar la columna "0" que es donde se encuentra 
+        el código del paciente seleccionado. 
+        */
+        var CodigoPaciente = $(this).parent().parent().find("td:eq(0)").html();
+
+        var Paciente;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoPaciente) }),
+            url: '@Url.Action("Buscar", "Patient")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Paciente = (Data);
+            }
+        });
+
+        var position = $("#divPatient").position();
+        scroll(0, position.top);
+  
+        myDate = convierteFecha(Paciente.Pat_birthday);      
+        Paciente.Pat_birthday = myDate;
+
+        CargarDatosFormulario(Paciente); // Muestra los datos de la fila seleccionada con el lapicito en el formulario de registro para poder cambiarlos.
+        $("#divPatient").find("#Nombre").focus();
+        $("#apos").val(aPos);
+    }
+
+    function convierteFecha(dato)
+    {
+        console.log(dato);
+        var dateString = dato.substr(6);
+        var currentime = new Date(parseInt(dateString));
+        console.log(dateString);
+        console.log(currentime);
+        var month = currentime.getMonth() + 1;
+        console.log(month);
+        var day = currentime.getDate();
+        console.log(day);
+        var year = currentime.getFullYear();
+        console.log(year);
+        //var myDate = day + "/" + month + "/" + year;
+        var myDate = month + "/" + day + "/" + year;
+        console.log(myDate);
+        return myDate;
+    }
+
+    function MensajeError(mensaje,error)
+    {
+            swal({
+                title: mensaje,
+                text: error
+            });
+    }
+
+    function EliminaPacienteModal(e)
+    {
+        e.preventDefault();
+
+        var codPac = $(this).parent().parent().find("td:eq(0)").html();
+        var nomPac = $(this).parent().parent().find("td:eq(1)").html();
+        var apePac = $(this).parent().parent().find("td:eq(2)").html();
+
+        dato = nomPac.trim() + " " + apePac.trim();
+
+        var otable = $("#tblPacientes").dataTable();
+        var target_row = $(this).closest("tr").get(0);
+        var aPos = otable.fnGetPosition(target_row);
+
+        ///limpia formulario
+        LimpiarControlesRegistro();
+
+        if (VerificarContraccionFormularioRegistro() != true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroPaciente").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));       
+        ///
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover the information from " + dato +"!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+        function (isConfirm)
+        {
+            if (isConfirm)
+            {
+                swal("Deleted!", "Your file information has been deleted.", "success");
+                EliminarPaciente(codPac, aPos, otable);
+            }
+            else
+            {
+                swal("Cancelled", "The information was not eliminated :)", "error");
+                return 0;
+            }
+        });
+    }
+
+
+    function CancelarRegistro()
+    {
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            $("#frmRegistroEspecialidad").css("display", "block");
+        else
+            $("#frmRegistroEspecialidad").css("display", "none");
+
+
+
+        LimpiarControlesRegistro();
+        $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+        $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+    }
+
+    function CargarDatosFormulario(Paciente)
+    {        
+        /*if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            ExpandirFormularioRegistro($("#frmRegistroPaciente").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));*/
+
+        if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+            $("#frmRegistroPaciente").css("display", "block");
+
+        $("#hdCodigo").val(Paciente.Pat_code);
+        $("#Nombre").val(Paciente.Pat_firstName);
+        $("#Apellido").val(Paciente.Pat_lastName);
+        $("#FechaNacimiento").datepicker("setDate", Paciente.Pat_birthday);
+        $("#NumeroSeguroSocialD").val(Paciente.Pat_socialSecurityNumberD);
+        $("#Direccion").val(Paciente.Pat_address);
+
+        // Cargar el estado del país
+        if (Paciente.Pat_state == "" || Paciente.Pat_state == null)
+        {
+            $("#hdAbreviaturaEstadoPais").val("");
+            $("#EstadoPais").val("");
+        }
+        else
+        {
+            $("#hdAbreviaturaEstadoPais").val(Paciente.Sta_abbreviation);
+            $("#EstadoPais").val(Paciente.Pat_state);        
+        }
+
+        // Carga la ciudad
+        if (Paciente.Pat_city == "" || Paciente.Pat_city == null) {
+            $("#hdCiudad").val("");
+            $("#Ciudad").val("");
+        }
+        else {
+            $("#hdCiudad").val(Paciente.Pat_city);
+            $("#Ciudad").val(Paciente.Pat_city);
+        }
+        
+        $("#CodigoPostal").val(Paciente.Pat_zipCode);
+        $("#ExtensionCodigoPostal").val(Paciente.Pat_zipCodeExt);
+        $("#Telefono").val(Paciente.Pat_phone);
+        $("#TelefonoAlternativo").val(Paciente.Pat_fax);
+
+        if (Paciente.Pat_sex == 'M')
+        {
+            $("#rdbMasculino").prop("checked", true);
+            $("#rdbFemenino").prop("checked", false);
+        }
+        else if (Paciente.Pat_sex == 'F') {
+            $("#rdbMasculino").prop("checked", false);
+            $("#rdbFemenino").prop("checked", true);
+        }
+        else
+        {
+            $("#rdbMasculino").prop("checked", false);
+            $("#rdbFemenino").prop("checked", false);
+        }
+    } 
+
+    function ActualizarDatos(e)
+    {
+        if ($("#Nombre").val().trim() == "") // Valida la obligatoriedad del nombre 
+        {
+            e.stopPropagation();
+
+            $("#Nombre").focus();
+            $("#Nombre").addClass("has-error");
+
+            mensaje = "Error!";
+            error = "Required First name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#Apellido").val().trim() == "") // Valida la obligatoriedad del apellido
+        {
+            e.stopPropagation();
+            $("#Apellido").focus();
+            $("#Apellido").addClass("has-error");
+            mensaje = "Error!";
+            error = "Required Last name!!...";
+            MensajeError(mensaje, error);
+            return false;
+        }
+        else if ($("#hdAbreviaturaEstadoPais").val() == "") // Valida la obligatoriedad del ciudad 
+        {
+            e.stopPropagation();
+
+            mensaje = "Error!";
+            error = "Choose a State from the list!!...";
+            MensajeError(mensaje, error);
+
+            $("#EstadoPais").focus();
+            return false;
+        }
+        else if ($("#hdCiudad").val() == "" && $("#Ciudad").val() == "") // Valida la obligatoriedad de la ciudad (valida que se seleccione una ciudad del autocompletado o que se escriba una ciudad en la caja de texto)
+        {
+            e.stopPropagation();
+
+            mensaje = "Error!";
+            error = "Choose a City from the list!!...";
+            MensajeError(mensaje, error);
+
+            $("#Ciudad").focus();
+            return false;
+        }
+        else {
+            e.preventDefault();
+
+            var NombreCiudad;
+            var Sexo = null; // almacena el sexo del paciente que se va a registrar
+
+            // Obtiene la el nombre de la ciudad seleccionada o ingresada
+            if ($("#hdCiudad").val() == "") // Si no se ha seleccionado una ciudad del autocompletado el valor que se registrará será el valor de la caja de texto
+                NombreCiudad = $("#Ciudad").val();
+            else // Si se ha seleccionado una ciudad del autocompletado el valor que se registrará será el id seleccionado (nombre de la ciudad).
+                NombreCiudad = $("#hdCiudad").val()
+            // ----------------------------------------------------------
+
+            Sexo = ($("#rdbMasculino").prop("checked") == true ? "M" : "F") // obtiene el sexo
+
+            aPos = $("#apos").val();
+
+            var Paciente = LlenarPaciente($("#hdCodigo").val()
+                                          ,$("#Nombre").val().trim()
+                                          ,$("#Apellido").val().trim()
+                                          ,$("#FechaNacimiento").val().trim()
+                                          ,$("#NumeroSeguroSocialD").val().trim()
+                                          ,$("#Direccion").val().trim()
+                                          ,$("#hdAbreviaturaEstadoPais").val()
+                                          ,NombreCiudad
+                                          ,$("#CodigoPostal").val().trim()
+                                          ,$("#ExtensionCodigoPostal").val().trim()
+                                          ,$("#Telefono").val().trim()
+                                          ,$("#TelefonoAlternativo").val().trim()
+                                          ,Sexo)
+
+            $.ajax({
+                type: "POST",
+                async: false,
+                data: JSON.stringify(Paciente),
+                url: '@Url.Action("Actualizar", "Patient")',
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (Data)
+                {
+                    PacienteX = Paciente;                                        
+                    Paciente = (Data);
+                    console.log(Data);
+                    if (Data[0].ErrorMessage == "")
+                    {
+                        var otable = $("#tblPacientes").dataTable();                        
+                        EditaFila(PacienteX, aPos, otable);
+
+                        mensaje = "Successful!";
+                        error = "Data save correctly...";
+                        LimpiarControlesRegistro();
+                        ExpandirFormularioRegistro($("#frmRegistroPaciente").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+                    }
+                    else
+                    {
+
+                        mensaje = "Error!";
+                        error = Data[0].ErrorMessage + "...";
+                        $("#NumeroSeguroSocialD").focus();//el error solo se muestra en SSD
+                    }
+
+
+                    MensajeError(mensaje, error);
+                    
+                }
+            });
+        }
+    }
+
+
+
+
+                    
+    function EliminarPaciente(CodigoPaciente, pos, otable)
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "Codigo": parseInt(CodigoPaciente) }),
+            url: '@Url.Action("Delete", "Patient")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                console.log(Data);
+
+                if (Data == 50000) { /// 50000 es el nro de error general 
+                    mensaje = "You can not delete patient he has an active case!!!";
+                    MensajeError("Error!", mensaje);
+                }
+                else
+                {
+                    Paciente = (Data);
+                    otable.fnDeleteRow(pos);
+                }
+            }
+        });
+    }
+
+
+    var EstadosPais;
+    var Ciudades;
+
+    function OntenerEstadosPais()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListaEstados", "State")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                EstadosPais = Data;
+            }
+        });
+    }
+
+    function OntenerCiudades()
+    {
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: '@Url.Action("ListaCiudades", "City")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                Ciudades = Data;
+
+                console.clear();
+                //console.log(Ciudades);
+            }
+        });
+    }
+    
+    function AutocompletarEstadosPais()
+    {
+        $("#EstadoPais").autocomplete(
+        {
+            source: function (request, response)
+            {
+                var results = $.map(EstadosPais, function (tag)
+                {
+                    if (tag.Sta_name.toUpperCase().indexOf(request.term.toUpperCase()) >= 0)
+                    {
+                        return { label: tag.Sta_name, value: tag.Sta_name, id: tag.Sta_abbreviation };
+                    }
+                });
+
+                response(results.slice(0, 10));
+            },
+            select: function (event, ui)
+            {
+                console.clear();
+
+                console.log(ui.item.label);
+                console.log(ui.item.value);
+                console.log(ui.item.id);
+
+                $("#hdAbreviaturaEstadoPais").val(ui.item.id);
+            }
+        });
+    }
+
+    function AutocompletarCiudades()
+    {
+        $("#Ciudad").autocomplete(
+        {
+            source: function (request, response)
+            {
+                var results = $.map(Ciudades, function (tag)
+                {
+                    if (tag.Cit_name.toUpperCase().indexOf(request.term.toUpperCase()) >= 0)
+                    {
+                        return { label: tag.Cit_name, value: tag.Cit_name, id: tag.Cit_name };
+                    }
+                });
+
+                response(results.slice(0, 10));
+            },
+            select: function (event, ui) 
+            {
+                console.clear();
+
+                console.log(ui.item.label);
+                console.log(ui.item.value);
+                console.log(ui.item.id);
+
+                $("#hdCiudad").val(ui.item.id);
+            }
+        });
+    }
+
+
+    function AgregaFila(Paciente, CodPatNew) {
+        Paciente.Cit_code = "--";
+        Paciente.Sta_code = "--";
+        //$('#tblPacientes').dataTable().fnSetColumnVis(0, false, false);        
+        $('#tblPacientes').dataTable().fnAddData([
+           CodPatNew, Paciente.Pat_firstName, Paciente.Pat_lastName, Paciente.Pat_birthday, Paciente.Pat_socialSecurityNumberD, Paciente.Pat_address, Paciente.Cit_code, Paciente.Pat_city,
+           Paciente.Sta_code, Paciente.Pat_state, Paciente.Pat_zipCode, Paciente.Pat_zipCodeExt, Paciente.Pat_phone, Paciente.Pat_fax, Paciente.Pat_sex, '<a class="btn EditarPaciente btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarPaciente  btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>']);
+
+        var otable = $("#tblPacientes").dataTable().fnDestroy();
+        //otable = $('.dataTables-example').DataTable({
+        otable = $("#tblPacientes").DataTable({
+            columnDefs: [{ className: "hidden", "targets": [0, 6, 8] }],
+            dom: '<"html5buttons"B>lTfgitp',
+            buttons: [
+                { extend: 'copy' },
+                { extend: 'csv' },
+                { extend: 'excel', title: 'ExampleFile' },
+                { extend: 'pdf', title: 'ExampleFile' },
+
+                {
+                    extend: 'print',
+                    customize: function (win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+
+                        $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                    }
+                }
+            ]
+        });
+        dato = Paciente.Pat_firstName + " " + Paciente.Pat_lastName;
+        otable = $('.dataTables-example').dataTable().fnFilter(dato);
+
+
+        ///otable =  $("#tblPacientes").dataTable({ "columnDefs": [{className:"hidden","targets": [0,6,8]}]  });
+    }
+
+    function EditaFila(Paciente, pos, otable) {
+        Paciente.Cit_code = "--";
+        Paciente.Sta_code = "--";
+        otable.fnUpdate([
+        Paciente.Pat_code, Paciente.Pat_firstName, Paciente.Pat_lastName, Paciente.Pat_birthday, Paciente.Pat_socialSecurityNumberD, Paciente.Pat_address, Paciente.Cit_code, Paciente.Pat_city,
+          Paciente.Sta_code, Paciente.Pat_state, Paciente.Pat_zipCode, Paciente.Pat_zipCodeExt, Paciente.Pat_phone, Paciente.Pat_fax, Paciente.Pat_sex, '<a class="btn EditarPaciente btn-white btn-bitbucket"><i class="fa fa-pencil text-danger"></i></a> &nbsp; <a class="btn EliminarPaciente btn-white btn-bitbucket"><i class="fa fa-trash-o text-danger"></i> </a>'], pos, undefined, true);
+
+        console.log(Paciente.Pat_firstName);
+        console.log(Paciente.Pat_lastName);
+
+
+        dato = Paciente.Pat_firstName + " " + Paciente.Pat_lastName;
+        otable = $('.dataTables-example').dataTable().fnFilter(dato);
+    }
+
+    function ControlarTeclaEstadoPais(e)
+    {
+        var KeyCode = e.keyCode || e.which;
+
+        if (KeyCode != 9)
+            if ($("#hdAbreviaturaEstadoPais").val() != "") // Al presionar una tecla, si el valor del campo oculto del estado tiene un valor entonces quedará vacío, pero se está validando que sea una tecla distinta de TAB.
+                $("#hdAbreviaturaEstadoPais").val("");
+    }
+
+    function ControlarTeclaCiudad()
+    {
+        if ($("#hdCiudad").val() != "")
+            $("#hdCiudad").val("");
+    }
+
+    $(document).ready(function () 
+    {
+
+        $("#EstadoPais").on("keydown", ControlarTeclaEstadoPais);
+        $("#Ciudad").on("keydown", ControlarTeclaCiudad);
+      
+        ///////////////////validando columnas al cargar tabla/////////////////////////////////////
+        //$("#tblPacientes").on("draw", function () {
+        //    //test();
+        //});
+        
+        $(".input-group-addon").on("click", function ()
+        {
+            e.stopPropagation();
+        });
+        
+        ////////////////////////////////////////////////////////
+        OntenerEstadosPais();
+        OntenerCiudades();
+        AutocompletarEstadosPais();
+        AutocompletarCiudades();
+
+        $('#FechaBirthday .input-group.date').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+        var otable = $("#tblPacientes").dataTable().fnDestroy();        
+        otable = $("#tblPacientes").DataTable({        
+            dom: '<"html5buttons"B>lTfgitp',
+            buttons: [
+                { extend: 'copy' },
+                { extend: 'csv' },
+                { extend: 'excel', title: 'ExampleFile' },
+                { extend: 'pdf', title: 'ExampleFile' },
+
+                {
+                    extend: 'print',
+                    customize: function (win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+
+                        $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                    }
+                }
+            ]
+        });
+
+
+
+        // Cuando se hace click en el enlace "Create New" este código hace que se despliegue el formulario de registro.
+        $("#EnlaceCrearNuevo").on("click", function (e) {
+            e.preventDefault();
+            
+            LimpiarControlesRegistro();
+            console.log("edher");
+            $("#btnRegistrar").attr("disabled", false); // Habilita el botón registrar.
+            $("#btnActualizar").attr("disabled", true); // Deshabilita el botón actualizar.
+
+            if (VerificarContraccionFormularioRegistro() == true) // "VerificarContraccionFormularioRegistro" es una función que retorna true si el formulario de registro está contraído.
+                $("#frmRegistroPaciente").css("display", "block");
+                //ExpandirFormularioRegistro($("#frmRegistroPaciente").parent().find("div:eq(0)").find("div:eq(0)").find("a:eq(0)"));
+
+            console.log("edherxxx");
+
+            var position = $("#divPatient").position();
+            scroll(0, position.top);
+            $("#divPatient").find("#Nombre").focus();
+        });
+
+        $("#btnRegistrar").on("click", RegistrarPaciente); // Dispara la función que registra un paciente, cuando se hace click en el botón registrar del formulario de registro.
+        $("#tblPacientes > tbody").on("click", "tr > td > .EditarPaciente", EditarPaciente); // Cuando se hace click en ícono de lápiz de cada fila de la tabla se expande el formulario de registro con los datos cargados para poder modificarlos.        
+        $("#tblPacientes > tbody").on("click", "tr > td > .EliminarPaciente", EliminaPacienteModal); // Cuando se hace click en ícono de la papelera de cada fila de la tabla se muestra una confirmación para eliminar el registro actual.
+        $("#btnActualizar").on("click", ActualizarDatos);
+        $("#btnCancelar").on("click", CancelarRegistro); // Dispara la función de cancelacion.
+
+        //$(".OpcionSexo").on("change", function () {
+        //    console.clear();
+        //    console.log($(this).val());
+        //})
+    });
+   
+
+  </script>          

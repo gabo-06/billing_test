@@ -1,0 +1,29 @@
+﻿<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12" id="divCaso">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title header_formulario">
+                    <h5>TRANSPORTATION REPORTS</h5>
+                </div> 
+                <div class="ibox-content" id="EnvolturatblCasos">
+                    <div class="form-group">
+                        <button id="btnGeneraWord" class="btn btn-primary" type="button" data-toggle="tooltipB"  data-placement="top" title="" data-original-title="Create a New case">
+<i class="fa fa-save"></i>&nbsp; Export to Word
+</button>
+<a  href='#' id="linkWord" data-url="@Url.Content("~/ReportTransportation/ExportToWordTransportation")" class="btn btn-primary" target="_blank" style="display:none;"><i class="fa fa-file"></i>&nbsp;Generate link</a>     
+
+                               <!--///////////////////LISTA///////////////////////-->
+                             @*@Html.Partial("../ReportTransportation/listaTransportation")*@
+                             @{ Html.RenderAction("listaTransportation", "ReportTransportation"); }
+                    </div>  
+                </div> 
+            </div>
+        </div>  
+    </div>
+     
+
+
+</div>
+
+@Html.Partial("footer")
+

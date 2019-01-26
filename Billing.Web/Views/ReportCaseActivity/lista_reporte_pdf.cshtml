@@ -1,0 +1,38 @@
+﻿@using System.Diagnostics;
+@model IEnumerable<Billing.Web.Models.ReporteCasosSinActividad>
+@{
+    var i = 0;
+}
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover dataTables-example" style="width:100%;font-size:7px;">
+         <thead class="th_tabla" >  
+         <tr border="0.5" bgcolor="#b42734" color="#ffffff">
+           @*<td width="6%"></td>*@
+           <td width="10%">Patient </td>
+           <td width="16%">New Referral </td>
+           <td width="16%">DOI </td>
+           <td width="16%">Insurer </td>
+           <td width="10%">Date of Referral </td>
+           <td width="12%">Days Since Last Entry </td>
+           <td width="16%">Supervisor </td>
+        </tr>
+       </thead>
+       <tbody>
+        @foreach (var item in Model)
+         {
+                i = i + 1;
+                 <tr border="0.5" >
+                     <td style="border: 1px solid #cccbcb;">@item.Paciente</td>                          
+                     <td style="border: 1px solid #cccbcb;">@item.NewReferral</td>                          
+                     <td style="border: 1px solid #cccbcb;">@item.fechaDeAccidente</td>                          
+                     <td style="border: 1px solid #cccbcb;">@item.aseguradora</td>              
+                     <td style="border: 1px solid #cccbcb;">@item.fechaReferencial</td>                                               
+                     <td style="border: 1px solid #cccbcb;">@item.diasPasadosDesdeUltimaEntrada</td>        
+                     <td style="border: 1px solid #cccbcb;">@item.supervisor</td>
+                 </tr>
+         }   
+        </tbody>
+        
+    </table>
+</div>

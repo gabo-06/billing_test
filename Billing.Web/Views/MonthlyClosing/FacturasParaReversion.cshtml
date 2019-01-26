@@ -1,0 +1,412 @@
+﻿@model IEnumerable<Billing.Web.Models.FacturaParaRevertir>
+
+@{
+    var NumeroCorrelativoFactura = 0;
+}
+
+@section Css_Extras
+{ 
+   <link href="@Url.Content("~/Content/css/dataTables.checkboxes.css")" rel="stylesheet"  type="text/css" media="all" />
+}  
+
+        
+
+
+<div class="row">
+            <div class="col-lg-12">
+
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title"> 
+                        <h5>Results</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="text-center">                            
+                                   <label class="col-lg-2 control-label">Closing Date: </label>
+                                   <div class="col-sm-3 input-group date" style="float: left;">
+                                   <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                   <input type="text"  maxlength="10" autocomplete="off" id="txtClosingDateModal" class="form-control ui-autocomplete-input"  data-mask="99/99/9999" disabled="disabled">
+                                   </div>
+                            
+                            <div class="m-r-md inline">
+                                        <button  id="btnSearchModal"  type="button" class="btn btn-primary" style="display:none;">Search Invoice</button>
+                                         <button  id="btnUndoModal" type="button" class="btn btn-primary">Undo invoice</button>
+                                         <button id="btnMostrarUltimasFechas" type="button" class="btn btn-primary">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>              
+
+            </div>      
+</div>
+
+<div id ="cargando_TablaFacturasParaCerrar" style="text-align: center;display:none;" ><img alt="image" class="img" src="@Url.Content("~/images/loading.gif")" /></div>
+
+<div class="table-responsive" style="height: 370px;overflow-y: scroll;overflow-x: hidden;" id="TablaFacturasParaCerrar">
+
+    @*<div class="form-group">*@
+    <table class="table table-striped table-bordered table-hover dataTables-example" id="tblFacturasParaCerrar" >
+        <thead class="th_tabla">
+            <tr>
+                <th class="hidden"></th>                                @* Correlativo                                            (Indice 0)  *@ @* Esta columna sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de casos seleccionados "ArregloCasosSeleccionados"). *@
+                <th><input type="checkbox" id="CheckBoxCabecera2"></th>                       @* Check para seleccionar las facturas a revertir *@
+                <th class="hidden">Invoice Code</th>      
+                <th class="hidden">Case Code</th>      
+                <th>Claim #</th>  
+                <th>Patient</th>           
+                <th>SS #</th>                                               
+                <th>Insurer</th>                                               
+                <th>DOI</th>                                               
+                <th class="hidden">Invoice Total</th>      
+                <th class="hidden">Invoice Pay</th>      
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) 
+        {
+            NumeroCorrelativoFactura = NumeroCorrelativoFactura + 1;
+            <tr>
+                <td class="hidden">@NumeroCorrelativoFactura</td>          @* Correlativo                                            (Indice 0)  *@ @* Esta columna sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de casos seleccionados "ArregloCasosSeleccionados"). *@
+                <td></td>                       @* Check para seleccionar las facturas a revertir *@
+                <td class="hidden">@item.CodigoFactura</td>          
+                <td class="hidden">@item.CodigoCaso</td>                                               
+                <td>@item.Claim</td>                  
+                <td>@item.Paciente</td>                             
+                <td>@item.NumeroSeguroSocial</td>                
+                <td>@item.Aseguradora</td>      
+                <td>@item.FechaAccidente</td>                
+                <td class="hidden">@item.TotalFactura</td>          
+                <td class="hidden">@item.PagoFactura</td>                                               
+            </tr>
+        }
+        </tbody> 
+
+    </table>
+    
+   @*</div>*@
+</div>
+
+<script> 
+
+    var fechaX= "@ViewBag.fechaBusqueda";
+
+    $(Inicio);
+
+    var ArregloFacturasReversion = new Array();
+    var IndiceArregloFacturasReversion = 0;
+
+    function Inicio()
+    {
+        //$("#cargando_TablaUltimasFechaCierre").css("display", "block");//no quitar
+        //$("#cargando_TablaFacturasParaCerrar").css("display", "block");//no quitar
+        $("#cargando_modal_general").css("display", "block");
+        
+        paginarTabla();
+
+        $("#cargando_modal_general").fadeOut(1500);
+
+        //$("#cargando_TablaUltimasFechaCierre").fadeOut(1500);
+        //$("#cargando_TablaFacturasParaCerrar").fadeOut(1500);
+
+
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+        
+
+        console.log("nueva_fecha_input");
+        fechaInput = $("#fecha_reversion").val();
+        console.log(fechaInput);
+
+        //$("#txtClosingDateModal").datepicker("setDate",fechaInput);
+        $("#txtClosingDateModal").datepicker("option","disable",true);
+        $("#txtClosingDateModal").val(fechaInput);
+
+        $("#btnSearchModal").on("click", btnSearchModal_click);
+        $("#btnUndoModal").on("click", btnUndoModal_click);
+        $("#btnMostrarUltimasFechas").on("click", btnMostrarUltimasFechas_click)
+
+        
+    }
+
+    function btnMostrarUltimasFechas_click()
+    {
+        // $("#tblUltimasFechasCierre_wrapper").css({"display":"block"});
+
+        // Luego de revertir oculta la tabla de facturas 
+        $("#tblCasosParaCerrar").find(".row:eq(0)").css({"display":"none"});
+        $("#TablaFacturasParaCerrar").css({"display":"none"});
+        // Luego de revertir vuelve a mostrar la tabla de útimas fechas de cierre.
+        $("#tblUltimasFechasCierre_wrapper").css({"display":"block"});
+        $("#tblUltimasFechasDecierre").css({"display":"block"});
+    }
+
+    function btnSearchModal_click()
+    {
+        // console.clear();
+        console.log("Busca por fecha");        
+        var FechaDeCierre = $("#txtClosingDateModal").val().trim();
+        console.log("xxx");
+
+        if(FechaDeCierre != "") 
+        ListarBillingPorFechaDeCierre(FechaDeCierre);
+        else 
+        {
+            error = "Error";
+            mensaje = "Put Date";
+            MensajeError(mensaje,error);
+        }
+        
+    }
+    
+    // Controla el evento click del botón "Undo Invoice" de la ventana modal.
+    function btnUndoModal_click()
+    {
+        var FechaReversionFactura;
+        $("#cargando_modal_general").css({"display":"block"});
+        $("#tblUltimasFechasDecierre").css({"display":"none"});
+        FechaReversionFactura = $("#txtClosingDateModal").val().trim();
+
+        // console.log(FechaReversionFactura);
+        if (FechaReversionFactura == "")
+        {
+            mensaje = "Enter reversal Date please";            
+            error = "Error";
+            MensajeError(mensaje, error);
+            return false;
+        }
+
+        if (ArregloFacturasReversion.length == 0)
+        {
+            mensaje = "You have not selected any cases. Please select any case.";
+            error = "Error";
+            MensajeError(mensaje, error);
+            return false;         
+        }
+
+        console.clear();
+        $.each(ArregloFacturasReversion, function (i, val)
+        {
+            var CodigoFactura = val.CodigoFactura;
+            var CodigoUsuario = CodigoUsuarioGlobal;
+
+            RevierteFacturaGenerada(CodigoFactura, CodigoUsuario);
+        });
+
+        ListarBillingPorFechaDeCierre(FechaReversionFactura);
+
+        // Luego de revertir oculta la tabla de facturas 
+        //$("#tblCasosParaCerrar").find(".row:eq(0)").css({"display":"none"});
+        //$("#TablaFacturasParaCerrar").css({"display":"none"});
+
+        // Luego de revertir vuelve a mostrar la tabla de útimas fechas de cierre.
+        //$("#tblUltimasFechasCierre_wrapper").css({"display":"block"});
+
+
+        ListarUltimasFechasDeCierre();                  // Una vez que revierte debe volver a refrescar las fechas de cierre.
+        CargarCasosSegunaAseguradoraSeleccionada();     // Una vez que revierte debe volver a cargar los casos en la página principal del MonthlyClosing
+        // $("#tblUltimasFechasCierre_wrapper").css({"display":"none"});
+        $("#cargando_modal_general").fadeOut(1500);
+        error="Success";
+        mensaje="The undo was successful!";
+        MensajeError(mensaje,error);
+    }
+
+    function RevierteFacturaGenerada(CodigoFactura, CodigoUsuario)
+    {
+        // console.clear();
+        // console.log(CodigoFactura);
+        // console.log(CodigoUsuario);
+        // return false;
+
+        $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoFactura": CodigoFactura, "CodigoUsuario": CodigoUsuario }),
+            url: '@Url.Action("RevertirFactura", "MonthlyClosing")',
+            contentType: "application/json",
+            // dataType: 'json',
+            //success: function (Data)
+            //{
+
+            //}
+        });        
+    }
+
+    function paginarTabla()
+    {
+        var otable;
+
+        otable = $("#tblFacturasParaCerrar").dataTable().fnDestroy();
+
+
+        otable = $('#tblFacturasParaCerrar')
+        .on("page.dt", function ()
+        {
+            var info = otable.page.info();
+            //$("#pageInfo").html("Mostrando página: " + info.page + " of " + info    .pages);
+        })
+        .DataTable({
+            "aLengthMenu": [5,10,50,100],
+            "pageLength": 5
+
+            , "columnDefs": [{
+                'targets': 1
+                , "render": function (data, type, full, meta) {
+                    return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                }
+            }]
+
+           ,"ordering": false
+        });
+        $(".dataTables_info").hide();
+        // Permite que cuando se seleccione o deseleccione el check que está en la cebecera de la tabla también se seleccionen o deseleccionen los checks de las filas de la tabla.
+        $("#CheckBoxCabecera2").on("click", function (e) {
+            var rows = otable.rows({ 'search': 'applied' }).nodes();
+            console.log("check-All");
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            $('input[type="checkbox"]', rows).trigger("change");
+            //console.log(rows);
+            //$.each(rows, function (i, val)
+            //{
+            //    console.log(val);
+            //    //Correlativo = val["0"].parentElement.parentElement.children["0"].innerHTML.trim();
+            //    console.log(Correlativo);
+            //});
+        });
+
+        // *********************************************************************************************************
+        // Check.
+        otable.column(1).nodes().to$().each(function (index)
+        {
+            console.log("check-normal");
+            var check = $(this).find("input[type='checkbox']");
+
+            check.css({ "cursor": "pointer" });
+
+            check.on("change", function ()
+            {
+                console.log("check-normal-change");
+                var Correlativo;     // Variable donde se obtiene el número correlativo de la factura (sirve para hacer comparaciones y detectar si la factura que se va a seleccionar ya se encuentra en el arreglo de facturas seleccionados "ArregloFacturasReversion").
+                var EstadoCheck;     // Variable donde se obtiene el valor del check (si está o no seleccionado).
+                var CodigoFactura;
+                var CodigoCaso;
+                var Claim;
+                var Paciente;
+                var NumeroSeguroSocial;
+                var Aseguradora;
+                var FechaAccidente;
+                var TotalFactura;
+                var PagoFactura;
+
+                Correlativo = $(this)["0"].parentElement.parentElement.children["0"].innerHTML.trim(); // Obtiene el número correlativo de la factura seleccionada que sirve para hacer comparaciones y detectar si el caso que se va a seleccionar ya se encuentra en el arreglo de facturas seleccionadas "ArregloFacturasReversion"
+                EstadoCheck = $(this)["0"].checked; // Obtiene el valor del check (TRUE: "Seleccionado", FALSE: "No Seleccionado").
+                CodigoFactura = $(this)["0"].parentElement.parentElement.children["2"].innerHTML.trim();
+                CodigoCaso = $(this)["0"].parentElement.parentElement.children["3"].innerHTML.trim();
+                Claim = $(this)["0"].parentElement.parentElement.children["4"].innerHTML.trim();
+                Paciente = $(this)["0"].parentElement.parentElement.children["5"].innerHTML.trim();
+                NumeroSeguroSocial = $(this)["0"].parentElement.parentElement.children["6"].innerHTML.trim();
+                Aseguradora = $(this)["0"].parentElement.parentElement.children["7"].innerHTML.trim();
+                FechaAccidente = $(this)["0"].parentElement.parentElement.children["8"].innerHTML.trim();
+                TotalFactura = $(this)["0"].parentElement.parentElement.children["9"].innerHTML.trim();
+                PagoFactura = $(this)["0"].parentElement.parentElement.children["10"].innerHTML.trim();
+
+                // Si el arreglo de facturas aún no tiene elementos, se llena inicialmente con el código de la primera factura que se selecciona.
+                // Esto es para la primera factura que se selecciona, para que el arreglo este lleno.
+                if (ArregloFacturasReversion.length == 0) 
+                {
+                 
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion] = Array();
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["IndiceArreglo"] = IndiceArregloFacturasReversion;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["Correlativo"] = Correlativo;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["CodigoFactura"] = CodigoFactura;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["CodigoCaso"] = CodigoCaso;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["Claim"] = Claim;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["Paciente"] = Paciente;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["NumeroSeguroSocial"] = NumeroSeguroSocial;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["Aseguradora"] = Aseguradora;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["FechaAccidente"] = FechaAccidente;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["TotalFactura"] = TotalFactura;
+                    ArregloFacturasReversion[IndiceArregloFacturasReversion]["PagoFactura"] = PagoFactura;
+                }
+
+                if (EstadoCheck) // Si se selecciona el check actual.
+                {
+                    // Primero verifica que el código del caso seleccionado se encuentre en el arreglo de casos seleccionados 
+                    // (el código del primer caso seleccionado siempre va a estar, se llena con este para tener con que comparar).
+                    if (ArregloFacturasReversion.map((el) =>  el.Correlativo).indexOf(Correlativo) != -1) 
+                    {
+                        // console.log("está");
+                    }
+                    else
+                    {
+                        IndiceArregloFacturasReversion += 1;
+
+                        // console.log("no está");
+                        // console.log(IndiceArregloCasos);
+
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion] = Array();
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["IndiceArreglo"] = IndiceArregloFacturasReversion;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["Correlativo"] = Correlativo;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["CodigoFactura"] = CodigoFactura;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["CodigoCaso"] = CodigoCaso;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["Claim"] = Claim;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["Paciente"] = Paciente;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["NumeroSeguroSocial"] = NumeroSeguroSocial;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["Aseguradora"] = Aseguradora;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["FechaAccidente"] = FechaAccidente;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["TotalFactura"] = TotalFactura;
+                        ArregloFacturasReversion[IndiceArregloFacturasReversion]["PagoFactura"] = PagoFactura;
+
+                    }
+                }
+                else // Si se deselecciona el check actual.
+                {
+                    // Rescata el indice del elemento deseleccionado que servirá para eliminarlo del arreglo de casos.
+                    var IndiceFacturaDeseleccionada = parseInt(ArregloFacturasReversion.map((el) => el.Correlativo).indexOf(Correlativo));
+
+                    ArregloFacturasReversion.splice(IndiceFacturaDeseleccionada,1); // Elimina el caso del arreglo de facturas seleccionadas.         
+                    IndiceArregloFacturasReversion -= 1;
+                }
+
+
+            });
+        });
+    }
+
+        function MensajeError(mensaje, error)
+        {
+            swal({
+                title: error,
+                text: mensaje,
+                html:true
+            });
+        }
+
+
+    
+        //$("#txtClosingDateModal").val(Date.now());
+
+        // Asigna datepicker al campo "Modal"
+        $("#txtClosingDateModal").datepicker().on("changeDate", function (e) {
+            $(this).datepicker("hide");
+        });
+
+        // Asigna datepicker al campo "Modal"
+        $("#txtClosingDateModal").on("click", function (e) {
+            console.log("cancelaFecha");
+            return false;
+        });
+
+
+
+        // Controla que cuando se haga click en el ícono de la fecha de cierre se muestre el calendario como si se hiciera click en la caja de texto.
+        $(".input-group-addon").on("click", function () {
+            ///$(this).parent(".input-group").find("#txtClosingDate").focus();
+        })
+
+
+
+
+
+</script>

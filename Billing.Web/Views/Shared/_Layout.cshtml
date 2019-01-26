@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OMNIMED | @ViewBag.Title</title>
+
+    <link href="@Url.Content("~/Content/css/bootstrap.min.css")" rel="stylesheet"  type="text/css" media="all" />
+    @Styles.Render("~/Content/css")
+    @RenderSection("Css_Extras", required: false)
+    
+   @* @Styles.Render("~/Content/css_app")*@
+
+    @*<link href="@Url.Content("~/Content/css/style.css")" rel="stylesheet"  type="text/css" media="all" />*@
+    <link href="@Url.Content("~/Scripts/jquery-ui-1.11.4.custom/jquery-ui.min.css")" rel="stylesheet"  type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/css/plugins/iCheck/custom.css")" rel="stylesheet"  type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css")" rel="stylesheet" type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/css/plugins/dataTables/datatables.min.css")" rel="stylesheet"  type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/css/plugins/chosen/chosen.css")" rel="stylesheet"  type="text/css" media="all" />
+
+    <link href="@Url.Content("~/Content/css/plugins/jasny/jasny-bootstrap.min.css")" rel="stylesheet" type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/css/plugins/sweetalert/sweetalert.css")" rel="stylesheet"  type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/select2.min.css")" rel="stylesheet"  type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/css/plugins/datapicker/datepicker3.css")" rel="stylesheet" type="text/css" media="all" />
+    <style>
+        .ibox-title h5 {
+            font-size: 14px;
+            margin: 0 0 7px;
+            padding: 0;
+            text-align: center;
+            float: none;
+            display: inherit;
+        }
+    </style>
+</head>
+
+<body>
+
+    @if (ViewBag.tipo == "login")
+    {
+        <div id="wrapper">
+            @RenderBody()
+        </div>
+    }
+    else
+    {
+          
+        <div id="wrapper">
+            <nav class="navbar-default navbar-static-side" role="navigation">
+                <div class="sidebar-collapse">
+                    <!--<ul class="nav metismenu" id="side-menu">-->
+                    <!--<ul class="nav metismenu navbar navbar-static-top" style="margin-bottom: 0px;" role="navigation" id="side-menu">-->
+                    <ul class="nav metismenu" id="side-menu" style="background-color: white; margin-bottom: 20px;">
+                        <li class="nav-header" style="padding-bottom: 18px; padding-top: 18px;">
+                            <div class="dropdown profile-element infont">
+                                <a data-toggle="dropdown" class="dropdown-toggle" href="#" style="text-align: center;">
+                                    <span class="clear">
+                                        <span class="block m-t-xs" id="UsuarioLoginTexto">
+                                          <strong class="font-bold"><i class="fa fa-user" style="font-size: 15px;"></i>&nbsp;  User</strong>
+                                        </span>
+                                    </span></a>
+                            </div>
+                            <div class="logo-element">
+                                IN+
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-content">
+                            @Html.Partial("_Menu_vertical")
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div id="page-wrapper" class="gray-bg">
+                <div class="row border-bottom">
+                    <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0;">
+                        <span style="display: block; text-align: center;">
+                            <img alt="image" class="img" src="@Url.Content("~/images/OMNIMED.png")"></span>
+                    </nav>
+                </div>
+                <div class="wrapper wrapper-content">
+                    <div class="row">
+                        @Html.Partial("_Menu_horizontal")
+                    </div>
+                    <div id="dvLoading"></div>
+                    <div id="MaestroProceso">
+                        @RenderBody()
+                    </div>
+
+                    <!--<div class="footer">
+                        <div class="pull-right">
+                            <strong>OMNIMED</strong>
+                        </div>
+                        <div>
+                            <strong>Copyright</strong> <a href="www.itusaservices.com">ITUSASERVICES</a>  © 2016
+                        </div>
+                    </div>-->
+                </div>
+           
+            </div>
+        </div>
+
+    }
+    
+</body>
+@Scripts.Render("~/bundles/jquery")
+@RenderSection("scripts", required: false)
+<script>
+    var url_obtenerip = "@Url.Action("ObtenerIPLocal", "Account")";//--Node--
+</script>
+<script src="@Url.Content("~/Scripts/ConfNode.js")" ></script> <!--Node-->
+<script>
+    /*-----Node------*/
+    var script = document.createElement('script');
+    script.src = ReferenciaGlobalNode;
+    document.write(script.outerHTML);
+    /*-----Node------*/
+
+    //function funcionEnviadaDesdeNode_llamada(data)
+    //{
+    //    // debugger;
+    //    console.log("ZXXXXZ");
+    //    console.log(data);
+    //}
+
+    $(window).bind("load", function ()
+    {
+        var websocket = io.connect(ServidorPuertoNode);
+        
+        // websocket.on('miFuncion', 'Gabo');
+        //////websocket.emit('funcionEnviadaDesdeRegistroPaciente', 'Gabo');
+        /////websocket.on('funcionEnviadaDesdeNode', funcionEnviadaDesdeNode_llamada);
+
+        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTT");
+        //---------------------------NODE
+        // debugger;
+        ////////var websocket = io.connect(ServidorPuertoNode);//--Node--
+        ////////websocket.emit('chat_message') //--Node--
+        ////////// debugger;
+        ///////////////console.clear();
+        ////////console.log(ServidorPuertoNode);
+
+        //////////$(document).ready(function () {
+        ////////console.log("xxxxxxxxxxxxxxxxxxx");
+        //////////websocket.on("chat_message", ActualizarAgendaCalendarxx);
+        //////////});
+
+        ////////function ActualizarAgendaCalendar() {
+        ////////    console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWZZZZZZZZZZZZZZZZZZZZ");
+        //////////    loadNotes(false);
+        ////////}
+        //---------------------------NODE
+
+        $("#dvLoading").fadeOut(10);
+        menuPermiso();
+
+        cadena = '<strong class="font-bold"><i class="fa fa-user" style="font-size: 15px;"></i>&nbsp;' + ApellidoUsuarioGlobal + " " + NombreUsuarioGlobal + '</strong>'
+        $("#UsuarioLoginTexto").html(cadena);
+    });
+
+    function menuPermiso()
+    {
+        console.log("odigo usuario : " + CodigoUsuarioGlobal);
+        //console.log("menuPermiso");
+        idmenuCompara = localStorage.getItem("idElementoMenu");
+        sw = 0;
+
+        $(".ElementoMenu").css("display", "none");
+
+            $.ajax({
+            type: "POST",
+            async: false,
+            data: JSON.stringify({ "CodigoUsuario": CodigoUsuarioGlobal }),
+            url: '@Url.Action("BuscarMenuPorUsuario", "Option")',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (Data)
+            {
+                $.each(Data, function (i, val)
+                {
+                    dato = val.trim();
+
+                    $("#" + dato).css("display", "block");
+
+                    if (idmenuCompara == val.trim())
+                        sw = 1;
+                });
+
+                // $.each(Data.data, function (i, val)
+                // {
+                //     debugger;
+                // 
+                //     dato = val.Opt_id.trim();
+                // 
+                //     $("#" + dato ).css("display", "block");
+                // 
+                //     //console.log(val.Opt_id.trim());
+                // 
+                //     if (idmenuCompara == val.Opt_id.trim())
+                //     {
+                //         sw = 1;
+                //     }
+                // 
+                // });
+
+                if(sw==0)
+                    localStorage.setItem("idElementoMenu","");
+
+          
+
+                //////for (i=0;i<=Data.Dat )
+
+                ////////Supervisores = Data; // Obtiene datos de los aseguradoras para autocompletado     (INSURER)                   
+
+                ////////console.log(Supervisores);
+                ////////CargarSupervisorEnCombo(Supervisores); // Carga las aseguradoras en el combo autocompletable de aseguradoras.
+            }
+        });
+
+
+    }
+
+
+</script>
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.4.custom/jquery-ui.min.js")" ></script>
+<script src="@Url.Content("~/Scripts/js/bootstrap.min.js")" ></script>
+<script src="@Url.Content("~/scripts/js/plugins/metisMenu/jquery.metisMenu.js")" async="async"></script>
+<script src="@Url.Content("~/scripts/js/plugins/slimscroll/jquery.slimscroll.min.js")" ></script>
+<script src="@Url.Content("~/scripts/js/plugins/dataTables/datatables.min.js")"></script>
+<script src="@Url.Content("~/scripts/js/inspinia.js")" ></script>
+<script src="@Url.Content("~/scripts/js/plugins/pace/pace.min.js")" ></script>
+<script src="@Url.Content("~/scripts/js/plugins/jasny/jasny-bootstrap.min.js")"></script>
+<script src="@Url.Content("~/scripts/js/plugins/datapicker/bootstrap-datepicker.js?v=1")" ></script>
+<script> $.fn.modal.Constructor.prototype.enforceFocus = function () {};</script>
+<script src="@Url.Content("~/scripts/js/plugins/sweetalert/sweetalert.min.js")" ></script>
+<script src="@Url.Content("~/scripts/js/plugins/chosen/chosen.jquery.js")" ></script>
+<script src="@Url.Content("~/Scripts/Conf.js")" async="async"></script> 
+<script src="@Url.Content("~/scripts/select2.min.js")" ></script>
+<script src="@Url.Content("~/Scripts/Concurrent.Thread.js")" ></script>
+
+</html>

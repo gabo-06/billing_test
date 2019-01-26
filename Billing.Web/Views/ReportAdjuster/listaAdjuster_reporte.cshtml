@@ -1,0 +1,91 @@
+﻿@model IEnumerable<Billing.Web.Models.SP_REPORTS_VIEW_CASES_FOR_ADJUSTER_Result>
+@{
+    var i = 0;
+    var estado = "";
+}
+
+  
+<div class="table-responsive" id="TablaParaBusquedaAvanzadaCasos">
+    <table id="tablaAdjusterReport" class="table table-striped table-bordered table-hover dataTables-example" width="100%" >
+        <thead class="th_tabla" style="background-color:#b42734;color:white;">    
+        <tr>
+           <th width="34px"></th>
+           <th style="font-size: 14px;font-family: sans-serif;">Patient </th>
+           <th style="font-size: 14px;font-family: sans-serif;">DOI</th>           
+           <th style="font-size: 14px;font-family: sans-serif;">SS#</th>           
+           <th style="font-size: 14px;font-family: sans-serif;">Claim#</th>           
+          <th style="font-size: 14px;font-family: sans-serif;">Status</th>           
+        </tr>
+       </thead>
+       <tbody>
+
+
+         @foreach (var item in Model)
+         {
+            i = i + 1;
+            if (item.Cis_status == false)
+            {
+                estado = "Close";
+            }
+            else
+            {
+                estado = "Open";
+            }
+                
+                 <tr>
+                     <td style="border: 1px solid #cccbcb;font-size: 14px;font-family: sans-serif;">@i</td>
+                     <td style="border: 1px solid #cccbcb;font-size: 14px;font-family: sans-serif;">@item.Patient</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 14px;font-family: sans-serif;">@item.AccidentDate </td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 14px;font-family: sans-serif;">@item.Pat_socialSecurityNumberD</td>                          
+                     <td style="border: 1px solid #cccbcb;font-size: 14px;font-family: sans-serif;">@item.Cis_caseCode </td>              
+                     <td style="border: 1px solid #cccbcb;font-size: 14px;font-family: sans-serif;">@estado</td>                                               
+                 </tr>
+        }
+
+       </tbody>
+    </table>
+                             
+</div>
+
+<script>
+
+
+
+ $(Inicio);
+
+    function Inicio()
+    {
+        PaginarTabla();
+         OcultarControlesDecorativosDataTable();
+
+    }
+
+
+    function PaginarTabla() {
+        console.log("PaginarTabla");
+        $('#tablaAdjusterReport').DataTable({
+            "pageLength": 10,
+            "ordering" : false ,
+            "language":
+                 { "processing": "<div class='overlay custom-loader-background'><i class='fa fa-cog fa-spin custom-loader-color'></i></div>" }
+            
+        });
+    }
+
+
+    function OcultarControlesDecorativosDataTable()
+    {
+        $("#tablaAdjusterReport_filter").css({ "display": "none" });
+        $("#tablaAdjusterReport_length").css({ "display": "none" });
+        $(".html5buttons").css({ "display": "none" });
+        $("#tblCasos_info").css({ "display": "none" });
+        $("#tblCasos_paginate").css({ "display": "none" });
+    }
+
+
+
+
+
+
+
+</script>
